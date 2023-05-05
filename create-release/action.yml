@@ -1,0 +1,36 @@
+name: 'Replicated create release'
+description: 'Create a Replicated release on a channel'
+inputs:
+  replicated-app:
+    description: 'Replicated App Slug.'
+    required: true
+    default: ''
+  replicated-api-token:
+    description: 'Replicated API Token.'
+    required: true
+    default: ''
+  yaml-dir:
+    description: 'The directory containing multiple yamls for a Replicated release.'
+    required: true
+    default: 'manifests'
+  promote-channel:
+    description: 'Channel name or id to promote this release to.'
+    required: true
+    default: '${GITHUB_REF}'
+  version:
+    description: 'Release version'
+    required: true
+    default: '${GITHUB_SHA::7}'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - release
+    - create
+    - --promote=${{ inputs.promote-channel }}
+    - --ensure-channel
+    - --yaml-dir=${{ inputs.yaml-dir }}
+    - --version=${{ inputs.version }}
+  env:
+    REPLICATED_APP: ${{ inputs.replicated-app }}
+    REPLICATED_API_TOKEN: ${{ inputs.replicated-api-token }}
