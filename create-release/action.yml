@@ -22,6 +22,9 @@ inputs:
     required: true
     default: '${GITHUB_SHA::7}'
 outputs:
+  channel-slug: # slug of the channel
+    description: 'Contains the channel slug.'
+    value: ${{ steps.inspect-channel.outputs.channel-slug }}
   release-sequence: # sequence number of the release
     description: 'Sequence number of the release.'
     value: ${{ steps.inspect-channel.outputs.release-sequence }}
