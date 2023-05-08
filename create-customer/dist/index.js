@@ -18,15 +18,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(186);
 const replicated_lib_1 = __nccwpck_require__(444);
+const configuration_1 = __nccwpck_require__(995);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const appSlug = core.getInput('replicated-app');
+            const apiToken = core.getInput('replicated-api-token');
             const name = core.getInput('customer-name');
             const email = core.getInput('customer-email');
             const licenseType = core.getInput('customer-license-type');
             const channelName = core.getInput('channel-name');
-            const customer = yield (0, replicated_lib_1.createCustomer)(appSlug, name, email, licenseType, channelName);
+            const apiClient = new configuration_1.VendorPortalApi();
+            apiClient.apiToken = apiToken;
+            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelName);
             core.setOutput('customer-id', customer.customerId);
             core.setOutput('customer-name', customer.name);
             core.setOutput('license-id', customer.licenseId);
@@ -1833,30 +1837,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findApplicationDetailsInOutput = exports.getApplicationDetails = exports.Application = void 0;
-const httpClient = __nccwpck_require__(255);
-const core = __nccwpck_require__(186);
+const configuration_1 = __nccwpck_require__(995);
 class Application {
 }
 exports.Application = Application;
-function getApplicationDetails(appSlug) {
+function getApplicationDetails(vendorPortalApi, appSlug) {
     return __awaiter(this, void 0, void 0, function* () {
-        const http = new httpClient.HttpClient();
-        const replicatedEndpoint = 'https://api.replicated.com/vendor/v3';
-        http.requestOptions = {
-            headers: {
-                "Authorization": core.getInput('replicated-api-token'),
-            }
-        };
+        const http = yield (0, configuration_1.client)(vendorPortalApi);
         // 1. get the app id from the app slug
-        core.info('Getting app id from app slug...');
-        const listAppsUri = `${replicatedEndpoint}/apps`;
+        console.log('Getting app id from app slug...');
+        const listAppsUri = `${vendorPortalApi.endpoint}/apps`;
         const listAppsRes = yield http.get(listAppsUri);
         if (listAppsRes.message.statusCode != 200) {
             throw new Error(`Failed to list apps: Server responded with ${listAppsRes.message.statusCode}`);
         }
         const listAppsBody = JSON.parse(yield listAppsRes.readBody());
         const app = yield findApplicationDetailsInOutput(listAppsBody.apps, appSlug);
-        core.info(`Found app id ${app.id} for app slug ${app.slug}`);
+        console.log(`Found app id ${app.id} for app slug ${app.slug}`);
         return app;
     });
 }
@@ -1892,52 +1889,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findChannelDetailsInOutput = exports.archiveChannel = exports.getChannelDetails = exports.Channel = void 0;
-const core = __nccwpck_require__(186);
-const httpClient = __nccwpck_require__(255);
 const application_1 = __nccwpck_require__(471);
+const configuration_1 = __nccwpck_require__(995);
 class Channel {
 }
 exports.Channel = Channel;
-function getChannelDetails(appSlug, channelName) {
+function getChannelDetails(vendorPortalApi, appSlug, channelName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const http = new httpClient.HttpClient();
-        const replicatedEndpoint = 'https://api.replicated.com/vendor/v3';
-        http.requestOptions = {
-            headers: {
-                "Authorization": core.getInput('replicated-api-token'),
-            }
-        };
+        const http = yield (0, configuration_1.client)(vendorPortalApi);
         // 1. get the app id from the app slug
-        const app = yield (0, application_1.getApplicationDetails)(appSlug);
+        const app = yield (0, application_1.getApplicationDetails)(vendorPortalApi, appSlug);
         // 2. get the channel id from the channel name
-        core.info('Getting channel id from channel name...');
-        const listChannelsUri = `${replicatedEndpoint}/app/${app.id}/channels?channelName=${channelName}&excludeDetail=true}`;
+        console.log('Getting channel id from channel name...');
+        const listChannelsUri = `${vendorPortalApi.endpoint}/app/${app.id}/channels?channelName=${channelName}&excludeDetail=true}`;
         const listChannelsRes = yield http.get(listChannelsUri);
         if (listChannelsRes.message.statusCode != 200) {
             throw new Error(`Failed to list channels: Server responded with ${listChannelsRes.message.statusCode}`);
         }
         const listChannelsBody = JSON.parse(yield listChannelsRes.readBody());
         const channel = yield findChannelDetailsInOutput(listChannelsBody.channels, channelName);
-        core.info(`Found channel for channel name ${channelName}`);
+        console.log(`Found channel for channel name ${channelName}`);
         return channel;
     });
 }
 exports.getChannelDetails = getChannelDetails;
-function archiveChannel(appSlug, channelName) {
+function archiveChannel(vendorPortalApi, appSlug, channelName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const channel = yield getChannelDetails(appSlug, channelName);
-        const http = new httpClient.HttpClient();
-        const replicatedEndpoint = 'https://api.replicated.com/vendor/v3';
-        http.requestOptions = {
-            headers: {
-                "Authorization": core.getInput('replicated-api-token'),
-            }
-        };
+        const channel = yield getChannelDetails(vendorPortalApi, appSlug, channelName);
+        const http = yield (0, configuration_1.client)(vendorPortalApi);
         // 1. get the app id from the app slug
-        const app = yield (0, application_1.getApplicationDetails)(appSlug);
+        const app = yield (0, application_1.getApplicationDetails)(vendorPortalApi, appSlug);
         // 2. Archive the channel
-        core.info(`Archive Channel with id: ${channel.id} ...`);
-        const archiveChannelUri = `${replicatedEndpoint}/app/${app.id}/channel/${channel.id}`;
+        console.log(`Archive Channel with id: ${channel.id} ...`);
+        const archiveChannelUri = `${vendorPortalApi.endpoint}/app/${app.id}/channel/${channel.id}`;
         const archiveChannelRes = yield http.del(archiveChannelUri);
         if (archiveChannelRes.message.statusCode != 200) {
             throw new Error(`Failed to archive channel: Server responded with ${archiveChannelRes.message.statusCode}`);
@@ -1960,6 +1944,51 @@ exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 
 /***/ }),
 
+/***/ 995:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.client = exports.VendorPortalApi = void 0;
+// Replicated Library Configuration
+const httpClient = __nccwpck_require__(255);
+class VendorPortalApi {
+    constructor() {
+        this.endpoint = 'https://api.replicated.com/vendor/v3';
+        // apiToken with default value
+        this.apiToken = 'default';
+    }
+}
+exports.VendorPortalApi = VendorPortalApi;
+function client(vendorPortalApi) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const http = new httpClient.HttpClient();
+        const replicatedEndpoint = vendorPortalApi.endpoint;
+        http.requestOptions = {
+            headers: {
+                "Authorization": vendorPortalApi.apiToken,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        };
+        return http;
+    });
+}
+exports.client = client;
+
+
+/***/ }),
+
 /***/ 958:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1976,29 +2005,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.archiveCustomer = exports.createCustomer = exports.Customer = void 0;
-const core = __nccwpck_require__(186);
-const httpClient = __nccwpck_require__(255);
+const configuration_1 = __nccwpck_require__(995);
 const channels_1 = __nccwpck_require__(76);
 const application_1 = __nccwpck_require__(471);
 class Customer {
 }
 exports.Customer = Customer;
-function createCustomer(appSlug, name, email, licenseType, channelName) {
+function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelName) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const app = yield (0, application_1.getApplicationDetails)(appSlug);
-            const channel = yield (0, channels_1.getChannelDetails)(appSlug, channelName);
-            core.info('Creating customer on appId ' + app.id + ' and channelId ' + channel.id);
-            const http = new httpClient.HttpClient();
-            const replicatedEndpoint = 'https://api.replicated.com/vendor/v3';
-            http.requestOptions = {
-                headers: {
-                    "Authorization": core.getInput('replicated-api-token'),
-                    "Content-Type": "application/json",
-                }
-            };
+            const app = yield (0, application_1.getApplicationDetails)(vendorPortalApi, appSlug);
+            const channel = yield (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, channelName);
+            console.log('Creating customer on appId ' + app.id + ' and channelId ' + channel.id);
+            const http = yield (0, configuration_1.client)(vendorPortalApi);
             // 1. create the customer
-            const createCustomerUri = `${replicatedEndpoint}/customer`;
+            const createCustomerUri = `${vendorPortalApi.endpoint}/customer`;
             const createCustomerReqBody = {
                 name: name,
                 email: email,
@@ -2012,7 +2033,7 @@ function createCustomer(appSlug, name, email, licenseType, channelName) {
             }
             const createCustomerBody = JSON.parse(yield createCustomerRes.readBody());
             // 2. download the license
-            const downloadLicenseUri = `${replicatedEndpoint}/app/${app.id}/customer/${createCustomerBody.customer.id}/license-download`;
+            const downloadLicenseUri = `${vendorPortalApi.endpoint}/app/${app.id}/customer/${createCustomerBody.customer.id}/license-download`;
             const downloadLicenseRes = yield http.get(downloadLicenseUri);
             if (downloadLicenseRes.message.statusCode != 200) {
                 throw new Error(`Failed to download created license: Server responded with ${downloadLicenseRes.message.statusCode}`);
@@ -2021,23 +2042,18 @@ function createCustomer(appSlug, name, email, licenseType, channelName) {
             return { name: name, customerId: createCustomerBody.customer.id, licenseId: downloadLicenseBody.spec.licenseID };
         }
         catch (error) {
-            core.setFailed(error.message);
+            console.error(error.message);
+            throw error;
         }
     });
 }
 exports.createCustomer = createCustomer;
-function archiveCustomer(customerId) {
+function archiveCustomer(vendorPortalApi, customerId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const http = new httpClient.HttpClient();
-        const replicatedEndpoint = 'https://api.replicated.com/vendor/v3';
-        http.requestOptions = {
-            headers: {
-                "Authorization": core.getInput('replicated-api-token'),
-            }
-        };
+        const http = yield (0, configuration_1.client)(vendorPortalApi);
         // 2. Archive a customer
-        core.info(`Archive Customer ...`);
-        const archiveCustomerUri = `${replicatedEndpoint}/customer/${customerId}/archive`;
+        console.log(`Archive Customer ...`);
+        const archiveCustomerUri = `${vendorPortalApi.endpoint}/customer/${customerId}/archive`;
         const archiveCustomerRes = yield http.post(archiveCustomerUri, undefined);
         if (archiveCustomerRes.message.statusCode != 204) {
             throw new Error(`Failed to archive customer: Server responded with ${archiveCustomerRes.message.statusCode}`);
@@ -2055,13 +2071,15 @@ exports.archiveCustomer = archiveCustomer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createCustomer = exports.archiveCustomer = exports.archiveChannel = exports.getChannelDetails = void 0;
+exports.client = exports.createCustomer = exports.archiveCustomer = exports.archiveChannel = exports.getChannelDetails = void 0;
 var channels_1 = __nccwpck_require__(76);
 Object.defineProperty(exports, "getChannelDetails", ({ enumerable: true, get: function () { return channels_1.getChannelDetails; } }));
 Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: function () { return channels_1.archiveChannel; } }));
 var customers_1 = __nccwpck_require__(958);
 Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
+var configuration_1 = __nccwpck_require__(995);
+Object.defineProperty(exports, "client", ({ enumerable: true, get: function () { return configuration_1.client; } }));
 
 
 /***/ }),
