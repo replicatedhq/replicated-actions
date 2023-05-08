@@ -1,0 +1,35 @@
+name: 'Install a Helm chart to a cluster'
+description: 'Install a Helm chart to a cluster'
+inputs:
+  helm-path:
+    description: 'The path to the helm binary to use'
+    required: true
+  kubeconfig:
+    description: 'A valid kubeconfig to connect to'
+    required: true
+  registry-username:
+    description: 'The registry username to log in with'
+    required: true
+  registry-password:
+    description: 'The registry password to use'
+    required: true
+  chart:
+    description: 'The chart to use'
+    required: true
+  version:
+    description: 'The version of the chart to install'
+    required: true
+  name:
+    description: 'The name of release to install'
+    required: true
+  namespace:
+    description: 'The namespace to install the application to'
+    required: true
+  values:
+    description: 'A values.yaml file to use'
+outputs:
+  helm-path:
+    description: 'The path to the helm binary'
+runs:
+  using: 'node16'
+  main: 'dist/run/index.js'
