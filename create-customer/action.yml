@@ -1,0 +1,35 @@
+name: 'Create Customer'
+description: 'Create Customer'
+inputs:
+  replicated-app:
+    description: 'Replicated App Slug.'
+    required: true
+    default: ''
+  replicated-api-token:
+    description: 'Replicated API Token.'
+    required: true
+    default: ''
+  customer-name:
+    description: 'Name of the customer.'
+    required: true
+  customer-email:
+    description: 'Email of the customer.'
+    required: false
+  license-type:
+    description: 'License Type for the customer.'
+    required: true
+    default: 'dev'
+  channel-name:
+    description: 'Channel to assign the customer to.'
+    required: true
+    default: '${GITHUB_REF}'
+outputs:
+  customer-name: # name of the customer
+    description: 'Contains the customer name.'
+  customer-id: # id of the customer
+    description: 'Contains the customer id.'
+  license-id: # id of the license
+    description: 'Contains the license id.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
