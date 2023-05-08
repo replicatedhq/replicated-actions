@@ -1,0 +1,17 @@
+name: 'Archive Channel'
+description: 'Archive a channel'
+inputs:
+  replicated-app:
+    description: 'Replicated App Slug.'
+    required: true
+    default: ''
+  replicated-api-token:
+    description: 'Replicated API Token.'
+    required: true
+    default: ''
+  channel-name:
+    description: 'The name of the channel to archive.'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
