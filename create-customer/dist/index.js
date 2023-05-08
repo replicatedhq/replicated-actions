@@ -1998,7 +1998,7 @@ function createCustomer(appSlug, name, email, licenseType, channelName) {
                 }
             };
             // 1. create the customer
-            const createCustomerUri = `${replicatedEndpoint}/v3/customer`;
+            const createCustomerUri = `${replicatedEndpoint}/customer`;
             const createCustomerReqBody = {
                 name: name,
                 email: email,
@@ -2012,7 +2012,7 @@ function createCustomer(appSlug, name, email, licenseType, channelName) {
             }
             const createCustomerBody = JSON.parse(yield createCustomerRes.readBody());
             // 2. download the license
-            const downloadLicenseUri = `${replicatedEndpoint}/v3/app/${app.id}/customer/${createCustomerBody.customer.id}/license-download`;
+            const downloadLicenseUri = `${replicatedEndpoint}/app/${app.id}/customer/${createCustomerBody.customer.id}/license-download`;
             const downloadLicenseRes = yield http.get(downloadLicenseUri);
             if (downloadLicenseRes.message.statusCode != 200) {
                 throw new Error(`Failed to download created license: Server responded with ${downloadLicenseRes.message.statusCode}`);
