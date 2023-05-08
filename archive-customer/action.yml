@@ -1,0 +1,17 @@
+name: 'Archive Customer'
+description: 'Archive a customer'
+inputs:
+  replicated-app:
+    description: 'Replicated App Slug.'
+    required: true
+    default: ''
+  replicated-api-token:
+    description: 'Replicated API Token.'
+    required: true
+    default: ''
+  customer-id:
+    description: 'The id of the customer.'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

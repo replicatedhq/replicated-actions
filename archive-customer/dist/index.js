@@ -21,7 +21,7 @@ const replicated_lib_1 = __nccwpck_require__(444);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield (0, replicated_lib_1.archiveChannel)(core.getInput('replicated-app'), core.getInput('channel-name'));
+            yield (0, replicated_lib_1.archiveCustomer)(core.getInput('customer-id'));
         }
         catch (error) {
             core.setFailed(error.message);
@@ -1884,11 +1884,11 @@ function archiveChannel(appSlug, channelName) {
         const appId = listAppsBody.apps.find((app) => app.slug === appSlug).id;
         core.info(`Found app id ${appId} for app slug ${appSlug}`);
         // 2. Archive the channel
-        core.info('Archive Channel...');
+        core.info(`Archive Channel with id: ${channel.id} ...`);
         const archiveChannelUri = `${replicatedEndpoint}/app/${appId}/channel/${channel.id}`;
         const archiveChannelRes = yield http.del(archiveChannelUri);
         if (archiveChannelRes.message.statusCode != 200) {
-            throw new Error(`Failed to archive channels: Server responded with ${archiveChannelRes.message.statusCode}`);
+            throw new Error(`Failed to archive channel: Server responded with ${archiveChannelRes.message.statusCode}`);
         }
     });
 }
@@ -1908,16 +1908,59 @@ exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 
 /***/ }),
 
+/***/ 958:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.archiveCustomer = void 0;
+const core = __nccwpck_require__(186);
+const httpClient = __nccwpck_require__(255);
+function archiveCustomer(customerId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const http = new httpClient.HttpClient();
+        const replicatedEndpoint = 'https://api.replicated.com/vendor/v3';
+        http.requestOptions = {
+            headers: {
+                "Authorization": core.getInput('replicated-api-token'),
+            }
+        };
+        // 2. Archive a customer
+        core.info(`Archive Customer ...`);
+        const archiveCustomerUri = `${replicatedEndpoint}/customer/${customerId}/archive`;
+        const archiveCustomerRes = yield http.post(archiveCustomerUri, undefined);
+        if (archiveCustomerRes.message.statusCode != 204) {
+            throw new Error(`Failed to archive customer: Server responded with ${archiveCustomerRes.message.statusCode}`);
+        }
+    });
+}
+exports.archiveCustomer = archiveCustomer;
+
+
+/***/ }),
+
 /***/ 444:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.archiveChannel = exports.getChannelDetails = void 0;
+exports.archiveCustomer = exports.archiveChannel = exports.getChannelDetails = void 0;
 var channels_1 = __nccwpck_require__(76);
 Object.defineProperty(exports, "getChannelDetails", ({ enumerable: true, get: function () { return channels_1.getChannelDetails; } }));
 Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: function () { return channels_1.archiveChannel; } }));
+var customers_1 = __nccwpck_require__(958);
+Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
 
 
 /***/ }),
