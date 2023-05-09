@@ -1,0 +1,23 @@
+name: 'Promote Release'
+description: 'Promote a Release to a Channel'
+inputs:
+  replicated-app:
+    description: 'Replicated App Slug.'
+    required: true
+    default: ''
+  replicated-api-token:
+    description: 'Replicated API Token.'
+    required: true
+    default: ''
+  channel-to:
+    description: 'The name of the Channel to promote the release sequence to.'
+    required: true
+  release-sequence:
+    description: 'The release sequence number to promote.'
+    required: true
+  release-version:
+    description: 'The version field of the Release to promote.'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
