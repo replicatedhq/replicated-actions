@@ -1,6 +1,6 @@
 # Create a cluster
 
-```
+```mermaid
 ---
 title: Create Cluster
 ---
@@ -29,4 +29,4 @@ create_cluster ---> cluster_kubeconfig
 | --- | --- |
 | cluster-id | Contains the cluster id. |
 | cluster-status | Contains the cluster status. |
-| cluster-kubeconfig | Contains the cluster status. |
+| cluster-kubeconfig | Contains the kubeconfig to connect with the cluster. |
