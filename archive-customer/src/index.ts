@@ -1,10 +1,18 @@
 import * as core from '@actions/core';
 import { archiveCustomer } from 'replicated-lib';
+import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 
 
 async function run() {
   try {
-    await archiveCustomer(core.getInput('customer-id'))
+    const apiToken = core.getInput('replicated-api-token')
+    const appSlug = core.getInput('replicated-app')
+    const customerId = core.getInput('customer-id')
+    
+    const apiClient = new VendorPortalApi();
+    apiClient.apiToken = apiToken;
+
+    await archiveCustomer(apiClient, customerId)
 
   } catch (error) {
     core.setFailed(error.message);
