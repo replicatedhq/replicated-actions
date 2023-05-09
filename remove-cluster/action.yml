@@ -1,4 +1,4 @@
-name: 'Replicated remove cluster'
+name: 'Remove cluster'
 description: 'Remove a cluster'
 inputs:
   replicated-api-token:
