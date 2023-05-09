@@ -1,0 +1,21 @@
+name: delete
+on:
+  delete:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!main'     # excludes main
+
+jobs:
+  cleanup-channel:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Archive Replicated Channel
+        uses: replicatedhq/reliability-actions/archive-channel@v0.0.1-alpha.17
+        with:
+          replicated-app: ${{ secrets.REPLICATED_APP }}
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          channel-name: ${{ github.event.ref }}

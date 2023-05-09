@@ -5,7 +5,10 @@
 
 ### Development
 
-https://github.com/replicatedhq/reliability-actions/blob/8bbd83c5b067b85a54e07b737bec264262671327/archive-channel/package.json#L1-L200
 
 ### Releasing
+
 ### Feature Branch Cleanup
+When following a development workflow that uses feature branches, it is often desirable to clean up the feature branch after it has been merged into the main branch. This workflow will delete the feature branch from the remote repository.
+
+TODO: Insert link.
