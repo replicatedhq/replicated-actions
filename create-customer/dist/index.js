@@ -1821,7 +1821,7 @@ function isLoopbackAddress(host) {
 
 /***/ }),
 
-/***/ 7471:
+/***/ 3770:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -1867,7 +1867,7 @@ exports.findApplicationDetailsInOutput = findApplicationDetailsInOutput;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findChannelDetailsInOutput = exports.archiveChannel = exports.getChannelDetails = exports.Channel = void 0;
-const application_1 = __nccwpck_require__(7471);
+const applications_1 = __nccwpck_require__(3770);
 const configuration_1 = __nccwpck_require__(4995);
 class Channel {
 }
@@ -1875,7 +1875,7 @@ exports.Channel = Channel;
 async function getChannelDetails(vendorPortalApi, appSlug, channelName) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
     // 1. get the app id from the app slug
-    const app = await (0, application_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. get the channel id from the channel name
     console.log('Getting channel id from channel name...');
     const listChannelsUri = `${vendorPortalApi.endpoint}/app/${app.id}/channels?channelName=${channelName}&excludeDetail=true}`;
@@ -1893,7 +1893,7 @@ async function archiveChannel(vendorPortalApi, appSlug, channelName) {
     const channel = await getChannelDetails(vendorPortalApi, appSlug, channelName);
     const http = await (0, configuration_1.client)(vendorPortalApi);
     // 1. get the app id from the app slug
-    const app = await (0, application_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. Archive the channel
     console.log(`Archive Channel with id: ${channel.id} ...`);
     const archiveChannelUri = `${vendorPortalApi.endpoint}/app/${app.id}/channel/${channel.id}`;
@@ -1912,6 +1912,90 @@ async function findChannelDetailsInOutput(channels, channelName) {
     return Promise.reject(`Could not find channel with name ${channelName}`);
 }
 exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
+
+
+/***/ }),
+
+/***/ 5230:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.Cluster = void 0;
+const configuration_1 = __nccwpck_require__(4995);
+class Cluster {
+}
+exports.Cluster = Cluster;
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const reqBody = {
+        "name": clusterName,
+        "kubernetes_distribution": k8sDistribution,
+        "kubernetes_version": k8sVersion,
+        "ttl": clusterTTL,
+    };
+    const uri = `${vendorPortalApi.endpoint}/cluster`;
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 201) {
+        throw new Error(`Failed to queue cluster create: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    return { name: body.cluster.name, id: body.cluster.id, status: body.cluster.status };
+}
+exports.createCluster = createCluster;
+async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120) {
+    // get clusters from the api, look for the status of the id to be ${status}
+    // if it's not ${status}, sleep for 5 seconds and try again
+    // if it is ${status}, return the cluster with that status
+    const sleeptime = 5;
+    // iterate for timeout/sleeptime times
+    for (let i = 0; i < timeout / sleeptime; i++) {
+        const clusterDetails = await getClusterDetails(vendorPortalApi, clusterId);
+        if (clusterDetails.status === expectedStatus) {
+            return clusterDetails;
+        }
+        console.debug(`Cluster status is ${clusterDetails.status}, sleeping for ${sleeptime} seconds`);
+        await new Promise(f => setTimeout(f, sleeptime * 1000));
+    }
+    throw new Error(`Cluster did not reach state ${expectedStatus} within ${timeout} seconds`);
+}
+exports.pollForStatus = pollForStatus;
+async function getClusterDetails(vendorPortalApi, clusterId) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const uri = `${vendorPortalApi.endpoint}/clusters`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to get clusters: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    const cluster = body.clusters.find((c) => c.id === clusterId);
+    if (!cluster) {
+        throw new Error(`Failed to find cluster with id ${clusterId}`);
+    }
+    return { name: cluster.name, id: cluster.id, status: cluster.status };
+}
+exports.getClusterDetails = getClusterDetails;
+async function getKubeconfig(vendorPortalApi, clusterId) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/kubeconfig`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to get kubeconfig: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    return atob(body.kubeconfig);
+}
+exports.getKubeconfig = getKubeconfig;
+async function removeCluster(vendorPortalApi, clusterId) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
+    const res = await http.del(uri);
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to remove cluster: Server responded with ${res.message.statusCode}`);
+    }
+}
+exports.removeCluster = removeCluster;
 
 
 /***/ }),
@@ -1959,14 +2043,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.archiveCustomer = exports.createCustomer = exports.Customer = void 0;
 const configuration_1 = __nccwpck_require__(4995);
 const channels_1 = __nccwpck_require__(7491);
-const application_1 = __nccwpck_require__(7471);
+const applications_1 = __nccwpck_require__(3770);
 const yaml_1 = __nccwpck_require__(4083);
 class Customer {
 }
 exports.Customer = Customer;
 async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelName) {
     try {
-        const app = await (0, application_1.getApplicationDetails)(vendorPortalApi, appSlug);
+        const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
         const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, channelName);
         console.log('Creating customer on appId ' + app.id + ' and channelId ' + channel.id);
         const http = await (0, configuration_1.client)(vendorPortalApi);
@@ -2020,15 +2104,52 @@ exports.archiveCustomer = archiveCustomer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.client = exports.createCustomer = exports.archiveCustomer = exports.archiveChannel = exports.getChannelDetails = void 0;
+exports.client = exports.promoteRelease = exports.createCustomer = exports.archiveCustomer = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.archiveChannel = exports.getChannelDetails = void 0;
 var channels_1 = __nccwpck_require__(7491);
 Object.defineProperty(exports, "getChannelDetails", ({ enumerable: true, get: function () { return channels_1.getChannelDetails; } }));
 Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: function () { return channels_1.archiveChannel; } }));
+var clusters_1 = __nccwpck_require__(5230);
+Object.defineProperty(exports, "createCluster", ({ enumerable: true, get: function () { return clusters_1.createCluster; } }));
+Object.defineProperty(exports, "pollForStatus", ({ enumerable: true, get: function () { return clusters_1.pollForStatus; } }));
+Object.defineProperty(exports, "getClusterDetails", ({ enumerable: true, get: function () { return clusters_1.getClusterDetails; } }));
+Object.defineProperty(exports, "getKubeconfig", ({ enumerable: true, get: function () { return clusters_1.getKubeconfig; } }));
+Object.defineProperty(exports, "removeCluster", ({ enumerable: true, get: function () { return clusters_1.removeCluster; } }));
 var customers_1 = __nccwpck_require__(8958);
 Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
+var releases_1 = __nccwpck_require__(4873);
+Object.defineProperty(exports, "promoteRelease", ({ enumerable: true, get: function () { return releases_1.promoteRelease; } }));
 var configuration_1 = __nccwpck_require__(4995);
 Object.defineProperty(exports, "client", ({ enumerable: true, get: function () { return configuration_1.client; } }));
+
+
+/***/ }),
+
+/***/ 4873:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.promoteRelease = void 0;
+const applications_1 = __nccwpck_require__(3770);
+const configuration_1 = __nccwpck_require__(4995);
+async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequence, version) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    // 1. get the app id from the app slug
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    // 2. promote the release
+    const reqBody = {
+        "versionLabel": version,
+        "channelIds": [channelId],
+    };
+    const uri = `${vendorPortalApi.endpoint}/app/${app.id}/release/${releaseSequence}/promote`;
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to promote release: Server responded with ${res.message.statusCode}`);
+    }
+}
+exports.promoteRelease = promoteRelease;
 
 
 /***/ }),

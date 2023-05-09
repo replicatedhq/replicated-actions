@@ -2,11 +2,17 @@
 
 ```mermaid
 ---
-title: Archive Customer
+title: Create Customer
 ---
 graph LR
-archive_customer["Archive Customer"]
-replicated_app ---> archive_customer
-replicated_api_token ---> archive_customer
-customer_id ---> archive_customer
+create_customer["Create Customer"]
+replicated_app ---> create_customer
+replicated_api_token ---> create_customer
+customer_name ---> create_customer
+customer_email ---> create_customer
+license_type ---> create_customer
+channel_name ---> create_customer
+create_customer ---> customer_name
+create_customer ---> customer_id
+create_customer ---> license_id
 ```
