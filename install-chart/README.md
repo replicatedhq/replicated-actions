@@ -1,4 +1,4 @@
-# Install app action
+# Install Chart
 
 ```mermaid
 ---
@@ -17,3 +17,20 @@ namespace ---> install_a_helm_chart_to_a_cluster
 values ---> install_a_helm_chart_to_a_cluster
 install_a_helm_chart_to_a_cluster ---> helm_path
 ```
+## Inputs
+| Name | Default | Required | Description |
+| --- | --- | --- | --- |
+| helm-path |  | True | The path to the helm binary to use |
+| kubeconfig |  | True | A valid kubeconfig to connect to |
+| registry-username |  | True | The registry username to log in with |
+| registry-password |  | True | The registry password to use |
+| chart |  | True | The chart to use |
+| version |  | True | The version of the chart to install |
+| name |  | True | The name of release to install |
+| namespace |  | True | The namespace to install the application to |
+| values |  | True | A values.yaml file to use |
+
+## Outputs
+| Name | Description |
+| --- | --- |
+| helm-path | The path to the helm binary |
