@@ -1,0 +1,13 @@
+name: 'Replicated remove cluster'
+description: 'Remove a cluster'
+inputs:
+  replicated-api-token:
+    description: 'Replicated API Token.'
+    required: true
+    default: ''
+  cluster-id:
+    description: 'Cluster id to remove.'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
