@@ -20,7 +20,7 @@ create_cluster ---> cluster_kubeconfig
 | --- | --- | --- | --- |
 | replicated-api-token |  | True | Replicated API Token. |
 | kubernetes-distribution | kind | True | Kubernetes distribution of the cluster to provision (default "kind") |
-| kubernetes-version | v1.25.3" | True | Kubernetes version to provision (format is distribution dependent) (default "v1.25.3") |
+| kubernetes-version | v1.25.3 | True | Kubernetes version to provision (format is distribution dependent) (default "v1.25.3") |
 | cluster-name |  | True | Name of the cluster to provision |
 | ttl | 1h | True | Cluster TTL (duration) (default "1h") |
 
