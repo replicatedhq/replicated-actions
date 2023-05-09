@@ -1,5 +1,5 @@
-name: 'Replicated Create Cluster'
-description: 'Replicated Create Cluster'
+name: 'Create Cluster'
+description: 'Create Cluster'
 inputs:
   replicated-api-token:
     description: 'Replicated API Token.'
