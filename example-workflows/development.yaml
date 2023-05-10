@@ -38,7 +38,7 @@ jobs:
 
       - name: Create Replicated Release
         id: create-release
-        uses: replicatedhq/reliability-actions/create-release@v0.0.1-alpha.17
+        uses: replicatedhq/reliability-actions/create-release@v0.0.1-alpha.18
         with:
           replicated-app: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -58,7 +58,7 @@ jobs:
 
       - name: Create Customer 
         id: create-customer
-        uses: replicatedhq/reliability-actions/create-customer@v0.0.1-alpha.17
+        uses: replicatedhq/reliability-actions/create-customer@v0.0.1-alpha.18
         with:
           replicated-app: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
 
       - name: Create Cluster
         id: create-cluster
-        uses: replicatedhq/reliability-actions/create-cluster@v0.0.1-alpha.17
+        uses: replicatedhq/reliability-actions/create-cluster@v0.0.1-alpha.18
         timeout-minutes: 2
         with:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
           ttl: 10m
 
       - name: Deploy the app
-        uses: replicatedhq/reliability-actions/install-chart@v0.0.1-alpha.17
+        uses: replicatedhq/reliability-actions/install-chart@v0.0.1-alpha.18
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           helm-path: "helm"
@@ -105,7 +105,7 @@ jobs:
 
       - name: Remove Cluster
         id: remove-cluster
-        uses: replicatedhq/reliability-actions/remove-cluster@v0.0.1-alpha.17
+        uses: replicatedhq/reliability-actions/remove-cluster@v0.0.1-alpha.18
         continue-on-error: true # It could be that the cluster is already removed
         with:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -113,7 +113,7 @@ jobs:
 
       - name: Archive Customer
         id: archive-customer
-        uses: replicatedhq/reliability-actions/archive-customer@v0.0.1-alpha.17
+        uses: replicatedhq/reliability-actions/archive-customer@v0.0.1-alpha.18
         with:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id:  ${{ steps.create-customer.outputs.customer-id }}
