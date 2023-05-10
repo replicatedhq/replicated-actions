@@ -12,28 +12,23 @@ jobs:
   push-to-replicated:
     runs-on: ubuntu-22.04
     outputs:
-      version: ${{ steps.get_version.outputs.version-without-v }}
       channel-slug: ${{ steps.create-release.outputs.channel-slug}}
     steps:
       - uses: actions/checkout@v3
-
-      - name: Get version
-        id: get_version
-        uses: battila7/get-version-action@v2
 
       - name: Package Helm Chart for Replicated
         id: package-helm-chart
         run: |
           helm package relmatrix-app -u -d kots \
-            --app-version=0.0.1-${{ steps.get_version.outputs.version-without-v }} \
-            --version=0.0.1-${{ steps.get_version.outputs.version-without-v }}
+            --app-version=0.0.1-${{ github.ref_name }} \
+            --version=0.0.1-${{ github.ref_name }}
 
       - name: Update the HelmChart kind
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           include: 'kots/relmatrix-app-chart.yaml'
           find: '$VERSION'
-          replace: '0.0.1-${{ steps.get_version.outputs.version-without-v }}'
+          replace: '0.0.1-${{ github.ref_name }}'
           regex: false
 
       - name: Create Replicated Release
@@ -44,7 +39,7 @@ jobs:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           yaml-dir: ./kots
           promote-channel: ${{ github.ref_name }}
-          version: 0.0.1-${{ steps.get_version.outputs.version-without-v }}
+          version: 0.0.1-${{ github.ref_name }}
 
   reliability_matrix:
     needs: push-to-replicated
@@ -86,7 +81,7 @@ jobs:
           registry-password: ${{ steps.create-customer.outputs.license-id }}
           chart: oci://registry.replicated.com/${{ secrets.REPLICATED_APP }}/${{ needs.push-to-replicated.outputs.channel-slug }}/relmatrix-app
           name: 'relmatrix-app'
-          version: 0.0.1-${{ needs.push-to-replicated.outputs.version }}
+          version: 0.0.1-${{ github.ref_name }}
           namespace: 'default'
           values: |
             image:
