@@ -18,16 +18,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const replicated_lib_1 = __nccwpck_require__(4409);
+const channels_1 = __nccwpck_require__(7491);
 const configuration_1 = __nccwpck_require__(4995);
+const releases_1 = __nccwpck_require__(4873);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput('replicated-api-token');
             const appSlug = core.getInput('replicated-app');
-            const channelName = core.getInput('channel-name');
+            const apiToken = core.getInput('replicated-api-token');
+            const yamlDir = core.getInput('yaml-dir');
+            const promoteChannel = core.getInput('promote-channel');
+            const releaseVersion = core.getInput('version');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
-            yield (0, replicated_lib_1.archiveChannel)(apiClient, appSlug, channelName);
+            const release = yield (0, releases_1.createRelease)(apiClient, appSlug, yamlDir);
+            const channel = (0, channels_1.getChannelDetails)(apiClient, appSlug, promoteChannel);
+            let resolvedChannel;
+            yield channel.then((channel) => {
+                console.log(channel.name);
+                resolvedChannel = channel;
+            }, (reason) => {
+                if (reason.channel === null) {
+                    console.error(reason.reason);
+                }
+            });
+            if (!resolvedChannel) {
+                resolvedChannel = yield (0, channels_1.createChannel)(apiClient, appSlug, promoteChannel);
+            }
+            yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion);
+            core.setOutput('channel-slug', resolvedChannel.slug);
+            core.setOutput('release-sequence', release.sequence);
         }
         catch (error) {
             core.setFailed(error.message);

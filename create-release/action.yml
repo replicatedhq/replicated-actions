@@ -24,26 +24,8 @@ inputs:
 outputs:
   channel-slug: # slug of the channel
     description: 'Contains the channel slug.'
-    value: ${{ steps.inspect-channel.outputs.channel-slug }}
   release-sequence: # sequence number of the release
     description: 'Sequence number of the release.'
-    value: ${{ steps.inspect-channel.outputs.release-sequence }}
 runs:
-  using: "composite"
-  steps:
-  - name: 'Create the release'
-    id: 'cli-create-release'
-    uses: replicatedhq/reliability-actions-lib/create-release@v0.0.1-alpha.7
-    with:
-      replicated-app: ${{ inputs.replicated-app }}
-      replicated-api-token: ${{ inputs.replicated-api-token }}
-      yaml-dir: ${{ inputs.yaml-dir }}
-      version: ${{ inputs.version }}
-      promote-channel: ${{ inputs.promote-channel }}
-  - name: 'Inspect a channel'
-    id: 'inspect-channel'
-    uses: replicatedhq/reliability-actions-lib/inspect-channel@v0.0.1-alpha.7
-    with:
-      replicated-app: ${{ inputs.replicated-app }}
-      replicated-api-token: ${{ inputs.replicated-api-token }}
-      channel-name: ${{ inputs.promote-channel }}
+  using: 'node16'
+  main: 'dist/index.js'
