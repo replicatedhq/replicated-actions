@@ -9,7 +9,7 @@ The next job will setup a reliability matrix of clusters, deploy the app and exe
 
 See the [example workflow](example-workflows/development.yaml) for more details.
 
-TODO insert permalink.
+https://github.com/replicatedhq/reliability-actions/blob/d18de25e4b973f64aa86eb99f5f0e99eae863a64/example-workflows/development.yaml#L1-L120
 
 ### Releasing
 The releasing workflow will run the workflow each time a tag is being placed on the repository. It will create a new release that is promoted to a channel with the same name as the tag.
@@ -17,7 +17,7 @@ The next job will setup a reliability matrix of clusters, deploy the app and exe
 
 See the [example workflow](example-workflows/development.yaml) for more details.
 
-TODO insert permalink.
+https://github.com/replicatedhq/reliability-actions/blob/d18de25e4b973f64aa86eb99f5f0e99eae863a64/example-workflows/release.yaml#L1-L144
 
 ### Feature Branch Cleanup
 When following a development workflow that uses feature branches, it is often desirable to clean up the feature branch after it has been merged into the main branch. This workflow will delete the feature branch from the remote repository. 
