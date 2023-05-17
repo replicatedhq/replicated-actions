@@ -11,9 +11,14 @@ async function run() {
     const channelName = core.getInput('channel-to')
     const releaseSequence = core.getInput('release-sequence')
     const releaseVersion = core.getInput('release-version')
-
+    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
+
+    if (apiEndpoint) {
+      apiClient.endpoint = apiEndpoint
+    }
 
     const channel: Channel = await getChannelDetails(apiClient, appSlug, channelName)
 

@@ -7,9 +7,14 @@ async function run() {
   try {
     const apiToken = core.getInput('replicated-api-token')
     const clusterId = core.getInput('cluster-id');
-
+    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
+
+    if (apiEndpoint) {
+      apiClient.endpoint = apiEndpoint
+    }
 
     await removeCluster(apiClient, clusterId);
 

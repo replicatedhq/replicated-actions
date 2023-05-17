@@ -69,7 +69,7 @@ async function login(helmPath, username, password) {
                 _core.info(data.toString());
             },
             stderr: (data)=>{
-                _core.error(data.toString());
+                _core.info(data.toString());
             }
         };
         const params = [
@@ -101,7 +101,7 @@ async function installChart(helmPath, valuesPath) {
                 _core.info(data.toString());
             },
             stderr: (data)=>{
-                _core.error(data.toString());
+                _core.info(data.toString());
             }
         };
         const params = [

@@ -11,9 +11,14 @@ async function run() {
     const email = core.getInput('customer-email');
     const licenseType = core.getInput('customer-license-type');
     const channelName = core.getInput('channel-name');
-
+    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
+
+    if (apiEndpoint) {
+      apiClient.endpoint = apiEndpoint
+    }
 
     const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelName);
 

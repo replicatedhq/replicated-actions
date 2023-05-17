@@ -12,9 +12,14 @@ async function run() {
     const yamlDir = core.getInput('yaml-dir')
     const promoteChannel = core.getInput('promote-channel')
     const releaseVersion = core.getInput('version')
-
+    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
+
+    if (apiEndpoint) {
+      apiClient.endpoint = apiEndpoint
+    }
 
     const release = await createRelease(apiClient, appSlug, yamlDir)
 

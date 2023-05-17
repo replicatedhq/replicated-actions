@@ -28,8 +28,12 @@ function run() {
             const channelName = core.getInput('channel-to');
             const releaseSequence = core.getInput('release-sequence');
             const releaseVersion = core.getInput('release-version');
+            const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
             const channel = yield (0, channels_1.getChannelDetails)(apiClient, appSlug, channelName);
             yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
         }
