@@ -25,8 +25,12 @@ function run() {
             const apiToken = core.getInput('replicated-api-token');
             const appSlug = core.getInput('replicated-app');
             const customerId = core.getInput('customer-id');
+            const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
             yield (0, replicated_lib_1.archiveCustomer)(apiClient, customerId);
         }
         catch (error) {

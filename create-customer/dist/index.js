@@ -28,8 +28,12 @@ function run() {
             const email = core.getInput('customer-email');
             const licenseType = core.getInput('customer-license-type');
             const channelName = core.getInput('channel-name');
+            const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
             const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelName);
             core.setOutput('customer-id', customer.customerId);
             core.setOutput('customer-name', customer.name);

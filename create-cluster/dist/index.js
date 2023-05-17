@@ -28,8 +28,12 @@ function run() {
             const k8sVersion = core.getInput('kubernetes-version');
             const k8sTTL = core.getInput('ttl');
             const timeoutMinutes = +(process.env['GITHUB_STEP_TIMEOUT_MINUTES'] || 5);
+            const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
             let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
             const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);

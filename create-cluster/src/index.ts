@@ -11,9 +11,14 @@ async function run() {
     const k8sVersion = core.getInput('kubernetes-version');
     const k8sTTL = core.getInput('ttl');
     const timeoutMinutes: number = +(process.env['GITHUB_STEP_TIMEOUT_MINUTES'] || 5);
-
+    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
+
+    if (apiEndpoint) {
+      apiClient.endpoint = apiEndpoint
+    }
 
     let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
     

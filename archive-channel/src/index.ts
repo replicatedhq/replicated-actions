@@ -8,9 +8,14 @@ async function run() {
     const apiToken = core.getInput('replicated-api-token')
     const appSlug = core.getInput('replicated-app')
     const channelName = core.getInput('channel-name')
+    const apiEndpoint = core.getInput('replicated-api-endpoint')
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
+
+    if (apiEndpoint) {
+      apiClient.endpoint = apiEndpoint
+    }
     
     await archiveChannel(apiClient, appSlug, channelName)
 

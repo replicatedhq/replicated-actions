@@ -29,8 +29,12 @@ function run() {
             const yamlDir = core.getInput('yaml-dir');
             const promoteChannel = core.getInput('promote-channel');
             const releaseVersion = core.getInput('version');
+            const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
             const release = yield (0, releases_1.createRelease)(apiClient, appSlug, yamlDir);
             const channel = (0, channels_1.getChannelDetails)(apiClient, appSlug, promoteChannel);
             let resolvedChannel;
