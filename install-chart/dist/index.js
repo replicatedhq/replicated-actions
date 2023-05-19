@@ -1,138 +1,137 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 8306:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ 8152:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", ({
-    value: true
-}));
-function _export(target, all) {
-    for(var name in all)Object.defineProperty(target, name, {
-        enumerable: true,
-        get: all[name]
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.installChart = exports.login = void 0;
+const core = __nccwpck_require__(2186);
+const exec = __nccwpck_require__(1514);
+const fs = __nccwpck_require__(7147);
+const url = __nccwpck_require__(7310);
+const tmp_promise_1 = __nccwpck_require__(8065);
+function login(helmPath, username, password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            if (!username || !password) {
+                core.info('No username or password provided, skipping login');
+                return;
+            }
+            const parsed = url.parse(core.getInput('chart'));
+            const loginOptions = {};
+            loginOptions.listeners = {
+                stdout: (data) => {
+                    core.info(data.toString());
+                },
+                stderr: (data) => {
+                    core.info(data.toString());
+                }
+            };
+            const hostname = parsed.hostname || '';
+            const params = [
+                'registry',
+                'login',
+                hostname,
+                '--username', username,
+                '--password', password,
+            ];
+            yield exec.exec(helmPath, params, loginOptions);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
     });
 }
-_export(exports, {
-    login: ()=>login,
-    installChart: ()=>installChart
-});
-const _core = /*#__PURE__*/ _interopRequireWildcard(__nccwpck_require__(2186));
-const _exec = /*#__PURE__*/ _interopRequireWildcard(__nccwpck_require__(1514));
-const _fs = /*#__PURE__*/ _interopRequireWildcard(__nccwpck_require__(7147));
-const _url = /*#__PURE__*/ _interopRequireWildcard(__nccwpck_require__(7310));
-const _tmpPromise = __nccwpck_require__(8065);
-function _getRequireWildcardCache(nodeInterop) {
-    if (typeof WeakMap !== "function") return null;
-    var cacheBabelInterop = new WeakMap();
-    var cacheNodeInterop = new WeakMap();
-    return (_getRequireWildcardCache = function(nodeInterop) {
-        return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
-    })(nodeInterop);
-}
-function _interopRequireWildcard(obj, nodeInterop) {
-    if (!nodeInterop && obj && obj.__esModule) {
-        return obj;
-    }
-    if (obj === null || typeof obj !== "object" && typeof obj !== "function") {
-        return {
-            default: obj
-        };
-    }
-    var cache = _getRequireWildcardCache(nodeInterop);
-    if (cache && cache.has(obj)) {
-        return cache.get(obj);
-    }
-    var newObj = {};
-    var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
-    for(var key in obj){
-        if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) {
-            var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
-            if (desc && (desc.get || desc.set)) {
-                Object.defineProperty(newObj, key, desc);
-            } else {
-                newObj[key] = obj[key];
+exports.login = login;
+function installChart(helmPath, valuesPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const kubeconfig = core.getInput('kubeconfig');
+            const namespace = core.getInput('namespace');
+            // write the kubeconfig to a temp file
+            const { fd, path: kubeconfigPath, cleanup } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            fs.writeFileSync(kubeconfigPath, kubeconfig);
+            const installOptions = {};
+            installOptions.listeners = {
+                stdout: (data) => {
+                    core.info(data.toString());
+                },
+                stderr: (data) => {
+                    core.info(data.toString());
+                }
+            };
+            const params = [
+                'install',
+                `${core.getInput('name')}`,
+                '--kubeconfig', kubeconfigPath,
+                '--namespace', core.getInput('namespace'),
+                '--create-namespace',
+                `${core.getInput('chart')}`,
+                `--version`, `${core.getInput('version')}`,
+            ];
+            if (valuesPath !== '') {
+                params.push('--values', valuesPath);
             }
+            yield exec.exec(helmPath, params, installOptions);
+            cleanup();
         }
-    }
-    newObj.default = obj;
-    if (cache) {
-        cache.set(obj, newObj);
-    }
-    return newObj;
-}
-async function login(helmPath, username, password) {
-    try {
-        if (!username || !password) {
-            _core.info('No username or password provided, skipping login');
-            return;
+        catch (error) {
+            core.setFailed(error.message);
         }
-        const parsed = _url.parse(_core.getInput('chart'));
-        const loginOptions = {};
-        loginOptions.listeners = {
-            stdout: (data)=>{
-                _core.info(data.toString());
-            },
-            stderr: (data)=>{
-                _core.info(data.toString());
-            }
-        };
-        const params = [
-            'registry',
-            'login',
-            parsed.hostname,
-            '--username',
-            username,
-            '--password',
-            password
-        ];
-        await _exec.exec(helmPath, params, loginOptions);
-    } catch (error) {
-        _core.setFailed(error.message);
-    }
+    });
 }
-async function installChart(helmPath, valuesPath) {
-    try {
-        const kubeconfig = _core.getInput('kubeconfig');
-        const namespace = _core.getInput('namespace');
-        // write the kubeconfig to a temp file
-        const { fd , path: kubeconfigPath , cleanup  } = await (0, _tmpPromise.file)({
-            postfix: '.yaml'
-        });
-        _fs.writeFileSync(kubeconfigPath, kubeconfig);
-        const installOptions = {};
-        installOptions.listeners = {
-            stdout: (data)=>{
-                _core.info(data.toString());
-            },
-            stderr: (data)=>{
-                _core.info(data.toString());
-            }
-        };
-        const params = [
-            'install',
-            `${_core.getInput('name')}`,
-            '--kubeconfig',
-            kubeconfigPath,
-            '--namespace',
-            _core.getInput('namespace'),
-            '--create-namespace',
-            `${_core.getInput('chart')}`,
-            `--version`,
-            `${_core.getInput('version')}`
-        ];
-        if (valuesPath !== '') {
-            params.push('--values', valuesPath);
-        }
-        await _exec.exec(helmPath, params, installOptions);
-        cleanup();
-    } catch (error) {
-        _core.setFailed(error.message);
-    }
-}
+exports.installChart = installChart;
+//# sourceMappingURL=helm.js.map
 
+/***/ }),
+
+/***/ 1667:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __nccwpck_require__(2186);
+const helm_1 = __nccwpck_require__(8152);
+const tmp_promise_1 = __nccwpck_require__(8065);
+const fs = __nccwpck_require__(7147);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Write the values
+        let valuesFilePath = '';
+        if (core.getInput('values')) {
+            const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            fs.writeFileSync(valuesPath, core.getInput('values'));
+            valuesFilePath = valuesPath;
+        }
+        yield (0, helm_1.login)(core.getInput('helm-path'), core.getInput('registry-username'), core.getInput('registry-password'));
+        yield (0, helm_1.installChart)(core.getInput('helm-path'), valuesFilePath);
+        // cleanupLicense();
+    });
+}
+run();
+//# sourceMappingURL=index.js.map
 
 /***/ }),
 
@@ -8858,77 +8857,13 @@ module.exports = require("util");
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-var exports = __webpack_exports__;
-
-Object.defineProperty(exports, "__esModule", ({
-    value: true
-}));
-const _core = /*#__PURE__*/ _interopRequireWildcard(__nccwpck_require__(2186));
-const _helm = __nccwpck_require__(8306);
-const _tmpPromise = __nccwpck_require__(8065);
-const _fs = /*#__PURE__*/ _interopRequireWildcard(__nccwpck_require__(7147));
-function _getRequireWildcardCache(nodeInterop) {
-    if (typeof WeakMap !== "function") return null;
-    var cacheBabelInterop = new WeakMap();
-    var cacheNodeInterop = new WeakMap();
-    return (_getRequireWildcardCache = function(nodeInterop) {
-        return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
-    })(nodeInterop);
-}
-function _interopRequireWildcard(obj, nodeInterop) {
-    if (!nodeInterop && obj && obj.__esModule) {
-        return obj;
-    }
-    if (obj === null || typeof obj !== "object" && typeof obj !== "function") {
-        return {
-            default: obj
-        };
-    }
-    var cache = _getRequireWildcardCache(nodeInterop);
-    if (cache && cache.has(obj)) {
-        return cache.get(obj);
-    }
-    var newObj = {};
-    var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
-    for(var key in obj){
-        if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) {
-            var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
-            if (desc && (desc.get || desc.set)) {
-                Object.defineProperty(newObj, key, desc);
-            } else {
-                newObj[key] = obj[key];
-            }
-        }
-    }
-    newObj.default = obj;
-    if (cache) {
-        cache.set(obj, newObj);
-    }
-    return newObj;
-}
-async function run() {
-    // Write the values
-    let valuesFilePath = '';
-    if (_core.getInput('values')) {
-        const { fd , path: valuesPath , cleanup: cleanupValues  } = await (0, _tmpPromise.file)({
-            postfix: '.yaml'
-        });
-        _fs.writeFileSync(valuesPath, _core.getInput('values'));
-        valuesFilePath = valuesPath;
-    }
-    await (0, _helm.login)(_core.getInput('helm-path'), _core.getInput('registry-username'), _core.getInput('registry-password'));
-    await (0, _helm.installChart)(_core.getInput('helm-path'), valuesFilePath);
-// cleanupLicense();
-}
-run();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(1667);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map

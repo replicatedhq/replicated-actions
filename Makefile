@@ -31,6 +31,11 @@ package-install-chart:
 	rm -rf ./install-chart/build ./install-chart/dist ./install-chart/node_modules
 	@$(MAKE) -C install-chart package
 
+.PHONY: package-kots-install
+package-kots-install:
+	rm -rf ./kots-install/build ./kots-install/dist ./kots-install/node_modules
+	@$(MAKE) -C kots-install package
+
 .PHONY: package-promote-release
 package-promote-release:
 	rm -rf ./promote-release/build ./promote-release/dist ./promote-release/node_modules
