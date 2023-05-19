@@ -9226,8 +9226,9 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         if (downloadLicenseRes.message.statusCode != 200) {
             throw new Error(`Failed to download created license: Server responded with ${downloadLicenseRes.message.statusCode}`);
         }
-        const downloadLicenseBody = (0, yaml_1.parse)(await downloadLicenseRes.readBody());
-        return { name: name, customerId: createCustomerBody.customer.id, licenseId: downloadLicenseBody.spec.licenseID, license: atob(downloadLicenseBody) };
+        const downloadLicenseBody = await downloadLicenseRes.readBody();
+        const licenseYAML = (0, yaml_1.parse)(downloadLicenseBody);
+        return { name: name, customerId: createCustomerBody.customer.id, licenseId: licenseYAML.spec.licenseID, license: downloadLicenseBody };
     }
     catch (error) {
         console.error(error.message);
