@@ -30,6 +30,8 @@ outputs:
     description: 'Contains the customer id.'
   license-id: # id of the license
     description: 'Contains the license id.'
+  license-file: # contains the license file
+    description: 'Contains he license file.' 
 runs:
   using: 'node16'
   main: 'dist/index.js'

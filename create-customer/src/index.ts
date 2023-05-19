@@ -25,6 +25,7 @@ async function run() {
     core.setOutput('customer-id', customer.customerId);
     core.setOutput('customer-name', customer.name);
     core.setOutput('license-id', customer.licenseId);
+    core.setOutput('license-file', customer.license);
 
   } catch (error) {
     core.setFailed(error.message);

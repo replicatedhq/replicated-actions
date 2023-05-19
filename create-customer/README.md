@@ -15,6 +15,7 @@ channel_name ---> create_customer
 create_customer ---> customer_name
 create_customer ---> customer_id
 create_customer ---> license_id
+create_customer ---> license_file
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -32,3 +33,4 @@ create_customer ---> license_id
 | customer-name | Contains the customer name. |
 | customer-id | Contains the customer id. |
 | license-id | Contains the license id. |
+| license-file | Contains he license file. |

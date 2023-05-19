@@ -1,5 +1,6 @@
 .PHONY: package-all
-package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer package-create-release package-install-chart package-promote-release package-remove-cluster
+package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
+			 package-create-release package-install-chart package-kots-install package-promote-release package-remove-cluster
 
 .PHONY: package-archive-channel
 package-archive-channel:
