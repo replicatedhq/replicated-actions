@@ -1,4 +1,4 @@
-name: development
+name: development-kots
 
 on:
   push:
@@ -73,19 +73,11 @@ jobs:
           ttl: 10m
 
       - name: Deploy the app
-        uses: replicatedhq/compatibility-actions/install-chart@v0.0.1-alpha.20
+        uses: replicatedhq/reliability-actions/kots-install@v0.0.1-alpha.20
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
-          helm-path: "helm"
-          registry-username: ${{ github.ref_name }}@example.com
-          registry-password: ${{ steps.create-customer.outputs.license-id }}
-          chart: oci://registry.replicated.com/${{ secrets.REPLICATED_APP }}/${{ needs.push-to-replicated.outputs.channel-slug }}/relmatrix-app
-          name: 'relmatrix-app'
-          version: 0.0.1-${{ github.ref_name }}
-          namespace: 'default'
-          values: |
-            image:
-              tag: latest
+          app-slug: ${{ secrets.REPLICATED_APP }}/${{ needs.push-to-replicated.outputs.channel-slug }}
+          license-file: ${{ steps.create-customer.outputs.license-file }}
 
       - name: Run a test
         # mask the kubeconfig so it doesn't show up in the logs
@@ -93,7 +85,7 @@ jobs:
           echo "Running a test"
           echo "${{ steps.create-cluster.outputs.cluster-kubeconfig }}" > kubeconfig.yaml
           sleep 60
-          kubectl port-forward svc/relmatrix-app --pod-running-timeout=2m --kubeconfig='./kubeconfig.yaml' 8080:80 &
+          kubectl port-forward svc/relmatrix-relmatrix-app --pod-running-timeout=2m --kubeconfig='./kubeconfig.yaml' 8080:80 &
           sleep 120
           curl -f http://localhost:8080
           echo "Test complete"

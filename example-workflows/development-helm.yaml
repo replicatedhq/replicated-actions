@@ -1,0 +1,115 @@
+name: development-helm
+
+on:
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!main'     # excludes main
+
+jobs:
+  push-to-replicated:
+    runs-on: ubuntu-22.04
+    outputs:
+      channel-slug: ${{ steps.create-release.outputs.channel-slug}}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package Helm Chart for Replicated
+        id: package-helm-chart
+        run: |
+          helm package relmatrix-app -u -d kots \
+            --app-version=0.0.1-${{ github.ref_name }} \
+            --version=0.0.1-${{ github.ref_name }}
+
+      - name: Update the HelmChart kind
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: 'kots/relmatrix-app-chart.yaml'
+          find: '$VERSION'
+          replace: '0.0.1-${{ github.ref_name }}'
+          regex: false
+
+      - name: Create Replicated Release
+        id: create-release
+        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.20
+        with:
+          replicated-app: ${{ secrets.REPLICATED_APP }}
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          yaml-dir: ./kots
+          promote-channel: ${{ github.ref_name }}
+          version: 0.0.1-${{ github.ref_name }}
+
+  reliability_matrix:
+    needs: push-to-replicated
+    strategy:
+      fail-fast: false
+      matrix:
+        cluster: [ {distribution: kind, version: v1.25.3}, {distribution: kind, version: v1.25.2}]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create Customer 
+        id: create-customer
+        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.20
+        with:
+          replicated-app: ${{ secrets.REPLICATED_APP }}
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
+          channel-name: ${{ github.ref_name }}
+          customer-email: ${{ github.ref_name }}@example.com
+
+      - name: Create Cluster
+        id: create-cluster
+        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.20
+        timeout-minutes: 2
+        with:
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          kubernetes-distribution: ${{ matrix.cluster.distribution }}
+          kubernetes-version: ${{ matrix.cluster.version }}
+          cluster-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
+          ttl: 10m
+
+      - name: Deploy the app
+        uses: replicatedhq/compatibility-actions/install-chart@v0.0.1-alpha.20
+        with:
+          kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+          helm-path: "helm"
+          registry-username: ${{ github.ref_name }}@example.com
+          registry-password: ${{ steps.create-customer.outputs.license-id }}
+          chart: oci://registry.replicated.com/${{ secrets.REPLICATED_APP }}/${{ needs.push-to-replicated.outputs.channel-slug }}/relmatrix-app
+          name: 'relmatrix-app'
+          version: 0.0.1-${{ github.ref_name }}
+          namespace: 'default'
+          values: |
+            image:
+              tag: latest
+
+      - name: Run a test
+        # mask the kubeconfig so it doesn't show up in the logs
+        run: |
+          echo "Running a test"
+          echo "${{ steps.create-cluster.outputs.cluster-kubeconfig }}" > kubeconfig.yaml
+          sleep 60
+          kubectl port-forward svc/relmatrix-app --pod-running-timeout=2m --kubeconfig='./kubeconfig.yaml' 8080:80 &
+          sleep 120
+          curl -f http://localhost:8080
+          echo "Test complete"
+
+      - name: Remove Cluster
+        id: remove-cluster
+        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.20
+        continue-on-error: true # It could be that the cluster is already removed
+        with:
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
+
+      - name: Archive Customer
+        id: archive-customer
+        uses: replicatedhq/compatibility-actions/archive-customer@v0.0.1-alpha.20
+        with:
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id:  ${{ steps.create-customer.outputs.customer-id }}
+          

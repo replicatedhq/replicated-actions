@@ -32,4 +32,4 @@ outputs:
     description: 'The path to the helm binary'
 runs:
   using: 'node16'
-  main: 'dist/run/index.js'
+  main: 'dist/index.js'

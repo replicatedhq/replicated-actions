@@ -23,10 +23,11 @@ export async function login(helmPath: string, username: string, password: string
       }
     };
 
-    const params = [
+    const hostname: string = parsed.hostname || '';
+    const params: string[] = [
       'registry',
       'login',
-      parsed.hostname,
+      hostname,
       '--username', username,
       '--password', password,
     ];

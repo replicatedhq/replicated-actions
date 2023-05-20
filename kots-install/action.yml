@@ -1,0 +1,32 @@
+name: 'KOTS Install'
+description: 'Install a application using KOTS'
+inputs:
+  kubeconfig:
+    description: 'A valid kubeconfig to connect to'
+    required: true
+  kots-version:
+    description: 'The version of KOTS to use'
+    required: true
+    default: "latest"
+  app-slug:
+    description: 'Name of the application'
+    required: true
+  app-version-label:
+    description: 'The application version label to install. If not specified, the latest version is installed.'
+    required: false
+  shared-password:
+    description: 'Shared password to use when deploying the admin console. If not specified, a random password is generated.'
+    required: false
+  license-file:
+    description: 'A license.yaml to use'
+    required: true
+  config-values:
+    description: 'The config values to use'
+    required: false
+  namespace:
+    description: 'The namespace to install the application to'
+    default: "default"
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

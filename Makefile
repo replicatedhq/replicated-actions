@@ -1,5 +1,6 @@
 .PHONY: package-all
-package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer package-create-release package-install-chart package-promote-release package-remove-cluster
+package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
+			 package-create-release package-install-chart package-kots-install package-promote-release package-remove-cluster
 
 .PHONY: package-archive-channel
 package-archive-channel:
@@ -30,6 +31,11 @@ package-create-release:
 package-install-chart:
 	rm -rf ./install-chart/build ./install-chart/dist ./install-chart/node_modules
 	@$(MAKE) -C install-chart package
+
+.PHONY: package-kots-install
+package-kots-install:
+	rm -rf ./kots-install/build ./kots-install/dist ./kots-install/node_modules
+	@$(MAKE) -C kots-install package
 
 .PHONY: package-promote-release
 package-promote-release:
