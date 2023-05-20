@@ -33,7 +33,7 @@ jobs:
 
       - name: Create Replicated Release
         id: create-release
-        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.20
+        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.21
         with:
           replicated-app: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Create Customer 
         id: create-customer
-        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.20
+        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.21
         with:
           replicated-app: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -63,7 +63,7 @@ jobs:
 
       - name: Create Cluster
         id: create-cluster
-        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.20
+        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.21
         timeout-minutes: 2
         with:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
           ttl: 10m
 
       - name: Deploy the app
-        uses: replicatedhq/reliability-actions/kots-install@v0.0.1-alpha.20
+        uses: replicatedhq/reliability-actions/kots-install@v0.0.1-alpha.21
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           app-slug: ${{ secrets.REPLICATED_APP }}/${{ needs.push-to-replicated.outputs.channel-slug }}
@@ -92,7 +92,7 @@ jobs:
 
       - name: Remove Cluster
         id: remove-cluster
-        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.20
+        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.21
         continue-on-error: true # It could be that the cluster is already removed
         with:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -100,7 +100,7 @@ jobs:
 
       - name: Archive Customer
         id: archive-customer
-        uses: replicatedhq/compatibility-actions/archive-customer@v0.0.1-alpha.20
+        uses: replicatedhq/compatibility-actions/archive-customer@v0.0.1-alpha.21
         with:
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id:  ${{ steps.create-customer.outputs.customer-id }}

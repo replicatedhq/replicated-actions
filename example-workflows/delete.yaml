@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Archive Replicated Channel
-        uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.20
+        uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.21
         with:
           replicated-app: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
