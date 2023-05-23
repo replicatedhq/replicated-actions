@@ -27,9 +27,6 @@ inputs:
     required: true
   values:
     description: 'A values.yaml file to use'
-outputs:
-  helm-path:
-    description: 'The path to the helm binary'
 runs:
   using: 'node16'
   main: 'dist/index.js'

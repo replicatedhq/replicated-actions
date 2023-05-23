@@ -1,5 +1,5 @@
 {
-  "name": "install-app",
+  "name": "helm-install",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",

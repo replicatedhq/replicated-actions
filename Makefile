@@ -1,6 +1,6 @@
 .PHONY: package-all
 package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
-			 package-create-release package-install-chart package-kots-install package-promote-release package-remove-cluster
+			 package-create-release package-helm-install package-kots-install package-promote-release package-remove-cluster
 
 .PHONY: package-archive-channel
 package-archive-channel:
@@ -27,10 +27,10 @@ package-create-release:
 	rm -rf ./create-release/build ./create-release/dist ./create-release/node_modules
 	cd ./create-release && npm install && npm run build && npm run package
 
-.PHONY: package-install-chart
-package-install-chart:
-	rm -rf ./install-chart/build ./install-chart/dist ./install-chart/node_modules
-	@$(MAKE) -C install-chart package
+.PHONY: package-helm-install
+package-helm-install:
+	rm -rf ./helm-install/build ./helm-install/dist ./helm-install/node_modules
+	@$(MAKE) -C helm-install package
 
 .PHONY: package-kots-install
 package-kots-install:
@@ -50,7 +50,7 @@ package-remove-cluster:
 
 .PHONY: readme-all
 readme-all: readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
-			 readme-create-release readme-install-chart readme-kots-install readme-promote-release readme-remove-cluster
+			 readme-create-release readme-helm-install readme-kots-install readme-promote-release readme-remove-cluster
 
 .PHONY: readme-archive-channel
 readme-archive-channel:
@@ -72,9 +72,9 @@ readme-create-customer:
 readme-create-release:
 	python3 docs/generate-readme/action-to-mermaid.py ./create-release/action.yml > ./create-release/README.md
 
-.PHONY: readme-install-chart
-readme-install-chart:
-	python3 docs/generate-readme/action-to-mermaid.py ./install-chart/action.yml > ./install-chart/README.md
+.PHONY: readme-helm-install
+readme-helm-install:
+	python3 docs/generate-readme/action-to-mermaid.py ./helm-install/action.yml > ./helm-install/README.md
 
 .PHONY: readme-kots-install
 readme-kots-install:

@@ -79,7 +79,7 @@ jobs:
           ttl: 10m
 
       - name: Deploy the app
-        uses: replicatedhq/compatibility-actions/install-chart@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/helm-install@v0.0.1-alpha.21
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           helm-path: "helm"

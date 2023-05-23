@@ -15,7 +15,6 @@ version ---> install_a_helm_chart_to_a_cluster
 name ---> install_a_helm_chart_to_a_cluster
 namespace ---> install_a_helm_chart_to_a_cluster
 values ---> install_a_helm_chart_to_a_cluster
-install_a_helm_chart_to_a_cluster ---> helm_path
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -33,5 +32,4 @@ install_a_helm_chart_to_a_cluster ---> helm_path
 ## Outputs
 | Name | Description |
 | --- | --- |
-| helm-path | The path to the helm binary |
 
