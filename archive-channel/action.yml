@@ -2,11 +2,11 @@ name: 'Archive Channel'
 description: 'Archive a channel'
 inputs:
   app-slug:
-    description: 'Replicated App Slug.'
+    description: 'App Slug.'
     required: true
     default: ''
-  replicated-api-token:
-    description: 'Replicated API Token.'
+  api-token:
+    description: 'API Token.'
     required: true
     default: ''
   channel-name:

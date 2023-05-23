@@ -25,7 +25,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('replicated-api-token');
+            const apiToken = core.getInput('api-token');
             const yamlDir = core.getInput('yaml-dir');
             const promoteChannel = core.getInput('promote-channel');
             const releaseVersion = core.getInput('version');

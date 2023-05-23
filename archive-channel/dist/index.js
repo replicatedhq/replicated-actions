@@ -22,7 +22,7 @@ const configuration_1 = __nccwpck_require__(4995);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput('replicated-api-token');
+            const apiToken = core.getInput('api-token');
             const appSlug = core.getInput('app-slug');
             const channelName = core.getInput('channel-name');
             const apiEndpoint = core.getInput('replicated-api-endpoint');

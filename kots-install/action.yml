@@ -9,7 +9,7 @@ inputs:
     required: true
     default: "latest"
   app-slug:
-    description: 'Name of the application'
+    description: 'App Slug.'
     required: true
   app-version-label:
     description: 'The application version label to install. If not specified, the latest version is installed.'

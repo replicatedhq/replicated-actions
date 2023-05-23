@@ -5,7 +5,7 @@ import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 
 async function run() {
   try {
-    const apiToken = core.getInput('replicated-api-token')
+    const apiToken = core.getInput('api-token')
     const name = core.getInput('cluster-name');
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');

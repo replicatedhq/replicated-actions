@@ -17,5 +17,5 @@ jobs:
         uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.21
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           channel-name: ${{ github.event.ref }}

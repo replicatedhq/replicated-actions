@@ -1,8 +1,8 @@
 name: 'Create Cluster'
 description: 'Create Cluster'
 inputs:
-  replicated-api-token:
-    description: 'Replicated API Token.'
+  api-token:
+    description: 'API Token.'
     required: true
     default: ''
   kubernetes-distribution:

@@ -7,7 +7,7 @@ import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 async function run() {
   try {
     const appSlug = core.getInput('app-slug')
-    const apiToken = core.getInput('replicated-api-token')
+    const apiToken = core.getInput('api-token')
     const channelName = core.getInput('channel-to')
     const releaseSequence = core.getInput('release-sequence')
     const releaseVersion = core.getInput('release-version')

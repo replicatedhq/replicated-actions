@@ -20,7 +20,7 @@ namespace ---> kots_install
 | --- | --- | --- | --- |
 | kubeconfig |  | True | A valid kubeconfig to connect to |
 | kots-version | latest | True | The version of KOTS to use |
-| app-slug |  | True | Name of the application |
+| app-slug |  | True | App Slug. |
 | app-version-label |  | False | The application version label to install. If not specified, the latest version is installed. |
 | shared-password |  | False | Shared password to use when deploying the admin console. If not specified, a random password is generated. |
 | license-file |  | True | A license.yaml to use |

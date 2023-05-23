@@ -39,7 +39,7 @@ jobs:
         uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.21
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           yaml-dir: ./kots
           promote-channel: ${{ github.ref_name }}
           version: ${{ env.APP_VERSION }}
@@ -62,7 +62,7 @@ jobs:
         uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.21
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
           channel-name: ${{ github.ref_name }}
           customer-email: ${{ github.ref_name }}@example.com
@@ -72,7 +72,7 @@ jobs:
         uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.21
         timeout-minutes: 2
         with:
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           kubernetes-distribution: ${{ matrix.cluster.distribution }}
           kubernetes-version: ${{ matrix.cluster.version }}
           cluster-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
@@ -109,13 +109,13 @@ jobs:
         uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.21
         continue-on-error: true # It could be that the cluster is already removed
         with:
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
 
       - name: Archive Customer
         id: archive-customer
         uses: replicatedhq/compatibility-actions/archive-customer@v0.0.1-alpha.21
         with:
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id:  ${{ steps.create-customer.outputs.customer-id }}
           

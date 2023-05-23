@@ -7,7 +7,7 @@ title: Replicated create release
 graph LR
 replicated_create_release["Replicated create release"]
 app_slug ---> replicated_create_release
-replicated_api_token ---> replicated_create_release
+api_token ---> replicated_create_release
 yaml_dir ---> replicated_create_release
 promote_channel ---> replicated_create_release
 version ---> replicated_create_release
@@ -17,8 +17,8 @@ replicated_create_release ---> release_sequence
 ## Inputs
 | Name | Default | Required | Description |
 | --- | --- | --- | --- |
-| app-slug |  | True | Replicated App Slug. |
-| replicated-api-token |  | True | Replicated API Token. |
+| app-slug |  | True | App Slug. |
+| api-token |  | True | API Token. |
 | yaml-dir | manifests | True | The directory containing multiple yamls for a Replicated release. |
 | promote-channel | ${GITHUB_REF} | True | Channel name or id to promote this release to. |
 | version | ${GITHUB_SHA::7} | True | Release version |

@@ -1,8 +1,8 @@
 name: 'Remove cluster'
 description: 'Remove a cluster'
 inputs:
-  replicated-api-token:
-    description: 'Replicated API Token.'
+  api-token:
+    description: 'API Token.'
     required: true
     default: ''
   cluster-id:

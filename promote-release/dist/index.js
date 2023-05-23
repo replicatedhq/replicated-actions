@@ -24,7 +24,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('replicated-api-token');
+            const apiToken = core.getInput('api-token');
             const channelName = core.getInput('channel-to');
             const releaseSequence = core.getInput('release-sequence');
             const releaseVersion = core.getInput('release-version');

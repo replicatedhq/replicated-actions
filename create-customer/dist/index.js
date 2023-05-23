@@ -23,7 +23,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('replicated-api-token');
+            const apiToken = core.getInput('api-token');
             const name = core.getInput('customer-name');
             const email = core.getInput('customer-email');
             const licenseType = core.getInput('customer-license-type');
