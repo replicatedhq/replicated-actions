@@ -22,8 +22,6 @@ inputs:
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'
-  cluster-status: # status of the cluster
-    description: 'Contains the cluster status.'
   cluster-kubeconfig: # kubeconfig of the cluster
     description: 'Contains the kubeconfig to connect with the cluster.'
 runs:

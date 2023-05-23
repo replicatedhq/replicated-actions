@@ -38,7 +38,6 @@ function run() {
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
             const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
             core.setOutput('cluster-id', cluster.id);
-            core.setOutput('cluster-status', cluster.status);
             core.setOutput('cluster-kubeconfig', kubeconfig);
         }
         catch (error) {

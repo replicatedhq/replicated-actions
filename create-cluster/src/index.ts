@@ -26,7 +26,6 @@ async function run() {
     const kubeconfig = await getKubeconfig(apiClient, cluster.id);
 
     core.setOutput('cluster-id', cluster.id);
-    core.setOutput('cluster-status', cluster.status);
     core.setOutput('cluster-kubeconfig', kubeconfig);
 
   } catch (error) {
