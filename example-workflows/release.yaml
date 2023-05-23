@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Define Channel Name
+        run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Package Helm Chart for Replicated
         id: package-helm-chart
         run: |
@@ -36,18 +39,21 @@ jobs:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           yaml-dir: ./kots
-          promote-channel: ${{ github.ref_name }}
+          promote-channel: ${{ env.CHANNEL_NAME }}
           version: ${{ github.ref_name }}
 
-  reliability_matrix:
+  compatibility_matrix:
     needs: push-to-replicated
     strategy:
       fail-fast: false
       matrix:
-        cluster: [ {distribution: kind, version: v1.25.3}, {distribution: kind, version: v1.25.2}]
+        cluster: [ {distribution: kind, version: v1.25.3}, {distribution: kind, version: v1.26.3}]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+
+      - name: Define Channel Name
+        run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Create Customer 
         id: create-customer
@@ -56,7 +62,7 @@ jobs:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
-          channel-name: ${{ github.ref_name }}
+          channel-name: ${{ env.CHANNEL_NAME }}
           customer-email: ${{ github.ref_name }}@example.com
 
       - name: Create Cluster
@@ -133,11 +139,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      
+
+      - name: Define Channel Name
+        run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Archive Replicated Channel
         uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.21
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          channel-name: ${{ github.ref_name }}
+          channel-name: ${{ env.CHANNEL_NAME }}
           
