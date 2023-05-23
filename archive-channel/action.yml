@@ -1,7 +1,7 @@
 name: 'Archive Channel'
 description: 'Archive a channel'
 inputs:
-  replicated-app:
+  app-slug:
     description: 'Replicated App Slug.'
     required: true
     default: ''

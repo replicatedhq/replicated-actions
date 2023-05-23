@@ -23,7 +23,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const apiToken = core.getInput('replicated-api-token');
-            const appSlug = core.getInput('replicated-app');
+            const appSlug = core.getInput('app-slug');
             const customerId = core.getInput('customer-id');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();

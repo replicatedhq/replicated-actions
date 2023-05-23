@@ -6,7 +6,7 @@ title: Create Customer
 ---
 graph LR
 create_customer["Create Customer"]
-replicated_app ---> create_customer
+app_slug ---> create_customer
 replicated_api_token ---> create_customer
 customer_name ---> create_customer
 customer_email ---> create_customer
@@ -20,7 +20,7 @@ create_customer ---> license_file
 ## Inputs
 | Name | Default | Required | Description |
 | --- | --- | --- | --- |
-| replicated-app |  | True | Replicated App Slug. |
+| app-slug |  | True | Replicated App Slug. |
 | replicated-api-token |  | True | Replicated API Token. |
 | customer-name |  | True | Name of the customer. |
 | customer-email |  | False | Email of the customer. |

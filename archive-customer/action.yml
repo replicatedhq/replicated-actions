@@ -1,7 +1,7 @@
 name: 'Archive Customer'
 description: 'Archive a customer'
 inputs:
-  replicated-app:
+  app-slug:
     description: 'Replicated App Slug.'
     required: true
     default: ''

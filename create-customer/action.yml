@@ -1,7 +1,7 @@
 name: 'Create Customer'
 description: 'Create Customer'
 inputs:
-  replicated-app:
+  app-slug:
     description: 'Replicated App Slug.'
     required: true
     default: ''

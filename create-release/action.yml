@@ -1,7 +1,7 @@
 name: 'Replicated create release'
 description: 'Create a Replicated release on a channel'
 inputs:
-  replicated-app:
+  app-slug:
     description: 'Replicated App Slug.'
     required: true
     default: ''

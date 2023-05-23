@@ -24,7 +24,7 @@ const releases_1 = __nccwpck_require__(4873);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('replicated-app');
+            const appSlug = core.getInput('app-slug');
             const apiToken = core.getInput('replicated-api-token');
             const yamlDir = core.getInput('yaml-dir');
             const promoteChannel = core.getInput('promote-channel');

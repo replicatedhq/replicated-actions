@@ -38,7 +38,7 @@ jobs:
         id: create-release
         uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.21
         with:
-          replicated-app: ${{ secrets.REPLICATED_APP }}
+          app-slug: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           yaml-dir: ./kots
           promote-channel: ${{ github.ref_name }}
@@ -61,7 +61,7 @@ jobs:
         id: create-customer
         uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.21
         with:
-          replicated-app: ${{ secrets.REPLICATED_APP }}
+          app-slug: ${{ secrets.REPLICATED_APP }}
           replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
           channel-name: ${{ github.ref_name }}
