@@ -1,4 +1,4 @@
-# Archive Customer
+## Archive Customer
 
 ```mermaid
 ---
@@ -20,3 +20,4 @@ customer_id ---> archive_customer
 ## Outputs
 | Name | Description |
 | --- | --- |
+

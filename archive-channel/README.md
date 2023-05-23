@@ -1,4 +1,4 @@
-# Archive Channel
+## Archive Channel
 
 ```mermaid
 ---
@@ -20,3 +20,4 @@ channel_name ---> archive_channel
 ## Outputs
 | Name | Description |
 | --- | --- |
+

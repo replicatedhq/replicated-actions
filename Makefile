@@ -46,3 +46,44 @@ package-promote-release:
 package-remove-cluster:
 	rm -rf ./remove-cluster/build ./remove-cluster/dist ./remove-cluster/node_modules
 	cd ./remove-cluster && npm install && npm run build && npm run package
+
+
+.PHONY: readme-all
+readme-all: readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
+			 readme-create-release readme-install-chart readme-kots-install readme-promote-release readme-remove-cluster
+
+.PHONY: readme-archive-channel
+readme-archive-channel:
+	python3 docs/generate-readme/action-to-mermaid.py ./archive-channel/action.yml > ./archive-channel/README.md
+
+.PHONY: readme-archive-customer
+readme-archive-customer:
+	python3 docs/generate-readme/action-to-mermaid.py ./archive-customer/action.yml > ./archive-customer/README.md
+
+.PHONY: readme-create-cluster
+readme-create-cluster:
+	python3 docs/generate-readme/action-to-mermaid.py ./create-cluster/action.yml > ./create-cluster/README.md
+
+.PHONY: readme-create-customer
+readme-create-customer:
+	python3 docs/generate-readme/action-to-mermaid.py ./create-customer/action.yml > ./create-customer/README.md
+
+.PHONY: readme-create-release
+readme-create-release:
+	python3 docs/generate-readme/action-to-mermaid.py ./create-release/action.yml > ./create-release/README.md
+
+.PHONY: readme-install-chart
+readme-install-chart:
+	python3 docs/generate-readme/action-to-mermaid.py ./install-chart/action.yml > ./install-chart/README.md
+
+.PHONY: readme-kots-install
+readme-kots-install:
+	python3 docs/generate-readme/action-to-mermaid.py ./kots-install/action.yml > ./kots-install/README.md
+
+.PHONY: readme-promote-release
+readme-promote-release:
+	python3 docs/generate-readme/action-to-mermaid.py ./promote-release/action.yml > ./promote-release/README.md
+
+.PHONY: readme-remove-cluster
+readme-remove-cluster:
+	python3 docs/generate-readme/action-to-mermaid.py ./remove-cluster/action.yml > ./remove-cluster/README.md

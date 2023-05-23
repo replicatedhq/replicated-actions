@@ -1,4 +1,4 @@
-# Promote a Release
+## Promote Release
 
 ```mermaid
 ---
@@ -24,3 +24,4 @@ release_version ---> promote_release
 ## Outputs
 | Name | Description |
 | --- | --- |
+

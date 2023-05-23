@@ -1,4 +1,4 @@
-# KOTS Install
+## KOTS Install
 
 ```mermaid
 ---
@@ -30,3 +30,4 @@ namespace ---> kots_install
 ## Outputs
 | Name | Description |
 | --- | --- |
+

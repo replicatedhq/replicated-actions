@@ -1,4 +1,4 @@
-# Create Customer
+## Create Customer
 
 ```mermaid
 ---
@@ -34,3 +34,4 @@ create_customer ---> license_file
 | customer-id | Contains the customer id. |
 | license-id | Contains the license id. |
 | license-file | Contains he license file. |
+

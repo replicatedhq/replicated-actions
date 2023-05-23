@@ -1,4 +1,4 @@
-# Install Chart
+## Install a Helm chart to a cluster
 
 ```mermaid
 ---
@@ -34,3 +34,4 @@ install_a_helm_chart_to_a_cluster ---> helm_path
 | Name | Description |
 | --- | --- |
 | helm-path | The path to the helm binary |
+

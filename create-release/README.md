@@ -1,4 +1,4 @@
-# Create Release
+## Replicated create release
 
 ```mermaid
 ---
@@ -28,3 +28,4 @@ replicated_create_release ---> release_sequence
 | --- | --- |
 | channel-slug | Contains the channel slug. |
 | release-sequence | Sequence number of the release. |
+

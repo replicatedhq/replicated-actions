@@ -1,4 +1,4 @@
-# Remove a cluster
+## Remove cluster
 
 ```mermaid
 ---
@@ -18,3 +18,4 @@ cluster_id ---> remove_cluster
 ## Outputs
 | Name | Description |
 | --- | --- |
+
