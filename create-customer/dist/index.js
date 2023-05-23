@@ -36,7 +36,6 @@ function run() {
             }
             const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelName);
             core.setOutput('customer-id', customer.customerId);
-            core.setOutput('customer-name', customer.name);
             core.setOutput('license-id', customer.licenseId);
             core.setOutput('license-file', customer.license);
         }

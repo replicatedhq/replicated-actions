@@ -24,8 +24,6 @@ inputs:
     required: true
     default: '${GITHUB_REF}'
 outputs:
-  customer-name: # name of the customer
-    description: 'Contains the customer name.'
   customer-id: # id of the customer
     description: 'Contains the customer id.'
   license-id: # id of the license

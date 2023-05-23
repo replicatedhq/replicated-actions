@@ -12,7 +12,6 @@ customer_name ---> create_customer
 customer_email ---> create_customer
 license_type ---> create_customer
 channel_name ---> create_customer
-create_customer ---> customer_name
 create_customer ---> customer_id
 create_customer ---> license_id
 create_customer ---> license_file
@@ -30,7 +29,6 @@ create_customer ---> license_file
 ## Outputs
 | Name | Description |
 | --- | --- |
-| customer-name | Contains the customer name. |
 | customer-id | Contains the customer id. |
 | license-id | Contains the license id. |
 | license-file | Contains he license file. |
