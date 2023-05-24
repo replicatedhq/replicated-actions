@@ -19,10 +19,17 @@ inputs:
     description: 'License Type for the customer.'
     required: true
     default: 'dev'
-  channel-name:
+  channel-slug:
     description: 'Channel to assign the customer to.'
     required: true
     default: '${GITHUB_REF}'
+  entitlements:
+    description: 'Entitlements to assign to the customer.'
+    required: false
+  auto-cleanup:
+    description: 'Automatically archive the customer when the workflow completes.'
+    required: false
+    default: 'true'
 outputs:
   customer-id: # id of the customer
     description: 'Contains the customer id.'
@@ -32,4 +39,6 @@ outputs:
     description: 'Contains he license file.' 
 runs:
   using: 'node16'
-  main: 'dist/index.js'
+  main: 'dist/main/index.js'
+  post: 'dist/post/index.js'
+  post-if: env.INPUT_AUTO_CLEANUP == 'true'

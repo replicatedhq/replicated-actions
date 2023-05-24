@@ -42,7 +42,7 @@ jobs:
           promote-channel: ${{ env.CHANNEL_NAME }}
           version: ${{ github.ref_name }}
 
-  compatibility_matrix:
+  compatibility-matrix:
     needs: push-to-replicated
     strategy:
       fail-fast: false
@@ -52,9 +52,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Define Channel Name
-        run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
-
       - name: Create Customer 
         id: create-customer
         uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.21
@@ -62,7 +59,7 @@ jobs:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
-          channel-name: ${{ env.CHANNEL_NAME }}
+          channel-slug: ${{ needs.push-to-replicated.outputs.channel-slug }}
           customer-email: ${{ github.ref_name }}@example.com
 
       - name: Create Cluster
@@ -110,43 +107,35 @@ jobs:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
 
-      - name: Archive Customer
-        id: archive-customer
-        uses: replicatedhq/compatibility-actions/archive-customer@v0.0.1-alpha.21
-        with:
-          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-id:  ${{ steps.create-customer.outputs.customer-id }}
-
-  promote_to_stable:
+  promote-to-stable:
     needs: 
-      - reliability_matrix
+      - compatibility-matrix
       - push-to-replicated
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
-      - name: Promoto to Stable channel
+      - name: Promote to Stable channel
         uses: replicatedhq/compatibility-actions/promote-release@v0.0.1-alpha.21
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          channel-to: Stable
+          channel-to: stable
           release-sequence: ${{ needs.push-to-replicated.outputs.release-sequence }}
           release-version: ${{ github.ref_name }}
 
   cleanup-channel:
-    needs: promote_to_stable
+    needs: 
+      - promote-to-stable
+      - push-to-replicated
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-
-      - name: Define Channel Name
-        run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Archive Replicated Channel
         uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.21
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          channel-name: ${{ env.CHANNEL_NAME }}
+          channel-slug: ${{ needs.push-to-replicated.outputs.channel-slug }}
           

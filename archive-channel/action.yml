@@ -9,8 +9,8 @@ inputs:
     description: 'API Token.'
     required: true
     default: ''
-  channel-name:
-    description: 'The name of the channel to archive.'
+  channel-slug:
+    description: 'The slug of the channel to archive.'
     required: true
 runs:
   using: 'node16'

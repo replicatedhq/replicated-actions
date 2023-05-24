@@ -23,7 +23,7 @@ async function run() {
 
     const release = await createRelease(apiClient, appSlug, yamlDir)
 
-    const channel = getChannelDetails(apiClient, appSlug, promoteChannel)
+    const channel = getChannelDetails(apiClient, appSlug, {name: promoteChannel})
     let resolvedChannel: Channel | undefined
     await channel.then((channel) => {
       console.log(channel.name);

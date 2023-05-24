@@ -19,24 +19,44 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const replicated_lib_1 = __nccwpck_require__(4409);
 const configuration_1 = __nccwpck_require__(4995);
+const yaml_1 = __nccwpck_require__(4083);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput('api-token');
             const appSlug = core.getInput('app-slug');
+            const apiToken = core.getInput('api-token');
+            const name = core.getInput('customer-name');
+            const email = core.getInput('customer-email');
+            const licenseType = core.getInput('customer-license-type');
             const channelSlug = core.getInput('channel-slug');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
+            const entitlements = core.getInput('entitlements');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            yield (0, replicated_lib_1.archiveChannel)(apiClient, appSlug, channelSlug);
+            const entitlementsArray = processEntitlements(entitlements);
+            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, entitlementsArray);
+            core.setOutput('customer-id', customer.customerId);
+            core.setOutput('license-id', customer.licenseId);
+            core.setOutput('license-file', customer.license);
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
+}
+function processEntitlements(entitlements) {
+    if (entitlements) {
+        const entitlementsYAML = (0, yaml_1.parse)(entitlements);
+        // for each entitlement in entitlementsYAML, convert to json and add to array
+        const entitlementsArray = entitlementsYAML.map((entitlement) => {
+            return { name: entitlement.name, value: entitlement.value };
+        });
+        return entitlementsArray;
+    }
+    return undefined;
 }
 run();
 //# sourceMappingURL=index.js.map
