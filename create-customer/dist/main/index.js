@@ -48,10 +48,8 @@ function run() {
     });
 }
 function processEntitlements(entitlements) {
-    core.info('entitlements: ' + entitlements);
     if (entitlements) {
         const entitlementsYAML = (0, yaml_1.parse)(entitlements);
-        core.info('entitlementsYaml: ' + JSON.stringify(entitlementsYAML));
         // for each entitlement in entitlementsYAML, convert to json and add to array
         const entitlementsArray = entitlementsYAML.map((entitlement) => {
             return { name: entitlement.name, value: entitlement.value };

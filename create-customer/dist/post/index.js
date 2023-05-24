@@ -37,6 +37,7 @@ function run() {
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
+            core.info(`Archiving customer ${customerId} for app ${appSlug}`);
             yield (0, replicated_lib_1.archiveCustomer)(apiClient, customerId);
         }
         catch (error) {

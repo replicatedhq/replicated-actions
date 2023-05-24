@@ -24,6 +24,7 @@ async function run() {
       apiClient.endpoint = apiEndpoint
     }
 
+    core.info(`Archiving customer ${customerId} for app ${appSlug}`)
     await archiveCustomer(apiClient, customerId)
 
   } catch (error) {
