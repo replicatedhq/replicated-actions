@@ -9,6 +9,13 @@ async function run() {
     const appSlug = core.getInput('app-slug')
     const customerId = core.getInput('customer-id')
     const apiEndpoint = core.getInput('replicated-api-endpoint')
+    const autoClean = core.getBooleanInput('auto-clean')
+    
+    // if autoClean is false, do not archive customer
+    if (!autoClean) {
+        core.info('auto-clean is false, skipping archive customer')
+        return
+    }
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
