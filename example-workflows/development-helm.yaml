@@ -119,7 +119,7 @@ jobs:
         id: archive-customer
         uses: replicatedhq/compatibility-actions/archive-customer@use-channel-slug
         with:
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id:  ${{ steps.create-customer.outputs.customer-id }}
 
   cleanup-channel:
@@ -133,6 +133,6 @@ jobs:
       - name: Archive Replicated Channel
         uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.21
         with:
-          replicated-app: ${{ secrets.REPLICATED_APP }}
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: ${{ secrets.REPLICATED_APP }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           channel-slug: ${{ needs.push-to-replicated.outputs.channel-slug }}        

@@ -111,9 +111,9 @@ jobs:
         id: archive-customer
         uses: replicatedhq/compatibility-actions/archive-customer@use-channel-slug
         with:
-          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id:  ${{ steps.create-customer.outputs.customer-id }}
-          
+
   promote-to-stable:
     needs: 
       - compatibility-matrix
