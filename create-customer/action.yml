@@ -41,4 +41,4 @@ runs:
   using: 'node16'
   main: 'dist/main/index.js'
   post: 'dist/post/index.js'
-  post-if: env.INPUT_AUTO_CLEANUP == 'true'
+  post-if: ${{ inputs.auto-cleanup == 'true' }} 
