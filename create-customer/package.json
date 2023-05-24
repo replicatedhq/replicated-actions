@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "npx jest --verbose",
-    "package": "ncc build -o dist/main build/index.js --source-map --license LICENSE && ncc build -o dist/post build/post.js --source-map --license LICENSE"
+    "package": "ncc build -o dist build/index.js --source-map --license LICENSE"
   },
   "keywords": [],
   "author": "",

@@ -108,6 +108,13 @@ jobs:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
 
+      - name: Archive Customer
+        id: archive-customer
+        uses: replicatedhq/compatibility-actions/archive-customer@use-channel-slug
+        with:
+          replicated-api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id:  ${{ steps.create-customer.outputs.customer-id }}
+          
   cleanup-channel:
     needs: 
       - compatibility-matrix

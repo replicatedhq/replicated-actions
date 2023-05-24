@@ -6,7 +6,6 @@ import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 async function run() {
   try {
     const apiToken = core.getInput('api-token')
-    const appSlug = core.getInput('app-slug')
     const customerId = core.getInput('customer-id')
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     

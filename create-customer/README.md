@@ -13,7 +13,6 @@ customer_email ---> create_customer
 license_type ---> create_customer
 channel_slug ---> create_customer
 entitlements ---> create_customer
-auto_cleanup ---> create_customer
 create_customer ---> customer_id
 create_customer ---> license_id
 create_customer ---> license_file
@@ -28,7 +27,6 @@ create_customer ---> license_file
 | license-type | dev | True | License Type for the customer. |
 | channel-slug | ${GITHUB_REF} | True | Channel to assign the customer to. |
 | entitlements |  | False | Entitlements to assign to the customer. |
-| auto-cleanup | true | False | Automatically archive the customer when the workflow completes. |
 
 ## Outputs
 | Name | Description |
