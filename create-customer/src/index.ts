@@ -36,9 +36,11 @@ async function run() {
 }
 
 function processEntitlements(entitlements: string): [] | undefined {
+  core.info('entitlements: ' + entitlements)
   if (entitlements) {
     const entitlementsYAML = parse(entitlements)
     
+    core.info('entitlementsYaml: ' + JSON.stringify(entitlementsYAML))
     // for each entitlement in entitlementsYAML, convert to json and add to array
     const entitlementsArray = entitlementsYAML.map((entitlement: any) => {
       return {name: entitlement.name, value: entitlement.value}
