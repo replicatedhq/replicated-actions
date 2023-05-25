@@ -19,6 +19,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const replicated_lib_1 = __nccwpck_require__(4409);
 const configuration_1 = __nccwpck_require__(4995);
+const yaml_1 = __nccwpck_require__(4083);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -27,14 +28,16 @@ function run() {
             const name = core.getInput('customer-name');
             const email = core.getInput('customer-email');
             const licenseType = core.getInput('customer-license-type');
-            const channelName = core.getInput('channel-name');
+            const channelSlug = core.getInput('channel-slug');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
+            const entitlements = core.getInput('entitlements');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelName);
+            const entitlementsArray = processEntitlements(entitlements);
+            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, entitlementsArray);
             core.setOutput('customer-id', customer.customerId);
             core.setOutput('license-id', customer.licenseId);
             core.setOutput('license-file', customer.license);
@@ -43,6 +46,17 @@ function run() {
             core.setFailed(error.message);
         }
     });
+}
+function processEntitlements(entitlements) {
+    if (entitlements) {
+        const entitlementsYAML = (0, yaml_1.parse)(entitlements);
+        // for each entitlement in entitlementsYAML, convert to json and add to array
+        const entitlementsArray = entitlementsYAML.map((entitlement) => {
+            return { name: entitlement.name, value: entitlement.value };
+        });
+        return entitlementsArray;
+    }
+    return undefined;
 }
 run();
 //# sourceMappingURL=index.js.map
@@ -9018,30 +9032,33 @@ async function createChannel(vendorPortalApi, appSlug, channelName) {
     return { name: createChannelBody.channel.name, id: createChannelBody.channel.id, slug: createChannelBody.channel.channelSlug };
 }
 exports.createChannel = createChannel;
-async function getChannelDetails(vendorPortalApi, appSlug, channelName) {
+async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
-    // 2. get the channel id from the channel name
-    return await getChannelByApplicationId(vendorPortalApi, app.id, channelName);
+    if (typeof slug === 'undefined' && typeof name === 'undefined') {
+        throw new Error(`Must provide either a channel slug or channel name`);
+    }
+    // 2. get the channel id from the channel slug
+    return await getChannelByApplicationId(vendorPortalApi, app.id, { slug, name });
 }
 exports.getChannelDetails = getChannelDetails;
-async function getChannelByApplicationId(vendorPortalApi, appid, channelName) {
+async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name }) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
-    console.log('Getting channel id from channel name...');
-    const listChannelsUri = `${vendorPortalApi.endpoint}/app/${appid}/channels?channelName=${channelName}&excludeDetail=true`;
+    console.log(`Getting channel id from channel slug ${slug} or name ${name}...`);
+    const listChannelsUri = `${vendorPortalApi.endpoint}/app/${appid}/channels?excludeDetail=true`;
     const listChannelsRes = await http.get(listChannelsUri);
     if (listChannelsRes.message.statusCode != 200) {
         throw new Error(`Failed to list channels: Server responded with ${listChannelsRes.message.statusCode}`);
     }
     const listChannelsBody = JSON.parse(await listChannelsRes.readBody());
-    const channel = await findChannelDetailsInOutput(listChannelsBody.channels, channelName);
-    console.log(`Found channel for channel name ${channelName}`);
+    const channel = await findChannelDetailsInOutput(listChannelsBody.channels, { slug, name });
+    console.log(`Found channel for channel slug ${channel.slug}`);
     return channel;
 }
 exports.getChannelByApplicationId = getChannelByApplicationId;
-async function archiveChannel(vendorPortalApi, appSlug, channelName) {
-    const channel = await getChannelDetails(vendorPortalApi, appSlug, channelName);
+async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
+    const channel = await getChannelDetails(vendorPortalApi, appSlug, { slug: channelSlug });
     const http = await (0, configuration_1.client)(vendorPortalApi);
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
@@ -9054,13 +9071,16 @@ async function archiveChannel(vendorPortalApi, appSlug, channelName) {
     }
 }
 exports.archiveChannel = archiveChannel;
-async function findChannelDetailsInOutput(channels, channelName) {
+async function findChannelDetailsInOutput(channels, { slug, name }) {
     for (const channel of channels) {
-        if (channel.name === channelName) {
-            return { name: channelName, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence };
+        if (slug && channel.channelSlug == slug) {
+            return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence };
+        }
+        if (name && channel.name == name) {
+            return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence };
         }
     }
-    return Promise.reject({ "channel": null, "reason": `Could not find channel with name ${channelName}` });
+    return Promise.reject({ "channel": null, "reason": `Could not find channel with slug ${slug} or name ${name}` });
 }
 exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 
@@ -9199,21 +9219,24 @@ const yaml_1 = __nccwpck_require__(4083);
 class Customer {
 }
 exports.Customer = Customer;
-async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelName) {
+async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, entitlementValues) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
-        const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, channelName);
+        const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
         console.log('Creating customer on appId ' + app.id + ' and channelId ' + channel.id);
         const http = await (0, configuration_1.client)(vendorPortalApi);
         // 1. create the customer
         const createCustomerUri = `${vendorPortalApi.endpoint}/customer`;
-        const createCustomerReqBody = {
+        let createCustomerReqBody = {
             name: name,
             email: email,
             type: licenseType,
             channel_id: channel.id,
             app_id: app.id,
         };
+        if (entitlementValues) {
+            createCustomerReqBody['entitlementValues'] = entitlementValues;
+        }
         const createCustomerRes = await http.post(createCustomerUri, JSON.stringify(createCustomerReqBody));
         if (createCustomerRes.message.statusCode != 201) {
             throw new Error(`Failed to create customer: Server responded with ${createCustomerRes.message.statusCode}`);
@@ -9283,7 +9306,7 @@ Object.defineProperty(exports, "client", ({ enumerable: true, get: function () {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.promoteRelease = exports.gzipData = exports.createRelease = void 0;
+exports.promoteReleaseByAppId = exports.promoteRelease = exports.gzipData = exports.createRelease = void 0;
 const applications_1 = __nccwpck_require__(3770);
 const configuration_1 = __nccwpck_require__(4995);
 const pako_1 = __nccwpck_require__(1726);
@@ -9385,17 +9408,22 @@ async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequen
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. promote the release
+    await promoteReleaseByAppId(vendorPortalApi, app.id, channelId, releaseSequence, version);
+}
+exports.promoteRelease = promoteRelease;
+async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
     const reqBody = {
         "versionLabel": version,
         "channelIds": [channelId],
     };
-    const uri = `${vendorPortalApi.endpoint}/app/${app.id}/release/${releaseSequence}/promote`;
+    const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}/promote`;
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 200) {
         throw new Error(`Failed to promote release: Server responded with ${res.message.statusCode}`);
     }
 }
-exports.promoteRelease = promoteRelease;
+exports.promoteReleaseByAppId = promoteReleaseByAppId;
 
 
 /***/ }),

@@ -15,7 +15,7 @@ https://github.com/replicatedhq/compatibility-actions/blob/0dae8d920db6e00a86a99
 ### Installation with KOTS
 See the [example workflow](example-workflows/development-kots.yaml) for more details.
 
-https://github.com/replicatedhq/compatibility-actions/blob/0dae8d920db6e00a86a996e984fb3899fb764c13/example-workflows/development-kots.yaml#L1-L107
+https://github.com/replicatedhq/compatibility-actions/blob/0dae8d920db6e00a86a996e984fb3899fb764c13/example-workflows/development-kots.yaml#L1-L114
 
 ### Releasing
 The releasing workflow will run the workflow each time a tag is being placed on the repository. It will create a new release that is promoted to a channel with the same name as the tag.

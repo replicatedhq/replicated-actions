@@ -19,10 +19,13 @@ inputs:
     description: 'License Type for the customer.'
     required: true
     default: 'dev'
-  channel-name:
+  channel-slug:
     description: 'Channel to assign the customer to.'
     required: true
     default: '${GITHUB_REF}'
+  entitlements:
+    description: 'Entitlements to assign to the customer.'
+    required: false
 outputs:
   customer-id: # id of the customer
     description: 'Contains the customer id.'

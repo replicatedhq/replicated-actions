@@ -8,7 +8,7 @@ async function run() {
   try {
     const appSlug = core.getInput('app-slug')
     const apiToken = core.getInput('api-token')
-    const channelName = core.getInput('channel-to')
+    const channelSlug = core.getInput('channel-to')
     const releaseSequence = core.getInput('release-sequence')
     const releaseVersion = core.getInput('release-version')
     const apiEndpoint = core.getInput('replicated-api-endpoint')
@@ -20,7 +20,7 @@ async function run() {
       apiClient.endpoint = apiEndpoint
     }
 
-    const channel: Channel = await getChannelDetails(apiClient, appSlug, channelName)
+    const channel: Channel = await getChannelDetails(apiClient, appSlug, {slug: channelSlug})
 
     await promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion)
 

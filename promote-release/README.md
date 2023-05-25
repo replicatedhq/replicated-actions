@@ -17,7 +17,7 @@ release_version ---> promote_release
 | --- | --- | --- | --- |
 | app-slug |  | True | App Slug. |
 | api-token |  | True | API Token. |
-| channel-to |  | True | The name of the Channel to promote the release sequence to. |
+| channel-to |  | True | The slug of the Channel to promote the release sequence to. |
 | release-sequence |  | True | The release sequence number to promote. |
 | release-version |  | True | The version field of the Release to promote. |
 

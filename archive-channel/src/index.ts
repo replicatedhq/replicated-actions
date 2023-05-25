@@ -7,7 +7,7 @@ async function run() {
   try {
     const apiToken = core.getInput('api-token')
     const appSlug = core.getInput('app-slug')
-    const channelName = core.getInput('channel-name')
+    const channelSlug = core.getInput('channel-slug')
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     
     const apiClient = new VendorPortalApi();
@@ -17,7 +17,7 @@ async function run() {
       apiClient.endpoint = apiEndpoint
     }
     
-    await archiveChannel(apiClient, appSlug, channelName)
+    await archiveChannel(apiClient, appSlug, channelSlug)
 
   } catch (error) {
     core.setFailed(error.message);
