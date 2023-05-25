@@ -39,7 +39,7 @@ jobs:
 
       - name: Create Replicated Release
         id: create-release
-        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.22
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
 
       - name: Create Customer 
         id: create-customer
-        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.22
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
 
       - name: Create Cluster
         id: create-cluster
-        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.22
         timeout-minutes: 2
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
           ttl: 10m
 
       - name: Deploy the app
-        uses: replicatedhq/compatibility-actions/kots-install@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/kots-install@v0.0.1-alpha.22
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           app-slug: ${{ secrets.REPLICATED_APP }}/${{ needs.push-to-replicated.outputs.channel-slug }}
@@ -102,7 +102,7 @@ jobs:
 
       - name: Remove Cluster
         id: remove-cluster
-        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.22
         continue-on-error: true # It could be that the cluster is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -127,7 +127,7 @@ jobs:
         run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Archive Replicated Channel
-        uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.21
+        uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.22
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
