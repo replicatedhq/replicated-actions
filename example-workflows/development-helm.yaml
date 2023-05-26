@@ -117,6 +117,7 @@ jobs:
 
       - name: Archive Customer
         id: archive-customer
+        if: always()
         uses: replicatedhq/compatibility-actions/archive-customer@use-channel-slug
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
