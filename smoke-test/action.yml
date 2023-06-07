@@ -81,7 +81,7 @@ runs:
       helm-path: "helm"
       registry-username: ${{ github.ref_name }}@example.com
       registry-password: ${{ steps.create-customer.outputs.license-id }}
-      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}/${{ inputs.helm-chart-name }}}
+      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}/${{ inputs.helm-chart-name }}
       name: ${{ inputs.app-slug }}
       version: ${{ env.APP_VERSION }}
       namespace: 'default'
