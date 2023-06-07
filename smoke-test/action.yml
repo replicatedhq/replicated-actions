@@ -95,6 +95,11 @@ runs:
       license-file: ${{ steps.create-customer.outputs.license-file }}
       app-version-label: ${{ env.APP_VERSION }}
       config-values: ${{ inputs.kots-config-values }}
+  - name: Run the test script
+    shell: bash
+    run: |
+      chmod +x ${{ inputs.test-script }}
+      ./${{ inputs.test-script }}
   - name: Remove Cluster
     id: remove-cluster
     uses: replicatedhq/compatibility-actions/remove-cluster@v0
