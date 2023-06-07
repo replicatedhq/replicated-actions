@@ -38,7 +38,7 @@ runs:
     run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
   - name: 'Create Release'
     id: 'create-release'
-    uses: replicatedhq/compatibility-actions/create-release@v0
+    uses: replicatedhq/compatibility-actions/create-release@v1
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -47,7 +47,7 @@ runs:
       version: ${{ env.APP_VERSION }}
   - name: 'Create Customer'
     id: 'create-customer'
-    uses: replicatedhq/compatibility-actions/create-customer@v0
+    uses: replicatedhq/compatibility-actions/create-customer@v1
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -58,7 +58,7 @@ runs:
   - name: 'Archive Customer'
     id: 'archive-customer'
     if: always()
-    uses: replicatedhq/compatibility-actions/archive-customer@v0
+    uses: replicatedhq/compatibility-actions/archive-customer@v1
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -66,7 +66,7 @@ runs:
   - name: 'Archive Channel'
     id: 'archive-channel'
     if: always()
-    uses: replicatedhq/compatibility-actions/archive-channel@v0
+    uses: replicatedhq/compatibility-actions/archive-channel@v1
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
