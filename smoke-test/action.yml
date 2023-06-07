@@ -30,7 +30,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - uses: actions/checkout@v3
   - name: Define App Version
     shell: bash
     run: echo "APP_VERSION=0.0.1-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_SHA::7}" >> $GITHUB_ENV
@@ -39,7 +38,7 @@ runs:
     run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
   - name: 'Create Release'
     id: 'create-release'
-    uses: ./create-release
+    uses: replicatedhq/compatibility-actions/create-release@v0
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -48,7 +47,7 @@ runs:
       version: ${{ env.APP_VERSION }}
   - name: 'Create Customer'
     id: 'create-customer'
-    uses: ./create-customer
+    uses: replicatedhq/compatibility-actions/create-customer@v0
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -59,7 +58,7 @@ runs:
   - name: 'Archive Customer'
     id: 'archive-customer'
     if: always()
-    uses: ./archive-customer
+    uses: replicatedhq/compatibility-actions/archive-customer@v0
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -67,7 +66,7 @@ runs:
   - name: 'Archive Channel'
     id: 'archive-channel'
     if: always()
-    uses: ./archive-channel
+    uses: replicatedhq/compatibility-actions/archive-channel@v0
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
