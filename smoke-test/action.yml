@@ -99,6 +99,8 @@ runs:
     shell: bash
     run: |
       chmod +x ${{ inputs.test-script }}
+      mkdir -p ~/.kube
+      echo "${{ steps.create-cluster.outputs.cluster-kubeconfig }}" > ~/.kube/config
       ./${{ inputs.test-script }}
   - name: Remove Cluster
     id: remove-cluster
