@@ -26,6 +26,9 @@ inputs:
   helm-values:
     description: 'A Helm values.yaml file to use'
     required: false
+  helm-chart-name:
+    description: 'The name of the Helm chart to use'
+    required: false
   kots-config-values:
     description: 'The KOTS config values to use'
     required: false
@@ -78,12 +81,12 @@ runs:
       helm-path: "helm"
       registry-username: ${{ github.ref_name }}@example.com
       registry-password: ${{ steps.create-customer.outputs.license-id }}
-      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}/relmatrix-app
-      name: 'relmatrix-app'
+      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}/${{ inputs.helm-chart-name }}}
+      name: ${{ inputs.app-slug }}
       version: ${{ env.APP_VERSION }}
       namespace: 'default'
       values: ${{ inputs.helm-values }}
-  - name: Deploy the app with kots
+  - name: Deploy the app with KOTS
     if: ${{ inputs.installation-method == 'kots' }}
     uses: replicatedhq/compatibility-actions/kots-install@v0
     with:
