@@ -30,6 +30,7 @@ inputs:
 runs:
   using: "composite"
   steps:
+  - uses: actions/checkout@v3
   - name: Define App Version
     shell: bash
     run: echo "APP_VERSION=0.0.1-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_SHA::7}" >> $GITHUB_ENV
