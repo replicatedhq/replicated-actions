@@ -23,6 +23,12 @@ inputs:
     description: "Method to install the application [helm|kots] (default: helm)"
     required: true
     default: "helm"
+  helm-values:
+    description: 'A Helm values.yaml file to use'
+    required: false
+  kots-config-values:
+    description: 'The KOTS config values to use'
+    required: false
   test-script:
     description: "Location of the test script to run (default: test.sh)"
     required: true
@@ -64,6 +70,28 @@ runs:
       kubernetes-version: ${{ inputs.kubernetes-version }}
       cluster-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
       ttl: 10m
+  - name: Deploy the app with Helm
+    uses: replicatedhq/compatibility-actions/helm-install@v0
+    if: ${{ inputs.installation-method == 'helm' }}
+    with:
+      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+      helm-path: "helm"
+      registry-username: ${{ github.ref_name }}@example.com
+      registry-password: ${{ steps.create-customer.outputs.license-id }}
+      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}/relmatrix-app
+      name: 'relmatrix-app'
+      version: ${{ env.APP_VERSION }}
+      namespace: 'default'
+      values: ${{ inputs.helm-values }}
+  - name: Deploy the app with kots
+    if: ${{ inputs.installation-method == 'kots' }}
+    uses: replicatedhq/compatibility-actions/kots-install@v0
+    with:
+      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+      app-slug: ${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}
+      license-file: ${{ steps.create-customer.outputs.license-file }}
+      app-version-label: ${{ env.APP_VERSION }}
+      config-values: ${{ inputs.kots-config-values }}
   - name: Remove Cluster
     id: remove-cluster
     uses: replicatedhq/compatibility-actions/remove-cluster@v0
