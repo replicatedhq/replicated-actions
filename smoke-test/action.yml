@@ -1,0 +1,73 @@
+name: 'Smoke Test'
+description: 'Smoke Test'
+inputs:
+  app-slug:
+    description: 'App Slug.'
+    required: true
+    default: ''
+  api-token:
+    description: 'API Token.'
+    required: true
+    default: ''
+  yaml-dir:
+    description: 'The directory containing multiple yamls for a Replicated release.'
+    required: true
+    default: 'manifests'
+  kubernetes-distribution:
+    description: 'Kubernetes distribution of the cluster to provision.'
+    required: true
+  kubernetes-version:
+    description: 'Kubernetes version to provision (format is distribution dependent).'
+    required: true
+  installation-method:
+    description: "Method to install the application [helm|kots] (default: helm)"
+    required: true
+    default: "helm"
+  test-script:
+    description: "Location of the test script to run (default: test.sh)"
+    required: true
+    default: "test.sh"
+runs:
+  using: "composite"
+  steps:
+  - name: Define App Version
+    shell: bash
+    run: echo "APP_VERSION=0.0.1-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_SHA::7}" >> $GITHUB_ENV
+  - name: Define Channel Name
+    shell: bash
+    run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
+  - name: 'Create Release'
+    id: 'create-release'
+    uses: ./create-release
+    with:
+      app-slug: ${{ inputs.app-slug }}
+      api-token: ${{ inputs.api-token }}
+      yaml-dir: ${{ inputs.yaml-dir }}
+      promote-channel: ${{ env.CHANNEL_NAME }}
+      version: ${{ env.APP_VERSION }}
+  - name: 'Create Customer'
+    id: 'create-customer'
+    uses: ./create-customer
+    with:
+      app-slug: ${{ inputs.app-slug }}
+      api-token: ${{ inputs.api-token }}
+      customer-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
+      customer-email: ${{ github.ref_name }}@example.com
+      license-type: "dev"
+      channel-slug: ${{ steps.create-release.outputs.channel-slug }}
+  - name: 'Archive Customer'
+    id: 'archive-customer'
+    if: always()
+    uses: ./archive-customer
+    with:
+      app-slug: ${{ inputs.app-slug }}
+      api-token: ${{ inputs.api-token }}
+      customer-id: ${{ steps.create-customer.outputs.customer-id }}
+  - name: 'Archive Channel'
+    id: 'archive-channel'
+    if: always()
+    uses: ./archive-channel
+    with:
+      app-slug: ${{ inputs.app-slug }}
+      api-token: ${{ inputs.api-token }}
+      channel-slug: ${{ steps.create-release.outputs.channel-slug }}
