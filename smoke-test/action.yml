@@ -55,6 +55,22 @@ runs:
       customer-email: ${{ github.ref_name }}@example.com
       license-type: "dev"
       channel-slug: ${{ steps.create-release.outputs.channel-slug }}
+  - name: Create Cluster
+    id: create-cluster
+    uses: replicatedhq/compatibility-actions/create-cluster@v0
+    with:
+      api-token: ${{ inputs.api-token }}
+      kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
+      kubernetes-version: ${{ inputs.kubernetes-version }}
+      cluster-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
+      ttl: 10m
+  - name: Remove Cluster
+    id: remove-cluster
+    uses: replicatedhq/compatibility-actions/remove-cluster@v0
+    continue-on-error: true # It could be that the cluster is already removed
+    with:
+      api-token: ${{ inputs.api-token }}
+      cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
   - name: 'Archive Customer'
     id: 'archive-customer'
     if: always()
