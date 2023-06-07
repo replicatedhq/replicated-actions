@@ -50,7 +50,8 @@ package-remove-cluster:
 
 .PHONY: readme-all
 readme-all: readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
-			 readme-create-release readme-helm-install readme-kots-install readme-promote-release readme-remove-cluster
+			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
+			 readme-remove-cluster smoke-test
 
 .PHONY: readme-archive-channel
 readme-archive-channel:
@@ -87,3 +88,7 @@ readme-promote-release:
 .PHONY: readme-remove-cluster
 readme-remove-cluster:
 	python3 docs/generate-readme/action-to-mermaid.py ./remove-cluster/action.yml > ./remove-cluster/README.md
+
+.PHONY: readme-smoke-test
+readme-smoke-test:
+	python3 docs/generate-readme/action-to-mermaid.py ./smoke-test/action.yml > ./smoke-test/README.md

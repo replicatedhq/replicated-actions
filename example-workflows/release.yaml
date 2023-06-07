@@ -34,7 +34,7 @@ jobs:
 
       - name: Create Replicated Release
         id: create-release
-        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/create-release@v0.0.1-alpha.23
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -54,7 +54,7 @@ jobs:
 
       - name: Create Customer 
         id: create-customer
-        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/create-customer@v0.0.1-alpha.23
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -64,7 +64,7 @@ jobs:
 
       - name: Create Cluster
         id: create-cluster
-        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/create-cluster@v0.0.1-alpha.23
         timeout-minutes: 2
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
           ttl: 10m
 
       - name: Deploy the app
-        uses: replicatedhq/compatibility-actions/helm-install@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/helm-install@v0.0.1-alpha.23
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           helm-path: "helm"
@@ -101,7 +101,7 @@ jobs:
 
       - name: Remove Cluster
         id: remove-cluster
-        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/remove-cluster@v0.0.1-alpha.23
         continue-on-error: true # It could be that the cluster is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -124,7 +124,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Promote to Stable channel
-        uses: replicatedhq/compatibility-actions/promote-release@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/promote-release@v0.0.1-alpha.23
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -141,7 +141,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Archive Replicated Channel
-        uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.22
+        uses: replicatedhq/compatibility-actions/archive-channel@v0.0.1-alpha.23
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
