@@ -35,7 +35,7 @@ runs:
     run: echo "APP_VERSION=0.0.1-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_SHA::7}" >> $GITHUB_ENV
   - name: Define Channel Name
     shell: bash
-    run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}" >> $GITHUB_ENV
+    run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_SHA::7}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}" >> $GITHUB_ENV
   - name: 'Create Release'
     id: 'create-release'
     uses: replicatedhq/compatibility-actions/create-release@v0
@@ -60,7 +60,6 @@ runs:
     if: always()
     uses: replicatedhq/compatibility-actions/archive-customer@v0
     with:
-      app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
       customer-id: ${{ steps.create-customer.outputs.customer-id }}
   - name: 'Archive Channel'
