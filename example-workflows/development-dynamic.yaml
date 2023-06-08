@@ -1,0 +1,69 @@
+name: development
+
+on:
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!main'     # excludes main
+
+jobs:
+  matrix-generator:
+    outputs:
+      matrix: ${{ steps.matrix-generator.outputs.matrix}}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Matrix
+        id: matrix-generator
+        uses: replicatedhq/compatibility-actions/matrix-generator@v0
+        with:
+          app-slug: ${{ secrets.REPLICATED_APP }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+
+  compatibility-matrix:
+    needs: matrix-generator
+    strategy:
+      fail-fast: false
+      matrix:
+        cluster: ${{ fromJson(needs.matrix-generator.outputs.matrix) }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Define App Version
+        shell: bash
+        run: echo "APP_VERSION=0.0.1-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Package Helm Chart for Replicated
+        id: package-helm-chart
+        run: |
+          helm package relmatrix-app -u -d kots \
+            --app-version=0.0.1-${{ github.ref_name }} \
+            --version=${{ env.APP_VERSION }}
+
+      - name: Update the HelmChart kind
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          include: 'kots/relmatrix-app-chart.yaml'
+          find: '$VERSION'
+          replace: ${{ env.APP_VERSION }}
+          regex: false
+
+      - name: Smoke Test
+        id: smoke-test
+        uses: replicatedhq/compatibility-actions/smoke-test@v0
+        with:
+          app-slug: ${{ secrets.REPLICATED_APP }}
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          yaml-dir: kots
+          kubernetes-distribution: ${{ matrix.cluster.distribution }}
+          kubernetes-version: ${{ matrix.cluster.version }}
+          installation-method: helm
+          test-script: ./tests/test.sh
+          helm-chart-name: relmatrix-app
+          helm-values: |
+            image:
+              tag: latest

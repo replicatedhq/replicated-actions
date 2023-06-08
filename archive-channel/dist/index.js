@@ -9163,7 +9163,7 @@ async function getSupportedClusters(vendorPortalApi) {
     for (const cluster of body['supported-clusters']) {
         for (const version of cluster.versions) {
             supportedClusters.push({
-                name: cluster.name,
+                name: cluster.short_name,
                 version: version
             });
         }
@@ -9289,6 +9289,10 @@ async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     const getClusterUsageBody = JSON.parse(await getClusterUsageRes.readBody());
     // 2. Convert body into KubernetesDistribution
     let kubernetesDistributions = [];
+    // check if getClusterUsageBody.clusterUsageDetails is undefined
+    if (!getClusterUsageBody.clusterUsageDetails) {
+        return kubernetesDistributions;
+    }
     for (const cluster of getClusterUsageBody.clusterUsageDetails) {
         kubernetesDistributions.push({
             k8sDistribution: cluster.kubernetes_distribution,
