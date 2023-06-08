@@ -11,19 +11,19 @@ Based on your preference you can either use the simplified smoke-test version, o
 #### Smoke Test
 See the [example workflow](example-workflows/development-helm-smoke-test.yaml) for more details and also the [smoke-test](smoke-test) directory for the actual action.
 
-https://github.com/replicatedhq/compatibility-actions/blob/c6c2642d6c68f189ad508db11fe0c7e6c8aa0f2b/example-workflows/development-helm-smoke-test.yaml#L1-L139
+https://github.com/replicatedhq/compatibility-actions/blob/60354bea8f660d3f568076a383b991fd2ee8353b/example-workflows/development-helm-smoke-test.yaml#L1-L54
 
 #### Customizable
 
 ##### Installation with Helm
 See the [example workflow](example-workflows/development-helm.yaml) for more details.
 
-https://github.com/replicatedhq/compatibility-actions/blob/c6c2642d6c68f189ad508db11fe0c7e6c8aa0f2b/example-workflows/development-helm.yaml#L1-L139
+https://github.com/replicatedhq/compatibility-actions/blob/60354bea8f660d3f568076a383b991fd2ee8353b/example-workflows/development-helm.yaml#L1-L139
 
 ##### Installation with KOTS
 See the [example workflow](example-workflows/development-kots.yaml) for more details.
 
-https://github.com/replicatedhq/compatibility-actions/blob/c6c2642d6c68f189ad508db11fe0c7e6c8aa0f2b/example-workflows/development-kots.yaml#L1-L135
+https://github.com/replicatedhq/compatibility-actions/blob/60354bea8f660d3f568076a383b991fd2ee8353b/example-workflows/development-kots.yaml#L1-L135
 
 ### Releasing
 The releasing workflow will run the workflow each time a tag is being placed on the repository. It will create a new release that is promoted to a channel with the same name as the tag.
@@ -31,4 +31,4 @@ The next job will setup a compatibility matrix of clusters, deploy the app and e
 
 See the [example workflow](example-workflows/release.yaml) for more details.
 
-https://github.com/replicatedhq/compatibility-actions/blob/c6c2642d6c68f189ad508db11fe0c7e6c8aa0f2b/example-workflows/release.yaml#L1-L149
+https://github.com/replicatedhq/compatibility-actions/blob/60354bea8f660d3f568076a383b991fd2ee8353b/example-workflows/release.yaml#L1-L149
