@@ -53,6 +53,7 @@ function processDistributions(usedDistributions, availableDistributions) {
         availableMap[key] = ad;
         // if semver is invalid, skip
         if (!semver.valid(ad.version)) {
+            core.info(`Available distribution ${ad.name} has invalid semver ${ad.version}`);
             continue;
         }
         // Used for distro + semver matches
@@ -89,6 +90,7 @@ function processDistributions(usedDistributions, availableDistributions) {
         }
         // if semver is invalid, skip
         if (!semver.valid(ud.k8sVersion)) {
+            core.info(`Used distribution ${ud.k8sDistribution} has invalid semver ${ud.k8sVersion}`);
             continue;
         }
         // Exact match for distribution, but using semver

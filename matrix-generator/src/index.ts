@@ -49,6 +49,7 @@ function processDistributions(usedDistributions: KubernetesDistribution[], avail
 
     // if semver is invalid, skip
     if (!semver.valid(ad.version)) {
+      core.info(`Available distribution ${ad.name} has invalid semver ${ad.version}`)
       continue
     }
 
@@ -88,6 +89,7 @@ function processDistributions(usedDistributions: KubernetesDistribution[], avail
 
     // if semver is invalid, skip
     if (!semver.valid(ud.k8sVersion)) {
+      core.info(`Used distribution ${ud.k8sDistribution} has invalid semver ${ud.k8sVersion}`)
       continue
     }
 
