@@ -49,6 +49,10 @@ function processDistributions(usedDistributions, availableDistributions) {
         // Used for exact matches
         const key = (ad.name + '-' + ad.version).toLowerCase();
         availableMap[key] = ad;
+        // if semver is invalid, skip
+        if (!semver.valid(ad.version)) {
+            continue;
+        }
         // Used for distro + semver matches
         const semverKey = (ad.name + '-' + semver.parse(ad.version)).toLowerCase();
         availableMap[semverKey] = ad;
@@ -79,6 +83,10 @@ function processDistributions(usedDistributions, availableDistributions) {
         if (availableMap[key]) {
             const matrixKey = availableMap[key].name + '-' + availableMap[key].version;
             matrixMap[matrixKey] = { distribution: availableMap[key].name, version: availableMap[key].version };
+            continue;
+        }
+        // if semver is invalid, skip
+        if (!semver.valid(ud.k8sVersion)) {
             continue;
         }
         // Exact match for distribution, but using semver
