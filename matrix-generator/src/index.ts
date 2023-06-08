@@ -38,6 +38,8 @@ async function run() {
 function processDistributions(usedDistributions: KubernetesDistribution[], availableDistributions: SupportedCluster[]): MatrixInstance[] {
   const matrixMap: { [key: string]: MatrixInstance } = {}
   const availableMap: { [key: string]: SupportedCluster } = {}
+  core.info(`Found ${usedDistributions.length} used distributions`)
+  core.info(`Found ${availableDistributions.length} available distributions`)
   for (const ad of availableDistributions) {
     // Used for exact matches
     const key = (ad.name+'-'+ad.version).toLowerCase()
