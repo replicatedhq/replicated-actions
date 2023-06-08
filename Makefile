@@ -1,6 +1,7 @@
 .PHONY: package-all
 package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
-			 package-create-release package-helm-install package-kots-install package-promote-release package-remove-cluster
+			 package-create-release package-helm-install package-kots-install package-promote-release \
+			 package-remove-cluster package-matrix-generator
 
 .PHONY: package-archive-channel
 package-archive-channel:
@@ -47,11 +48,15 @@ package-remove-cluster:
 	rm -rf ./remove-cluster/build ./remove-cluster/dist ./remove-cluster/node_modules
 	cd ./remove-cluster && npm install && npm run build && npm run package
 
+.PHONY: package-matrix-generator
+package-matrix-generator:
+	rm -rf ./matrix-generator/build ./matrix-generator/dist ./matrix-generator/node_modules
+	cd ./matrix-generator && npm install && npm run build && npm run package
 
 .PHONY: readme-all
 readme-all: readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
 			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
-			 readme-remove-cluster smoke-test
+			 readme-remove-cluster smoke-test readme-matrix-generator
 
 .PHONY: readme-archive-channel
 readme-archive-channel:
@@ -92,3 +97,7 @@ readme-remove-cluster:
 .PHONY: readme-smoke-test
 readme-smoke-test:
 	python3 docs/generate-readme/action-to-mermaid.py ./smoke-test/action.yml > ./smoke-test/README.md
+
+.PHONY: readme-matrix-generator
+readme-matrix-generator:
+	python3 docs/generate-readme/action-to-mermaid.py ./matrix-generator/action.yml > ./matrix-generator/README.md
