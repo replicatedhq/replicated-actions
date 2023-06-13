@@ -9,26 +9,26 @@ on:
       - '!main'     # excludes main
 
 jobs:
-  matrix-generator:
+  get-customer-instances:
     outputs:
-      matrix: ${{ steps.matrix-generator.outputs.matrix}}
+      matrix: ${{ steps.get-customer-instances.outputs.matrix}}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
-      - name: Generate Matrix
-        id: matrix-generator
-        uses: replicatedhq/compatibility-actions/matrix-generator@v0
+      - name: Get Customer Instances
+        id: get-customer-instances
+        uses: replicatedhq/compatibility-actions/get-customer-instances@v0
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
 
   compatibility-matrix:
-    needs: matrix-generator
+    needs: get-customer-instances
     strategy:
       fail-fast: false
       matrix:
-        cluster: ${{ fromJson(needs.matrix-generator.outputs.matrix) }}
+        cluster: ${{ fromJson(needs.get-customer-instances.outputs.matrix) }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
