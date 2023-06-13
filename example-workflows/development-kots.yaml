@@ -73,12 +73,12 @@ jobs:
       - name: Create Cluster
         id: create-cluster
         uses: replicatedhq/compatibility-actions/create-cluster@v0
-        timeout-minutes: 2
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           kubernetes-distribution: ${{ matrix.cluster.distribution }}
           kubernetes-version: ${{ matrix.cluster.version }}
           cluster-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
+          timeout-minutes: 2
           ttl: 10m
 
       - name: Deploy the app

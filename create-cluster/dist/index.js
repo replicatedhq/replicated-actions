@@ -27,7 +27,7 @@ function run() {
             const k8sDistribution = core.getInput('kubernetes-distribution');
             const k8sVersion = core.getInput('kubernetes-version');
             const k8sTTL = core.getInput('ttl');
-            const timeoutMinutes = +(process.env['GITHUB_STEP_TIMEOUT_MINUTES'] || 5);
+            const timeoutMinutes = +(core.getInput('timeout-minutes') || 5);
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
@@ -35,6 +35,7 @@ function run() {
                 apiClient.endpoint = apiEndpoint;
             }
             let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
+            core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
             const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
             core.setOutput('cluster-id', cluster.id);
