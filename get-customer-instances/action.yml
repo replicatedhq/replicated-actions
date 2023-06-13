@@ -1,0 +1,17 @@
+name: 'Get Customer Instances'
+description: 'Generate k8s matrix for testing based on usage and availability'
+inputs:
+  app-slug:
+    description: 'App Slug.'
+    required: true
+    default: ''
+  api-token:
+    description: 'API Token.'
+    required: true
+    default: ''
+outputs:
+  matrix: # matrix to test with
+    description: 'Matrix to test with (json).' 
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

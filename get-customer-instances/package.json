@@ -1,12 +1,12 @@
 {
-  "name": "archive-customer",
+  "name": "get-customer-instances",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
     "test": "npx jest --verbose",
-    "package": "ncc build --source-map --license LICENSE"
+    "package": "ncc build -o dist build/index.js --source-map --license LICENSE"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "@actions/core": "^1.10.0",
     "esbuild-jest": "^0.5.0",
     "replicated-lib": "^0.0.1-alpha.20",
+    "semver": "^7.5.1",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {

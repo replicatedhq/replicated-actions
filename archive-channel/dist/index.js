@@ -9073,11 +9073,14 @@ exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.Cluster = void 0;
+exports.getSupportedClusters = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.SupportedCluster = exports.Cluster = void 0;
 const configuration_1 = __nccwpck_require__(4995);
 class Cluster {
 }
 exports.Cluster = Cluster;
+class SupportedCluster {
+}
+exports.SupportedCluster = SupportedCluster;
 async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
     const reqBody = {
@@ -9147,6 +9150,27 @@ async function removeCluster(vendorPortalApi, clusterId) {
     }
 }
 exports.removeCluster = removeCluster;
+async function getSupportedClusters(vendorPortalApi) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const uri = `${vendorPortalApi.endpoint}/supported-clusters`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to get supported clusters: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    // 2. Convert body into SupportedCluster[]
+    let supportedClusters = [];
+    for (const cluster of body['supported-clusters']) {
+        for (const version of cluster.versions) {
+            supportedClusters.push({
+                name: cluster.short_name,
+                version: version
+            });
+        }
+    }
+    return supportedClusters;
+}
+exports.getSupportedClusters = getSupportedClusters;
 
 
 /***/ }),
@@ -9191,7 +9215,7 @@ exports.client = client;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.archiveCustomer = exports.createCustomer = exports.Customer = void 0;
+exports.getUsedKubernetesDistributions = exports.archiveCustomer = exports.createCustomer = exports.KubernetesDistribution = exports.Customer = void 0;
 const configuration_1 = __nccwpck_require__(4995);
 const channels_1 = __nccwpck_require__(7491);
 const applications_1 = __nccwpck_require__(3770);
@@ -9199,6 +9223,9 @@ const yaml_1 = __nccwpck_require__(4083);
 class Customer {
 }
 exports.Customer = Customer;
+class KubernetesDistribution {
+}
+exports.KubernetesDistribution = KubernetesDistribution;
 async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, entitlementValues) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
@@ -9249,6 +9276,37 @@ async function archiveCustomer(vendorPortalApi, customerId) {
     }
 }
 exports.archiveCustomer = archiveCustomer;
+async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
+    const http = await (0, configuration_1.client)(vendorPortalApi);
+    // 1. get the app
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    // 1. get the cluster usage
+    const getClusterUsageUri = `${vendorPortalApi.endpoint}/app/${app.id}/cluster-usage`;
+    const getClusterUsageRes = await http.get(getClusterUsageUri);
+    if (getClusterUsageRes.message.statusCode != 200) {
+        throw new Error(`Failed to get Cluster Usage: Server responded with ${getClusterUsageRes.message.statusCode}`);
+    }
+    const getClusterUsageBody = JSON.parse(await getClusterUsageRes.readBody());
+    // 2. Convert body into KubernetesDistribution
+    let kubernetesDistributions = [];
+    // check if getClusterUsageBody.clusterUsageDetails is undefined
+    if (!getClusterUsageBody.clusterUsageDetails) {
+        return kubernetesDistributions;
+    }
+    for (const cluster of getClusterUsageBody.clusterUsageDetails) {
+        kubernetesDistributions.push({
+            k8sDistribution: cluster.kubernetes_distribution,
+            k8sVersion: cluster.kubernetes_version,
+            kotsVersion: cluster.kots_version,
+            cloudProvider: cluster.cloud_provider,
+            isKurl: cluster.is_kurl,
+            numberOfInstances: cluster.number_of_instances,
+            isAirgap: cluster.is_airgap
+        });
+    }
+    return kubernetesDistributions;
+}
+exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 
 
 /***/ }),
