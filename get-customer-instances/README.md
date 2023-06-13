@@ -1,14 +1,14 @@
-## Matrix Generator
+## Get Customer Instances
 
 ```mermaid
 ---
-title: Matrix Generator
+title: Get Customer Instances
 ---
 graph LR
-matrix_generator["Matrix Generator"]
-app_slug ---> matrix_generator
-api_token ---> matrix_generator
-matrix_generator ---> matrix
+get_customer_instances["Get Customer Instances"]
+app_slug ---> get_customer_instances
+api_token ---> get_customer_instances
+get_customer_instances ---> matrix
 ```
 ## Inputs
 | Name | Default | Required | Description |
