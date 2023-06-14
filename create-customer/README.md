@@ -12,6 +12,7 @@ customer_name ---> create_customer
 customer_email ---> create_customer
 license_type ---> create_customer
 channel_slug ---> create_customer
+expires_in ---> create_customer
 entitlements ---> create_customer
 create_customer ---> customer_id
 create_customer ---> license_id
@@ -26,6 +27,7 @@ create_customer ---> license_file
 | customer-email |  | False | Email of the customer. |
 | license-type | dev | True | License Type for the customer. |
 | channel-slug | ${GITHUB_REF} | True | Channel to assign the customer to. |
+| expires-in | 0 | False | Expiration of the license in days. (default: 0 - never expires)) |
 | entitlements |  | False | Entitlements to assign to the customer. |
 
 ## Outputs

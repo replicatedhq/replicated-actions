@@ -64,6 +64,7 @@ runs:
       customer-email: ${{ github.ref_name }}@example.com
       license-type: "dev"
       channel-slug: ${{ steps.create-release.outputs.channel-slug }}
+      expires-in: 14
   - name: Create Cluster
     id: create-cluster
     uses: replicatedhq/compatibility-actions/create-cluster@v0

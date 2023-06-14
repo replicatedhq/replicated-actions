@@ -13,6 +13,7 @@ async function run() {
     const licenseType = core.getInput('license-type');
     const channelSlug = core.getInput('channel-slug');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
+    const expiresInDays: number = +(core.getInput('expires-in') || 0);
     const entitlements = core.getInput('entitlements')
     
     const apiClient = new VendorPortalApi();
@@ -24,7 +25,7 @@ async function run() {
 
 
     const entitlementsArray = processEntitlements(entitlements)
-    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, entitlementsArray);
+    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray);
 
     core.setOutput('customer-id', customer.customerId);
     core.setOutput('license-id', customer.licenseId);
