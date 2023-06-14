@@ -62,13 +62,14 @@ jobs:
 
       - name: Create Customer 
         id: create-customer
-        uses: replicatedhq/compatibility-actions/create-customer@use-channel-slug
+        uses: replicatedhq/compatibility-actions/create-customer@v0
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
           channel-slug: ${{ needs.push-to-replicated.outputs.channel-slug }}
           customer-email: ${{ github.ref_name }}@example.com
+          expires-in: 14
 
       - name: Create Cluster
         id: create-cluster

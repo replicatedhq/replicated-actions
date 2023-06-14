@@ -61,6 +61,7 @@ jobs:
           customer-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
           channel-slug: ${{ needs.push-to-replicated.outputs.channel-slug }}
           customer-email: ${{ github.ref_name }}@example.com
+          expires-in: 14
 
       - name: Create Cluster
         id: create-cluster

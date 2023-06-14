@@ -23,6 +23,10 @@ inputs:
     description: 'Channel to assign the customer to.'
     required: true
     default: '${GITHUB_REF}'
+  expires-in:
+    description: 'Expiration of the license in days. (default: 0 - never expires))'
+    required: false
+    default: '0'
   entitlements:
     description: 'Entitlements to assign to the customer.'
     required: false
