@@ -24,7 +24,7 @@ async function run() {
 
 
     const entitlementsArray = processEntitlements(entitlements)
-    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, entitlementsArray);
+    const customer = await createCustomer(apiClient, appSlug, name, email, "dev", channelSlug, entitlementsArray);
 
     core.setOutput('customer-id', customer.customerId);
     core.setOutput('license-id', customer.licenseId);
