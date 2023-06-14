@@ -9239,7 +9239,6 @@ exports.getUsedKubernetesDistributions = exports.archiveCustomer = exports.creat
 const configuration_1 = __nccwpck_require__(4995);
 const channels_1 = __nccwpck_require__(7491);
 const applications_1 = __nccwpck_require__(3770);
-const yaml_1 = __nccwpck_require__(4083);
 class Customer {
 }
 exports.Customer = Customer;
@@ -9272,12 +9271,15 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         // 2. download the license
         const downloadLicenseUri = `${vendorPortalApi.endpoint}/app/${app.id}/customer/${createCustomerBody.customer.id}/license-download`;
         const downloadLicenseRes = await http.get(downloadLicenseUri);
-        if (downloadLicenseRes.message.statusCode != 200) {
+        // If response is 403, ignore as we could be using a trial license (on builders plan)
+        if (downloadLicenseRes.message.statusCode != 200 && downloadLicenseRes.message.statusCode != 403) {
             throw new Error(`Failed to download created license: Server responded with ${downloadLicenseRes.message.statusCode}`);
         }
-        const downloadLicenseBody = await downloadLicenseRes.readBody();
-        const licenseYAML = (0, yaml_1.parse)(downloadLicenseBody);
-        return { name: name, customerId: createCustomerBody.customer.id, licenseId: licenseYAML.spec.licenseID, license: downloadLicenseBody };
+        let downloadLicenseBody = "";
+        if (downloadLicenseRes.message.statusCode == 200) {
+            downloadLicenseBody = await downloadLicenseRes.readBody();
+        }
+        return { name: name, customerId: createCustomerBody.customer.id, licenseId: createCustomerBody.customer.installationId, license: downloadLicenseBody };
     }
     catch (error) {
         console.error(error.message);
