@@ -10,7 +10,7 @@ async function run() {
     const apiToken = core.getInput('api-token')
     const name = core.getInput('customer-name');
     const email = core.getInput('customer-email');
-    const licenseType = core.getInput('customer-license-type');
+    const licenseType = core.getInput('license-type');
     const channelSlug = core.getInput('channel-slug');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     const entitlements = core.getInput('entitlements')
