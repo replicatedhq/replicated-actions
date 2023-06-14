@@ -56,7 +56,7 @@ runs:
       version: ${{ env.APP_VERSION }}
   - name: 'Create Customer'
     id: 'create-customer'
-    uses: replicatedhq/compatibility-actions/create-customer@license-type
+    uses: replicatedhq/compatibility-actions/create-customer@v0
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
