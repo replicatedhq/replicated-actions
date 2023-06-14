@@ -27,7 +27,7 @@ function run() {
             const apiToken = core.getInput('api-token');
             const name = core.getInput('customer-name');
             const email = core.getInput('customer-email');
-            const licenseType = core.getInput('customer-license-type');
+            const licenseType = core.getInput('license-type');
             const channelSlug = core.getInput('channel-slug');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const entitlements = core.getInput('entitlements');
@@ -37,7 +37,7 @@ function run() {
                 apiClient.endpoint = apiEndpoint;
             }
             const entitlementsArray = processEntitlements(entitlements);
-            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, entitlementsArray);
+            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, "dev", channelSlug, entitlementsArray);
             core.setOutput('customer-id', customer.customerId);
             core.setOutput('license-id', customer.licenseId);
             core.setOutput('license-file', customer.license);
