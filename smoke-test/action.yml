@@ -67,7 +67,7 @@ runs:
       expires-in: 14
   - name: Create Cluster
     id: create-cluster
-    uses: replicatedhq/compatibility-actions/create-cluster@v0
+    uses: replicatedhq/compatibility-actions/create-cluster@fix_disk_gib
     with:
       api-token: ${{ inputs.api-token }}
       kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
