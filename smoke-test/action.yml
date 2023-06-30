@@ -62,6 +62,17 @@ runs:
   - name: Define Channel Name
     shell: bash
     run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}" >> $GITHUB_ENV
+  - name: Update Chart YAML
+    id: update-chart-yaml
+    uses: mikefarah/yq@master
+    with:
+      cmd: yq '.version = "${APP_VERSION}"' ${CHART_YAML}
+  - name: Update Chart Version
+    id: update-chart-version
+    shell: bash
+    run: |
+      tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
+      tar -uzvf ${tarball} ${CHART_YAML}
   - name: 'Create Release'
     id: 'create-release'
     uses: replicatedhq/compatibility-actions/create-release@v0
