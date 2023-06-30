@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as semver from 'semver';
-import { SupportedCluster, getSupportedClusters } from 'replicated-lib/dist/clusters';
+import { ClusterVersion, getClusterVersions } from 'replicated-lib/dist/clusters';
 import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 import { KubernetesDistribution, getUsedKubernetesDistributions } from 'replicated-lib/dist/customers';
 
@@ -24,7 +24,7 @@ async function run() {
     }
 
     const usedDistributions = await getUsedKubernetesDistributions(apiClient, appSlug)
-    const availableDistributions = await getSupportedClusters(apiClient)
+    const availableDistributions = await getClusterVersions(apiClient)
 
     const matrix = processDistributions(usedDistributions, availableDistributions)
 
@@ -35,9 +35,9 @@ async function run() {
   }
 }
 
-function processDistributions(usedDistributions: KubernetesDistribution[], availableDistributions: SupportedCluster[]): MatrixInstance[] {
+function processDistributions(usedDistributions: KubernetesDistribution[], availableDistributions: ClusterVersion[]): MatrixInstance[] {
   const matrixMap: { [key: string]: MatrixInstance } = {}
-  const availableMap: { [key: string]: SupportedCluster } = {}
+  const availableMap: { [key: string]: ClusterVersion } = {}
   
   core.info(`Found ${availableDistributions.length} available distributions`)
   core.info(`Found ${usedDistributions.length} used distributions`)

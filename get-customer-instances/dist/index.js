@@ -33,7 +33,7 @@ function run() {
                 apiClient.endpoint = apiEndpoint;
             }
             const usedDistributions = yield (0, customers_1.getUsedKubernetesDistributions)(apiClient, appSlug);
-            const availableDistributions = yield (0, clusters_1.getSupportedClusters)(apiClient);
+            const availableDistributions = yield (0, clusters_1.getClusterVersions)(apiClient);
             const matrix = processDistributions(usedDistributions, availableDistributions);
             core.setOutput('matrix', JSON.stringify(matrix));
         }
@@ -23395,14 +23395,14 @@ exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSupportedClusters = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.SupportedCluster = exports.Cluster = void 0;
+exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.Cluster = void 0;
 const configuration_1 = __nccwpck_require__(4995);
 class Cluster {
 }
 exports.Cluster = Cluster;
-class SupportedCluster {
+class ClusterVersion {
 }
-exports.SupportedCluster = SupportedCluster;
+exports.ClusterVersion = ClusterVersion;
 async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
     const reqBody = {
@@ -23410,6 +23410,7 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
         "kubernetes_distribution": k8sDistribution,
         "kubernetes_version": k8sVersion,
         "ttl": clusterTTL,
+        "disk_gib": 50,
     };
     const uri = `${vendorPortalApi.endpoint}/cluster`;
     const res = await http.post(uri, JSON.stringify(reqBody));
@@ -23472,27 +23473,27 @@ async function removeCluster(vendorPortalApi, clusterId) {
     }
 }
 exports.removeCluster = removeCluster;
-async function getSupportedClusters(vendorPortalApi) {
+async function getClusterVersions(vendorPortalApi) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
-    const uri = `${vendorPortalApi.endpoint}/supported-clusters`;
+    const uri = `${vendorPortalApi.endpoint}/cluster/versions`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
-        throw new Error(`Failed to get supported clusters: Server responded with ${res.message.statusCode}`);
+        throw new Error(`Failed to get cluster versions: Server responded with ${res.message.statusCode}`);
     }
     const body = JSON.parse(await res.readBody());
-    // 2. Convert body into SupportedCluster[]
-    let supportedClusters = [];
-    for (const cluster of body['supported-clusters']) {
+    // 2. Convert body into ClusterVersion[]
+    let clusterVersions = [];
+    for (const cluster of body['cluster-versions']) {
         for (const version of cluster.versions) {
-            supportedClusters.push({
+            clusterVersions.push({
                 name: cluster.short_name,
                 version: version
             });
         }
     }
-    return supportedClusters;
+    return clusterVersions;
 }
-exports.getSupportedClusters = getSupportedClusters;
+exports.getClusterVersions = getClusterVersions;
 
 
 /***/ }),
