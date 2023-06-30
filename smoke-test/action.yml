@@ -39,9 +39,26 @@ inputs:
 runs:
   using: "composite"
   steps:
+  - name: Extract Chart YAML
+    id: extract-chart-yaml
+    shell: bash
+    run: |
+      tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
+      chart_yaml=$(tar -xzvf ${tarball} $(tar -tzf ${tarball} | grep Chart.yaml))
+      echo "chart-yaml=${chart_yaml}" >> $GITHUB_OUTPUT
+    env:
+      YAML_DIR: ${{ inputs.yaml-dir }}
+      CHART_NAME: ${{ inputs.helm-chart-name }}
+  - name: Get Chart Version
+    id: get-chart-version
+    uses: mikefarah/yq@master
+    with:
+      cmd: yq '.version' ${{ steps.extract-chart-yaml.outputs.chart-yaml }}
   - name: Define App Version
     shell: bash
-    run: echo "APP_VERSION=0.0.1-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+    run: echo "APP_VERSION=${CHART_VERSION}-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+    env:
+      CHART_VERSION: ${{ steps.get-chart-version.outputs.results }}
   - name: Define Channel Name
     shell: bash
     run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}" >> $GITHUB_ENV
