@@ -45,7 +45,7 @@ runs:
     run: |
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
       chart_yaml=$(tar -xzvf ${tarball} $(tar -tzf ${tarball} | grep Chart.yaml))
-      echo "chart-yaml=${chart_yaml}" >> $GITHUB_OUTPUT
+      echo "CHART_YAML=${chart_yaml}" >> $GITHUB_ENV
     env:
       YAML_DIR: ${{ inputs.yaml-dir }}
       CHART_NAME: ${{ inputs.helm-chart-name }}
@@ -53,7 +53,9 @@ runs:
     id: get-chart-version
     uses: mikefarah/yq@master
     with:
-      cmd: yq '.version' ${{ steps.extract-chart-yaml.outputs.chart-yaml }}
+      cmd: yq '.version' ${CHART_YAML}
+    env:
+      CHART_YAML: ${{ env.CHART_YAML }}
   - name: Define App Version
     shell: bash
     run: echo "APP_VERSION=${CHART_VERSION}-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
