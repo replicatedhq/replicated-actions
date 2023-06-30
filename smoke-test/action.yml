@@ -44,7 +44,7 @@ runs:
     shell: bash
     run: |
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
-      chart_yaml=$(tar -xzvf ${tarball} $(tar -tzf ${tarball} | grep Chart.yaml))
+      chart_yaml=$(tar -xzvf ${tarball} $(tar -tzf ${tarball} --exclude "*/charts/*" | grep Chart.yaml))
       echo "CHART_YAML=${chart_yaml}" >> $GITHUB_ENV
     env:
       YAML_DIR: ${{ inputs.yaml-dir }}
