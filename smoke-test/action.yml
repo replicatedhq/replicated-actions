@@ -54,8 +54,6 @@ runs:
     uses: mikefarah/yq@master
     with:
       cmd: yq '.version' ${CHART_YAML}
-    env:
-      CHART_YAML: ${{ env.CHART_YAML }}
   - name: Define App Version
     shell: bash
     run: echo "APP_VERSION=${CHART_VERSION}-${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
