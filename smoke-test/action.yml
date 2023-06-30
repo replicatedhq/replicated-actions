@@ -66,13 +66,18 @@ runs:
     id: update-chart-yaml
     uses: mikefarah/yq@master
     with:
-      cmd: yq '.version = "${APP_VERSION}"' ${CHART_YAML}
+      cmd: yq  -i '.version = "${{ env.APP_VERSION }}"' ${CHART_YAML}
   - name: Update Chart Version
     id: update-chart-version
     shell: bash
     run: |
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
-      tar -uzvf ${tarball} ${CHART_YAML}
+      gunzip ${tarball} 
+      tar -uvf ${tarball%tgz}.tar ${CHART_YAML}
+      gzip ${tarball%tgz}.tar
+      mv ${tarball%tgz}.tar.gz ${tarball}
+    env:
+      YAML_DIR: ${{ inputs.yaml-dir }}
   - name: 'Create Release'
     id: 'create-release'
     uses: replicatedhq/compatibility-actions/create-release@v0
