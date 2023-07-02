@@ -13,6 +13,9 @@ inputs:
     description: 'The directory containing multiple yamls for a Replicated release.'
     required: true
     default: 'manifests'
+  version:
+    description: 'Provides version to use for the Replicated Release'
+    reqired: false
   kubernetes-distribution:
     description: 'Kubernetes distribution of the cluster to provision.'
     required: true
@@ -41,6 +44,7 @@ runs:
   steps:
   - name: Extract Chart YAML
     id: extract-chart-yaml
+    if: inputs.version == ''
     shell: bash
     run: |
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
@@ -51,27 +55,36 @@ runs:
       CHART_NAME: ${{ inputs.helm-chart-name }}
   - name: Get Chart Version
     id: get-chart-version
+    if: inputs.version == ''
     uses: mikefarah/yq@master
     with:
       cmd: yq '.version' ${CHART_YAML}
   - name: Define App Version
     shell: bash
+    if: inputs.version == ''
     run: echo "APP_VERSION=${CHART_VERSION}+${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
     env:
       CHART_VERSION: ${{ steps.get-chart-version.outputs.result }}
+  - name: Use Explicit Version
+    shell: bash
+    if: inputs.version != ''
+    run: echo "APP_VERSION=${VERSION}" >> $GITHUB_ENV
+    env:
+      VERSION: ${{ inputs.version }}
   - name: Define Channel Name
     shell: bash
     run: echo "CHANNEL_NAME=${{ github.ref_name }}-${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}" >> $GITHUB_ENV
   - name: Update Chart YAML
     id: update-chart-yaml
+    if: inputs.version == ''
     uses: mikefarah/yq@master
     with:
       cmd: yq  -i '.version = "${{ env.APP_VERSION }}"' ${CHART_YAML}
   - name: Update Chart Version
     id: update-chart-version
     shell: bash
-    if: ${{ inputs.installation-method == 'helm' }}
-    run: |
+    if: inputs.installation-method == 'helm' && inputs.version == ''
+    run:  |
       # update the chart version to match the Replicated app version
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
       mkdir -p /tmp/repack
@@ -81,6 +94,7 @@ runs:
       rm ${tarball}
     env:
       YAML_DIR: ${{ inputs.yaml-dir }}
+      CHART_NAME: ${{ inputs.helm-chart-name }}
   - name: 'Create Release'
     id: 'create-release'
     uses: replicatedhq/compatibility-actions/create-release@v0
