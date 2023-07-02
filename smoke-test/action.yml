@@ -72,10 +72,10 @@ runs:
     shell: bash
     run: |
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
-      gunzip ${tarball} 
-      tar -uvf ${tarball%tgz}.tar ${CHART_YAML}
-      gzip ${tarball%tgz}.tar
-      mv ${tarball%tgz}.tar.gz ${tarball}
+      tar -xvf ${tarball%tgz} -C /tmp/repack
+      helm package --version "${{ env.APP_VERSION }}" /tmp/repack
+      mv /tmp/repack/${{ inputs.helm-chart-name }}-${{env.APP_VERSION }}.tgz $(dirname ${tarball })
+      rm ${tarball}
     env:
       YAML_DIR: ${{ inputs.yaml-dir }}
   - name: 'Create Release'
