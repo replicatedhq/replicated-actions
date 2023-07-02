@@ -70,7 +70,9 @@ runs:
   - name: Update Chart Version
     id: update-chart-version
     shell: bash
+    if: ${{ inputs.installation-method == 'helm' }}
     run: |
+      # update the chart version to match the Replicated app version
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
       tar -xvf ${tarball%tgz} -C /tmp/repack
       helm package --version "${{ env.APP_VERSION }}" /tmp/repack
