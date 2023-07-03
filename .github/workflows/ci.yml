@@ -1,0 +1,17 @@
+name: CI
+
+on: push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: package
+      run: make package-all
+
+    - name: readme
+      run: make readme-all
