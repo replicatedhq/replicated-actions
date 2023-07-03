@@ -54,50 +54,54 @@ package-get-customer-instances:
 	cd ./get-customer-instances && npm install && npm run build && npm run package
 
 .PHONY: readme-all
-readme-all: readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
+readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
 			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
 			 readme-remove-cluster smoke-test readme-get-customer-instances
 
+.PHONE: pip-install
+pip-install:
+	pip3 install -r docs/generate-readme/requirements.txt
+	
 .PHONY: readme-archive-channel
-readme-archive-channel:
+readme-archive-channel: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./archive-channel/action.yml > ./archive-channel/README.md
 
 .PHONY: readme-archive-customer
-readme-archive-customer:
+readme-archive-customer: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./archive-customer/action.yml > ./archive-customer/README.md
 
 .PHONY: readme-create-cluster
-readme-create-cluster:
+readme-create-cluster: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./create-cluster/action.yml > ./create-cluster/README.md
 
 .PHONY: readme-create-customer
-readme-create-customer:
+readme-create-customer: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./create-customer/action.yml > ./create-customer/README.md
 
 .PHONY: readme-create-release
-readme-create-release:
+readme-create-release: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./create-release/action.yml > ./create-release/README.md
 
 .PHONY: readme-helm-install
-readme-helm-install:
+readme-helm-install: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./helm-install/action.yml > ./helm-install/README.md
 
 .PHONY: readme-kots-install
-readme-kots-install:
+readme-kots-install: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./kots-install/action.yml > ./kots-install/README.md
 
 .PHONY: readme-promote-release
-readme-promote-release:
+readme-promote-release: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./promote-release/action.yml > ./promote-release/README.md
 
 .PHONY: readme-remove-cluster
-readme-remove-cluster:
+readme-remove-cluster: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./remove-cluster/action.yml > ./remove-cluster/README.md
 
 .PHONY: readme-smoke-test
-readme-smoke-test:
+readme-smoke-test: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./smoke-test/action.yml > ./smoke-test/README.md
 
 .PHONY: readme-get-customer-instances
-readme-get-customer-instances:
+readme-get-customer-instances: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./get-customer-instances/action.yml > ./get-customer-instances/README.md
