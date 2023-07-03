@@ -30623,7 +30623,14 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         }
         const createCustomerRes = await http.post(createCustomerUri, JSON.stringify(createCustomerReqBody));
         if (createCustomerRes.message.statusCode != 201) {
-            throw new Error(`Failed to create customer: Server responded with ${createCustomerRes.message.statusCode}`);
+            let body = "";
+            try {
+                body = await createCustomerRes.readBody();
+            }
+            catch (err) {
+                // ignore
+            }
+            throw new Error(`Failed to create customer: Server responded with ${createCustomerRes.message.statusCode}: ${body}`);
         }
         const createCustomerBody = JSON.parse(await createCustomerRes.readBody());
         // 2. download the license
@@ -30839,7 +30846,6 @@ async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseS
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 200) {
         // If res has a body, read it and add it to the error message
-        console.log(`Failed to promote release: Server responded with ${res.message.statusCode}`);
         let body = "";
         try {
             body = await res.readBody();
