@@ -30473,6 +30473,7 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
     // if it's not ${status}, sleep for 5 seconds and try again
     // if it is ${status}, return the cluster with that status
     const sleeptime = 5;
+    await new Promise(f => setTimeout(f, sleeptime * 1000)); // sleep for 5 seconds before polling as the cluster takes a few seconds to start provisioning
     // iterate for timeout/sleeptime times
     for (let i = 0; i < timeout / sleeptime; i++) {
         const clusterDetails = await getClusterDetails(vendorPortalApi, clusterId);
