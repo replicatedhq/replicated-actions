@@ -10,7 +10,7 @@ async function run() {
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');
     const k8sTTL = core.getInput('ttl');
-    const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 5);
+    const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     
     const apiClient = new VendorPortalApi();

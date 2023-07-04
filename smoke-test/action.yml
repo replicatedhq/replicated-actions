@@ -67,13 +67,14 @@ runs:
       expires-in: 14
   - name: Create Cluster
     id: create-cluster
-    uses: replicatedhq/compatibility-actions/create-cluster@v0
+    uses: replicatedhq/compatibility-actions/create-cluster@joshd/timeouts-for-smoke-test
     with:
       api-token: ${{ inputs.api-token }}
       kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
       kubernetes-version: ${{ inputs.kubernetes-version }}
       cluster-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
-      ttl: 10m
+      ttl: ${{ inputs.ttl || '2h' }}
+      timeout-minutes: ${{ inputs.timeout-minutes || 20 }}
   - name: Deploy the app with Helm
     uses: replicatedhq/compatibility-actions/helm-install@v0
     if: ${{ inputs.installation-method == 'helm' }}
