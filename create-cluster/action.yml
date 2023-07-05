@@ -16,9 +16,9 @@ inputs:
     required: true
     default: ''
   ttl:
-    description: 'Cluster TTL (duration) (default "1h")'
+    description: 'Cluster TTL (duration) (default "2h")'
     required: true
-    default: '1h'
+    default: '2h'
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'

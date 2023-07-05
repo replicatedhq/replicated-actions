@@ -9,7 +9,7 @@ async function run() {
     const name = core.getInput('cluster-name');
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');
-    const k8sTTL = core.getInput('ttl') || '1h';
+    const k8sTTL = core.getInput('ttl') || '2h';
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     
