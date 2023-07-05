@@ -67,7 +67,7 @@ runs:
       expires-in: 14
   - name: Create Cluster
     id: create-cluster
-    uses: replicatedhq/compatibility-actions/create-cluster@joshd/timeouts-for-smoke-test
+    uses: replicatedhq/compatibility-actions/create-cluster@v0
     with:
       api-token: ${{ inputs.api-token }}
       kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
