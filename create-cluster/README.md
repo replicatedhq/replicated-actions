@@ -21,7 +21,7 @@ create_cluster ---> cluster_kubeconfig
 | kubernetes-distribution |  | True | Kubernetes distribution of the cluster to provision. |
 | kubernetes-version |  | True | Kubernetes version to provision (format is distribution dependent). |
 | cluster-name |  | True | Name of the cluster to provision |
-| ttl | 1h | True | Cluster TTL (duration) (default "1h") |
+| ttl | 2h | True | Cluster TTL (duration) (default "2h") |
 
 ## Outputs
 | Name | Description |

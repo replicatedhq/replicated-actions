@@ -73,7 +73,8 @@ runs:
       kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
       kubernetes-version: ${{ inputs.kubernetes-version }}
       cluster-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
-      ttl: 10m
+      ttl: ${{ inputs.ttl || '2h' }}
+      timeout-minutes: ${{ inputs.timeout-minutes || 20 }}
   - name: Deploy the app with Helm
     uses: replicatedhq/compatibility-actions/helm-install@v0
     if: ${{ inputs.installation-method == 'helm' }}
