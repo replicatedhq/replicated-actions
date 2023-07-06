@@ -21,3 +21,5 @@ jobs:
 
     # Commit all changed files back to the repository (dist and readme files)
     - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Automated commit of npm build result and updated readme files
