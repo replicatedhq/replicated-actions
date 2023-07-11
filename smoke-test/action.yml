@@ -15,7 +15,7 @@ inputs:
     default: 'manifests'
   version:
     description: 'Provides version to use for the Replicated Release'
-    reqired: false
+    required: false
   kubernetes-distribution:
     description: 'Kubernetes distribution of the cluster to provision.'
     required: true
@@ -44,7 +44,7 @@ runs:
   steps:
   - name: Extract Chart YAML
     id: extract-chart-yaml
-    if: inputs.version == ''
+    if: inputs.installation-method == 'helm' && inputs.version == ''
     shell: bash
     run: |
       tarball=$(find ${YAML_DIR} -name "${CHART_NAME}*.tgz")
@@ -55,14 +55,21 @@ runs:
       CHART_NAME: ${{ inputs.helm-chart-name }}
   - name: Get Chart Version
     id: get-chart-version
-    if: inputs.version == ''
+    if: inputs.installation-method == 'helm' && inputs.version == ''
     uses: mikefarah/yq@master
     with:
       cmd: yq '.version' ${CHART_YAML}
   - name: Define App Version
     shell: bash
-    if: inputs.version == ''
+    if: inputs.installation-method == 'helm' && inputs.version == ''
     run: echo "APP_VERSION=${CHART_VERSION}+${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
+    env:
+      CHART_VERSION: ${{ steps.get-chart-version.outputs.result }}
+  # there no good default here, going back to what Josh had since it's specific to the channel and the channel goes away
+  - name: Define App Version
+    shell: bash
+    if: inputs.installation-method == 'kots' && inputs.version == ''
+    run: echo "APP_VERSION=0.1.0+${GITHUB_REF_NAME//[^a-zA-Z0-9]/}.${GITHUB_RUN_ID}${GITHUB_RUN_ATTEMPT}" >> $GITHUB_ENV
     env:
       CHART_VERSION: ${{ steps.get-chart-version.outputs.result }}
   - name: Use Explicit Version
