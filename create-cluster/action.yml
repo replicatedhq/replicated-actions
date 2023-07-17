@@ -18,6 +18,10 @@ inputs:
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
+  timeout-minutes:
+    description: 'Time to wait for the cluster to have a status of `running`'
+    required: false
+    default: '20'
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'
