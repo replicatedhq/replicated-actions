@@ -30495,7 +30495,7 @@ async function getClusterDetails(vendorPortalApi, clusterId) {
             throw new Error(`Failed to get clusters: Server responded with ${res.message.statusCode}`);
         }
         const body = JSON.parse(await res.readBody());
-        if (clusters.length == body.totalClusters || body.clusters.length == 0) {
+        if (clusters.length == body.totalClusters || body.clusters == undefined || body.clusters.length == 0) {
             break;
         }
         clusters = clusters.concat(body.clusters);
