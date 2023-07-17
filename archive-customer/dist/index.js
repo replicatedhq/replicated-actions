@@ -30453,7 +30453,14 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
     const uri = `${vendorPortalApi.endpoint}/cluster`;
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 201) {
-        throw new Error(`Failed to queue cluster create: Server responded with ${res.message.statusCode}`);
+        let body = "";
+        try {
+            body = await res.readBody();
+        }
+        catch (err) {
+            // ignore
+        }
+        throw new Error(`Failed to queue cluster create: Server responded with ${res.message.statusCode}: ${body}`);
     }
     const body = JSON.parse(await res.readBody());
     return { name: body.cluster.name, id: body.cluster.id, status: body.cluster.status };
@@ -30479,13 +30486,22 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
 exports.pollForStatus = pollForStatus;
 async function getClusterDetails(vendorPortalApi, clusterId) {
     const http = await (0, configuration_1.client)(vendorPortalApi);
+    let page = 0;
+    let clusters = [];
     const uri = `${vendorPortalApi.endpoint}/clusters`;
-    const res = await http.get(uri);
-    if (res.message.statusCode != 200) {
-        throw new Error(`Failed to get clusters: Server responded with ${res.message.statusCode}`);
+    while (true) {
+        const res = await http.get(`${uri}?currentPage=${page}`);
+        if (res.message.statusCode != 200) {
+            throw new Error(`Failed to get clusters: Server responded with ${res.message.statusCode}`);
+        }
+        const body = JSON.parse(await res.readBody());
+        if (clusters.length == body.totalClusters || body.clusters.length == 0) {
+            break;
+        }
+        clusters = clusters.concat(body.clusters);
+        page++;
     }
-    const body = JSON.parse(await res.readBody());
-    const cluster = body.clusters.find((c) => c.id === clusterId);
+    const cluster = clusters.find((c) => c.id === clusterId);
     if (!cluster) {
         throw new Error(`Failed to find cluster with id ${clusterId}`);
     }
@@ -30746,7 +30762,7 @@ async function createRelease(vendorPortalApi, appSlug, yamlDir) {
         throw new Error(`Failed to create release: Server responded with ${createReleaseRes.message.statusCode}`);
     }
     const createReleaseBody = JSON.parse(await createReleaseRes.readBody());
-    console.log(`Created release with sequence nunmber ${createReleaseBody.release.sequence}`);
+    console.log(`Created release with sequence number ${createReleaseBody.release.sequence}`);
     return { sequence: createReleaseBody.release.sequence };
 }
 exports.createRelease = createRelease;
