@@ -17,6 +17,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const os = __nccwpck_require__(2037);
 const replicated_lib_1 = __nccwpck_require__(4409);
 const configuration_1 = __nccwpck_require__(4995);
 function run() {
@@ -29,6 +32,8 @@ function run() {
             const k8sTTL = core.getInput('ttl');
             const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
             const apiEndpoint = core.getInput('replicated-api-endpoint');
+            let kubeconfigPath = core.getInput('kubeconfig-path');
+            const exportKubeconfig = core.getInput('export-kubeconfig') === 'true';
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
@@ -40,11 +45,31 @@ function run() {
             const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
             core.setOutput('cluster-id', cluster.id);
             core.setOutput('cluster-kubeconfig', kubeconfig);
+            if (kubeconfigPath) {
+                writeFile(kubeconfigPath, kubeconfig);
+                core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
+            }
+            if (exportKubeconfig) {
+                if (!kubeconfigPath) {
+                    kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${k8sDistribution}-${k8sVersion}`;
+                    writeFile(kubeconfigPath, kubeconfig);
+                    core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
+                }
+                core.exportVariable('KUBECONFIG', kubeconfigPath);
+                core.info(`Set KUBECONFIG=${kubeconfigPath}`);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
+}
+function writeFile(filePath, contents) {
+    const directoryPath = path.dirname(filePath);
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+    fs.writeFileSync(filePath, contents);
 }
 run();
 //# sourceMappingURL=index.js.map
