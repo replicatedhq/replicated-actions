@@ -1,4 +1,7 @@
 import * as core from '@actions/core';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import { createCluster, getKubeconfig, pollForStatus } from 'replicated-lib';
 import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 
@@ -12,6 +15,8 @@ async function run() {
     const k8sTTL = core.getInput('ttl');
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const apiEndpoint = core.getInput('replicated-api-endpoint')
+    let kubeconfigPath = core.getInput('kubeconfig-path');
+    const exportKubeconfig = core.getInput('export-kubeconfig') === 'true';
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -28,9 +33,32 @@ async function run() {
     core.setOutput('cluster-id', cluster.id);
     core.setOutput('cluster-kubeconfig', kubeconfig);
 
+    if (kubeconfigPath) {
+      writeFile(kubeconfigPath, kubeconfig);
+      core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
+    }
+
+    if (exportKubeconfig) {
+      if (!kubeconfigPath) {
+        kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${k8sDistribution}-${k8sVersion}`;
+        writeFile(kubeconfigPath, kubeconfig);
+        core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
+      }
+      core.exportVariable('KUBECONFIG', kubeconfigPath);
+      core.info(`Set KUBECONFIG=${kubeconfigPath}`);
+    }
+
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+function writeFile(filePath: string, contents: string) {
+  const directoryPath = path.dirname(filePath);
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
+  fs.writeFileSync(filePath, contents);
 }
 
 
