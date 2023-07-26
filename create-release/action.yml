@@ -11,15 +11,19 @@ inputs:
     default: ''
   yaml-dir:
     description: 'The directory containing multiple yamls for a Replicated release.'
-    required: true
+    required: false
     default: 'manifests'
+  chart:
+    description: 'The Helm chart tarball for a Replicated release'
+    required: false
+    default: ''
   promote-channel:
     description: 'Channel name or id to promote this release to.'
-    required: true
-    default: '${GITHUB_REF}'
+    required: false
+    default: ''
   version:
     description: 'Release version'
-    required: true
+    required: false
     default: '${GITHUB_SHA::7}'
 outputs:
   channel-slug: # slug of the channel

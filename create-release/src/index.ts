@@ -10,6 +10,7 @@ async function run() {
     const appSlug = core.getInput('app-slug')
     const apiToken = core.getInput('api-token')
     const yamlDir = core.getInput('yaml-dir')
+    const chart = core.getInput('chart')
     const promoteChannel = core.getInput('promote-channel')
     const releaseVersion = core.getInput('version')
     const apiEndpoint = core.getInput('replicated-api-endpoint')
@@ -21,25 +22,31 @@ async function run() {
       apiClient.endpoint = apiEndpoint
     }
 
-    const release = await createRelease(apiClient, appSlug, yamlDir)
-
-    const channel = getChannelDetails(apiClient, appSlug, {name: promoteChannel})
-    let resolvedChannel: Channel | undefined
-    await channel.then((channel) => {
-      console.log(channel.name);
-      resolvedChannel = channel
-    }, (reason) => {
-        if (reason.channel === null) {
-            console.error(reason.reason);
-        } 
-    })
-
-    if (!resolvedChannel) {
-      resolvedChannel = await createChannel(apiClient, appSlug, promoteChannel)
+    var source = yamlDir
+    if ( chart ) {
+      source = chart
     }
+    const release = await createRelease(apiClient, appSlug, source)
 
-    await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion)
-    core.setOutput('channel-slug', resolvedChannel.slug);
+    if ( promoteChannel ) {
+      const channel = getChannelDetails(apiClient, appSlug, {name: promoteChannel})
+      let resolvedChannel: Channel | undefined
+      await channel.then((channel) => {
+        console.log(channel.name);
+        resolvedChannel = channel
+      }, (reason) => {
+          if (reason.channel === null) {
+              console.error(reason.reason);
+          } 
+      })
+
+      if (!resolvedChannel) {
+        resolvedChannel = await createChannel(apiClient, appSlug, promoteChannel)
+      }
+
+      await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion)
+      core.setOutput('channel-slug', resolvedChannel.slug);
+    }
     core.setOutput('release-sequence', release.sequence);
 
   } catch (error) {

@@ -27,6 +27,7 @@ function run() {
             const appSlug = core.getInput('app-slug');
             const apiToken = core.getInput('api-token');
             const yamlDir = core.getInput('yaml-dir');
+            const chart = core.getInput('chart');
             const promoteChannel = core.getInput('promote-channel');
             const releaseVersion = core.getInput('version');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
@@ -35,22 +36,28 @@ function run() {
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            const release = yield (0, releases_1.createRelease)(apiClient, appSlug, yamlDir);
-            const channel = (0, channels_1.getChannelDetails)(apiClient, appSlug, { name: promoteChannel });
-            let resolvedChannel;
-            yield channel.then((channel) => {
-                console.log(channel.name);
-                resolvedChannel = channel;
-            }, (reason) => {
-                if (reason.channel === null) {
-                    console.error(reason.reason);
-                }
-            });
-            if (!resolvedChannel) {
-                resolvedChannel = yield (0, channels_1.createChannel)(apiClient, appSlug, promoteChannel);
+            var source = yamlDir;
+            if (chart) {
+                source = chart;
             }
-            yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion);
-            core.setOutput('channel-slug', resolvedChannel.slug);
+            const release = yield (0, releases_1.createRelease)(apiClient, appSlug, source);
+            if (promoteChannel) {
+                const channel = (0, channels_1.getChannelDetails)(apiClient, appSlug, { name: promoteChannel });
+                let resolvedChannel;
+                yield channel.then((channel) => {
+                    console.log(channel.name);
+                    resolvedChannel = channel;
+                }, (reason) => {
+                    if (reason.channel === null) {
+                        console.error(reason.reason);
+                    }
+                });
+                if (!resolvedChannel) {
+                    resolvedChannel = yield (0, channels_1.createChannel)(apiClient, appSlug, promoteChannel);
+                }
+                yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion);
+                core.setOutput('channel-slug', resolvedChannel.slug);
+            }
             core.setOutput('release-sequence', release.sequence);
         }
         catch (error) {
