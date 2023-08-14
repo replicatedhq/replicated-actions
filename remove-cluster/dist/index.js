@@ -30303,18 +30303,17 @@ module.exports = ZStream;
 /***/ }),
 
 /***/ 3770:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findApplicationDetailsInOutput = exports.getApplicationDetails = exports.Application = void 0;
-const configuration_1 = __nccwpck_require__(4995);
 class Application {
 }
 exports.Application = Application;
 async function getApplicationDetails(vendorPortalApi, appSlug) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     console.log('Getting app id from app slug...');
     const listAppsUri = `${vendorPortalApi.endpoint}/apps`;
@@ -30349,12 +30348,11 @@ exports.findApplicationDetailsInOutput = findApplicationDetailsInOutput;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findChannelDetailsInOutput = exports.archiveChannel = exports.getChannelByApplicationId = exports.getChannelDetails = exports.createChannel = exports.Channel = void 0;
 const applications_1 = __nccwpck_require__(3770);
-const configuration_1 = __nccwpck_require__(4995);
 class Channel {
 }
 exports.Channel = Channel;
 async function createChannel(vendorPortalApi, appSlug, channelName) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. create the channel
@@ -30373,7 +30371,7 @@ async function createChannel(vendorPortalApi, appSlug, channelName) {
 }
 exports.createChannel = createChannel;
 async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     if (typeof slug === 'undefined' && typeof name === 'undefined') {
@@ -30384,7 +30382,7 @@ async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
 }
 exports.getChannelDetails = getChannelDetails;
 async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name }) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     console.log(`Getting channel id from channel slug ${slug} or name ${name}...`);
     const listChannelsUri = `${vendorPortalApi.endpoint}/app/${appid}/channels?excludeDetail=true`;
     const listChannelsRes = await http.get(listChannelsUri);
@@ -30399,7 +30397,7 @@ async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name })
 exports.getChannelByApplicationId = getChannelByApplicationId;
 async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
     const channel = await getChannelDetails(vendorPortalApi, appSlug, { slug: channelSlug });
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. Archive the channel
@@ -30428,13 +30426,12 @@ exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 /***/ }),
 
 /***/ 5230:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.Cluster = void 0;
-const configuration_1 = __nccwpck_require__(4995);
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -30442,7 +30439,7 @@ class ClusterVersion {
 }
 exports.ClusterVersion = ClusterVersion;
 async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
         "kubernetes_distribution": k8sDistribution,
@@ -30485,7 +30482,7 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
 }
 exports.pollForStatus = pollForStatus;
 async function getClusterDetails(vendorPortalApi, clusterId) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
@@ -30496,7 +30493,7 @@ async function getClusterDetails(vendorPortalApi, clusterId) {
 }
 exports.getClusterDetails = getClusterDetails;
 async function getKubeconfig(vendorPortalApi, clusterId) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/kubeconfig`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
@@ -30507,7 +30504,7 @@ async function getKubeconfig(vendorPortalApi, clusterId) {
 }
 exports.getKubeconfig = getKubeconfig;
 async function removeCluster(vendorPortalApi, clusterId) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
     const res = await http.del(uri);
     if (res.message.statusCode != 200) {
@@ -30516,7 +30513,7 @@ async function removeCluster(vendorPortalApi, clusterId) {
 }
 exports.removeCluster = removeCluster;
 async function getClusterVersions(vendorPortalApi) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/versions`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
@@ -30546,7 +30543,7 @@ exports.getClusterVersions = getClusterVersions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.client = exports.VendorPortalApi = void 0;
+exports.VendorPortalApi = void 0;
 // Replicated Library Configuration
 const httpClient = __nccwpck_require__(6255);
 class VendorPortalApi {
@@ -30555,21 +30552,20 @@ class VendorPortalApi {
         // apiToken with default value
         this.apiToken = 'default';
     }
+    async client() {
+        const http = new httpClient.HttpClient();
+        const replicatedEndpoint = this.endpoint;
+        http.requestOptions = {
+            headers: {
+                "Authorization": this.apiToken,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        };
+        return http;
+    }
 }
 exports.VendorPortalApi = VendorPortalApi;
-async function client(vendorPortalApi) {
-    const http = new httpClient.HttpClient();
-    const replicatedEndpoint = vendorPortalApi.endpoint;
-    http.requestOptions = {
-        headers: {
-            "Authorization": vendorPortalApi.apiToken,
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        }
-    };
-    return http;
-}
-exports.client = client;
 
 
 /***/ }),
@@ -30581,7 +30577,6 @@ exports.client = client;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getUsedKubernetesDistributions = exports.archiveCustomer = exports.createCustomer = exports.KubernetesDistribution = exports.Customer = void 0;
-const configuration_1 = __nccwpck_require__(4995);
 const channels_1 = __nccwpck_require__(7491);
 const applications_1 = __nccwpck_require__(3770);
 const date_fns_1 = __nccwpck_require__(3314);
@@ -30597,7 +30592,7 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
         const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
         console.log('Creating customer on appId ' + app.id + ' and channelId ' + channel.id);
-        const http = await (0, configuration_1.client)(vendorPortalApi);
+        const http = await vendorPortalApi.client();
         // 1. create the customer
         const createCustomerUri = `${vendorPortalApi.endpoint}/customer`;
         let createCustomerReqBody = {
@@ -30648,7 +30643,7 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
 }
 exports.createCustomer = createCustomer;
 async function archiveCustomer(vendorPortalApi, customerId) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 2. Archive a customer
     console.log(`Archive Customer ...`);
     const archiveCustomerUri = `${vendorPortalApi.endpoint}/customer/${customerId}/archive`;
@@ -30659,7 +30654,7 @@ async function archiveCustomer(vendorPortalApi, customerId) {
 }
 exports.archiveCustomer = archiveCustomer;
 async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 1. get the app
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 1. get the cluster usage
@@ -30699,7 +30694,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.client = exports.promoteRelease = exports.createCustomer = exports.archiveCustomer = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.archiveChannel = exports.getChannelDetails = void 0;
+exports.promoteRelease = exports.createCustomer = exports.archiveCustomer = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.archiveChannel = exports.getChannelDetails = void 0;
 var channels_1 = __nccwpck_require__(7491);
 Object.defineProperty(exports, "getChannelDetails", ({ enumerable: true, get: function () { return channels_1.getChannelDetails; } }));
 Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: function () { return channels_1.archiveChannel; } }));
@@ -30714,8 +30709,6 @@ Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: func
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
 var releases_1 = __nccwpck_require__(4873);
 Object.defineProperty(exports, "promoteRelease", ({ enumerable: true, get: function () { return releases_1.promoteRelease; } }));
-var configuration_1 = __nccwpck_require__(4995);
-Object.defineProperty(exports, "client", ({ enumerable: true, get: function () { return configuration_1.client; } }));
 
 
 /***/ }),
@@ -30726,16 +30719,16 @@ Object.defineProperty(exports, "client", ({ enumerable: true, get: function () {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.promoteReleaseByAppId = exports.promoteRelease = exports.gzipData = exports.createRelease = void 0;
+exports.getReleaseByAppId = exports.getRelease = exports.areReleaseChartsPushed = exports.isReleaseReadyForInstall = exports.promoteReleaseByAppId = exports.promoteRelease = exports.gzipData = exports.createRelease = void 0;
 const applications_1 = __nccwpck_require__(3770);
-const configuration_1 = __nccwpck_require__(4995);
 const pako_1 = __nccwpck_require__(1726);
 const path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
 const util = __nccwpck_require__(3837);
 const base64 = __nccwpck_require__(6463);
 async function createRelease(vendorPortalApi, appSlug, yamlDir) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    var _a;
+    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. create the release
@@ -30750,7 +30743,15 @@ async function createRelease(vendorPortalApi, appSlug, yamlDir) {
     }
     const createReleaseBody = JSON.parse(await createReleaseRes.readBody());
     console.log(`Created release with sequence number ${createReleaseBody.release.sequence}`);
-    return { sequence: createReleaseBody.release.sequence };
+    // 3. If contains charts, wait for charts to be ready
+    // If there are charts, wait for them to be ready
+    if (((_a = createReleaseBody.release.charts) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+        const isReleaseReady = await isReleaseReadyForInstall(vendorPortalApi, app.id, createReleaseBody.release.sequence);
+        if (!isReleaseReady) {
+            throw new Error(`Release ${createReleaseBody.release.sequence} is not ready`);
+        }
+    }
+    return { sequence: createReleaseBody.release.sequence, charts: createReleaseBody.release.charts };
 }
 exports.createRelease = createRelease;
 const gzipData = (data) => {
@@ -30824,7 +30825,7 @@ function isSupportedExt(ext) {
     return supportedExts.includes(ext);
 }
 async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequence, version) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. promote the release
@@ -30832,7 +30833,7 @@ async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequen
 }
 exports.promoteRelease = promoteRelease;
 async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version) {
-    const http = await (0, configuration_1.client)(vendorPortalApi);
+    const http = await vendorPortalApi.client();
     const reqBody = {
         "versionLabel": version,
         "channelIds": [channelId],
@@ -30852,6 +30853,66 @@ async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseS
     }
 }
 exports.promoteReleaseByAppId = promoteReleaseByAppId;
+async function isReleaseReadyForInstall(vendorPortalApi, appId, releaseSequence) {
+    var _a;
+    let release = await getReleaseByAppId(vendorPortalApi, appId, releaseSequence);
+    if (((_a = release.charts) === null || _a === void 0 ? void 0 : _a.length) === 0) {
+        throw new Error(`Release ${releaseSequence} does not contain any charts`);
+    }
+    const sleeptime = 5;
+    const timeout = 30 * release.charts.length;
+    // iterate for timeout/sleeptime times
+    for (let i = 0; i < timeout / sleeptime; i++) {
+        release = await getReleaseByAppId(vendorPortalApi, appId, releaseSequence);
+        const ready = areReleaseChartsPushed(release.charts);
+        if (ready) {
+            return true;
+        }
+        console.debug(`Release ${releaseSequence} is not ready, sleeping for ${sleeptime} seconds`);
+        await new Promise(f => setTimeout(f, sleeptime * 1000));
+    }
+    return false;
+}
+exports.isReleaseReadyForInstall = isReleaseReadyForInstall;
+function areReleaseChartsPushed(charts) {
+    let pushedChartsCount = 0;
+    for (const chart of charts) {
+        switch (chart.status) {
+            case "pushed":
+                pushedChartsCount++;
+                break;
+            case "unknown":
+            case "pushing":
+                // wait for the chart to be pushed
+                continue;
+            case "error":
+                throw new Error(`chart ${chart.name} failed to push: ${chart.error}`);
+            default:
+                throw new Error(`unknown release chart status ${chart.status}`);
+        }
+    }
+    return pushedChartsCount == charts.length;
+}
+exports.areReleaseChartsPushed = areReleaseChartsPushed;
+async function getRelease(vendorPortalApi, appSlug, releaseSequence) {
+    const http = await vendorPortalApi.client();
+    // 1. get the app id from the app slug
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    // 2. get the release by app Id
+    return getReleaseByAppId(vendorPortalApi, app.id, releaseSequence);
+}
+exports.getRelease = getRelease;
+async function getReleaseByAppId(vendorPortalApi, appId, releaseSequence) {
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to get release: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    return { sequence: body.release.sequence, charts: body.release.charts };
+}
+exports.getReleaseByAppId = getReleaseByAppId;
 
 
 /***/ }),
