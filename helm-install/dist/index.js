@@ -76,8 +76,10 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
                 '--kubeconfig', kubeconfigPath,
                 '--namespace', namespace,
                 '--create-namespace', chart,
-                `--version`, version,
             ];
+            if (version) {
+                params.push(`--version`, version);
+            }
             if (valuesPath !== '') {
                 params.push('--values', valuesPath);
             }
@@ -106,8 +108,10 @@ function templateChart(helmPath, chart, version, valuesPath) {
             const params = [
                 'template',
                 chart,
-                `--version`, version,
             ];
+            if (version) {
+                params.push(`--version`, version);
+            }
             if (valuesPath !== '') {
                 params.push('--values', valuesPath);
             }
