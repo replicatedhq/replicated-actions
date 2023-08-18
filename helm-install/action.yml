@@ -18,7 +18,7 @@ inputs:
     required: true
   version:
     description: 'The version of the chart to install'
-    required: true
+    required: false
   name:
     description: 'The name of release to install'
     required: true

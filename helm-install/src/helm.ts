@@ -60,9 +60,11 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
       '--kubeconfig',  kubeconfigPath,
       '--namespace', namespace,
       '--create-namespace', chart,
-      `--version`, version,
     ];
 
+    if (version) {
+      params.push(`--version`, version);
+    }
     if (valuesPath !== '') {
       params.push('--values', valuesPath);
     }
@@ -91,8 +93,11 @@ export async function templateChart(helmPath: string, chart: string, version: st
     const params = [
       'template',
       chart,
-      `--version`, version,
     ];
+
+    if (version) {
+      params.push(`--version`, version);
+    }
 
     if (valuesPath !== '') {
       params.push('--values', valuesPath);
