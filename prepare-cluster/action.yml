@@ -38,7 +38,7 @@ runs:
   steps:
   - name: 'Create Release'
     id: 'create-release'
-    uses: replicatedhq/compatibility-actions/create-release@v0
+    uses: replicatedhq/compatibility-actions/create-release@joshd/sc-86715/cluster-prepare-github-action
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -46,7 +46,7 @@ runs:
       chart: ${{ inputs.chart }}
   - name: 'Create Customer'
     id: 'create-customer'
-    uses: replicatedhq/compatibility-actions/create-customer@v0
+    uses: replicatedhq/compatibility-actions/create-customer@joshd/sc-86715/cluster-prepare-github-action
     with:
       app-slug: ${{ inputs.app-slug }}
       api-token: ${{ inputs.api-token }}
@@ -56,7 +56,7 @@ runs:
       channel-slug: ${{ steps.create-release.outputs.channel-slug }}
   - name: Create Cluster
     id: create-cluster
-    uses: replicatedhq/compatibility-actions/create-cluster@v0
+    uses: replicatedhq/compatibility-actions/create-cluster@joshd/sc-86715/cluster-prepare-github-action
     with:
       api-token: ${{ inputs.api-token }}
       kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
@@ -65,7 +65,7 @@ runs:
       ttl: ${{ inputs.ttl || '' }}
       timeout-minutes: ${{ inputs.timeout-minutes || 20 }}
   - name: Deploy the app with Helm
-    uses: replicatedhq/compatibility-actions/helm-install@v0
+    uses: replicatedhq/compatibility-actions/helm-install@joshd/sc-86715/cluster-prepare-github-action
     if: ${{ inputs.chart != '' }}
     with:
       kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
@@ -80,17 +80,10 @@ runs:
       run-preflights: true
   - name: Deploy the app with KOTS
     if: ${{ inputs.yaml-dir != '' }}
-    uses: replicatedhq/compatibility-actions/kots-install@v0
+    uses: replicatedhq/compatibility-actions/kots-install@joshd/sc-86715/cluster-prepare-github-action
     with:
       kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
       app-slug: ${{ inputs.app-slug }}/test-channel
       license-file: ${{ steps.create-customer.outputs.license-file }}
       app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
       config-values: ${{ inputs.kots-config-values }}
-  - name: Remove Cluster
-    id: remove-cluster
-    uses: replicatedhq/compatibility-actions/remove-cluster@v0
-    continue-on-error: true # It could be that the cluster is already removed
-    with:
-      api-token: ${{ inputs.api-token }}
-      cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
