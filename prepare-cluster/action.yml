@@ -74,7 +74,6 @@ runs:
       registry-password: ${{ steps.create-customer.outputs.license-id }}
       chart: oci://registry.replicated.com/${{ inputs.app-slug }}/release__${{ steps.create-release.outputs.release-sequence }}/${{ inputs.helm-chart-name }}
       name: ${{ inputs.app-slug }}
-      version: ${{ env.APP_VERSION }}
       namespace: 'default'
       values: ${{ inputs.helm-values }}
       run-preflights: true
