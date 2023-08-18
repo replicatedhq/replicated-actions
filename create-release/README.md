@@ -8,6 +8,7 @@ graph LR
 replicated_create_release["Replicated create release"]
 app_slug ---> replicated_create_release
 api_token ---> replicated_create_release
+chart ---> replicated_create_release
 yaml_dir ---> replicated_create_release
 promote_channel ---> replicated_create_release
 version ---> replicated_create_release
@@ -19,9 +20,10 @@ replicated_create_release ---> release_sequence
 | --- | --- | --- | --- |
 | app-slug |  | True | App Slug. |
 | api-token |  | True | API Token. |
-| yaml-dir | manifests | True | The directory containing multiple yamls for a Replicated release. |
-| promote-channel | ${GITHUB_REF} | True | Channel name or id to promote this release to. |
-| version | ${GITHUB_SHA::7} | True | Release version |
+| chart |  | False | Path to the helm chart (One of `chart` or `yaml-dir` is required). |
+| yaml-dir |  | False | The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required). |
+| promote-channel |  | False | Channel name or id to promote this release to. |
+| version |  | False | Release version |
 
 ## Outputs
 | Name | Description |

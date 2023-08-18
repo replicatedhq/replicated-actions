@@ -27,6 +27,10 @@ inputs:
     required: true
   values:
     description: 'A values.yaml file to use'
+  run-preflights:
+    description: 'Run preflight checks (true/false)'
+    required: false
+    default: 'false'
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -4,14 +4,14 @@ import * as fs from 'fs';
 import * as url from 'url';
 import { file } from 'tmp-promise';
 
-export async function login(helmPath: string, username: string, password: string) {
+export async function login(helmPath: string, username: string, password: string, chart: string) {
   try {
     if (!username || !password) {
       core.info('No username or password provided, skipping login');
       return;
     }
 
-    const parsed = url.parse(core.getInput('chart'));
+    const parsed = url.parse(chart);
 
     const loginOptions: any = {};
     loginOptions.listeners = {
@@ -38,11 +38,8 @@ export async function login(helmPath: string, username: string, password: string
   }
 }
 
-export async function installChart(helmPath: string, valuesPath: string) {
+export async function installChart(helmPath: string, kubeconfig: string, chart: string, version: string, releaseName: string, namespace: string, valuesPath: string) {
   try {
-    const kubeconfig = core.getInput('kubeconfig');
-    const namespace = core.getInput('namespace');
-
     // write the kubeconfig to a temp file
     const {fd, path: kubeconfigPath, cleanup} = await file({postfix: '.yaml'});
     fs.writeFileSync(kubeconfigPath, kubeconfig);
@@ -59,12 +56,11 @@ export async function installChart(helmPath: string, valuesPath: string) {
 
     const params = [
       'install',
-      `${core.getInput('name')}`,
+      releaseName,
       '--kubeconfig',  kubeconfigPath,
-      '--namespace', core.getInput('namespace'),
-      '--create-namespace',
-      `${core.getInput('chart')}`,
-      `--version`, `${core.getInput('version')}`,
+      '--namespace', namespace,
+      '--create-namespace', chart,
+      `--version`, version,
     ];
 
     if (valuesPath !== '') {
@@ -75,5 +71,37 @@ export async function installChart(helmPath: string, valuesPath: string) {
     cleanup();
   } catch (error) {
     core.setFailed(error.message);
+  }
+}
+
+
+export async function templateChart(helmPath: string, chart: string, version: string, valuesPath: string): Promise<string> {
+  try {
+    const installOptions: any = {};
+    let templateOutput : string = '';
+    installOptions.listeners = {
+      stdout: (data: Buffer) => {
+        templateOutput += data.toString();
+      },
+      stderr: (data: Buffer) => {
+        core.info(data.toString());
+      }
+    };
+
+    const params = [
+      'template',
+      chart,
+      `--version`, version,
+    ];
+
+    if (valuesPath !== '') {
+      params.push('--values', valuesPath);
+    }
+
+    await exec.exec(helmPath, params, installOptions);
+    return templateOutput;
+  } catch (error) {
+    core.setFailed(error.message);
+    throw error;
   }
 }

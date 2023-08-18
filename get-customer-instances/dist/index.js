@@ -23270,7 +23270,7 @@ module.exports = exports.default;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.findApplicationDetailsInOutput = exports.getApplicationDetails = exports.Application = void 0;
+exports.getApplicationDetails = exports.Application = void 0;
 class Application {
 }
 exports.Application = Application;
@@ -23297,7 +23297,6 @@ async function findApplicationDetailsInOutput(apps, appSlug) {
     }
     return Promise.reject(`Could not find app with slug ${appSlug}`);
 }
-exports.findApplicationDetailsInOutput = findApplicationDetailsInOutput;
 
 
 /***/ }),
@@ -23308,11 +23307,15 @@ exports.findApplicationDetailsInOutput = findApplicationDetailsInOutput;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.findChannelDetailsInOutput = exports.archiveChannel = exports.getChannelByApplicationId = exports.getChannelDetails = exports.createChannel = exports.Channel = void 0;
+exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.exportedForTesting = exports.Channel = void 0;
 const applications_1 = __nccwpck_require__(3770);
 class Channel {
 }
 exports.Channel = Channel;
+exports.exportedForTesting = {
+    getChannelByApplicationId,
+    findChannelDetailsInOutput,
+};
 async function createChannel(vendorPortalApi, appSlug, channelName) {
     const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
@@ -23356,7 +23359,6 @@ async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name })
     console.log(`Found channel for channel slug ${channel.slug}`);
     return channel;
 }
-exports.getChannelByApplicationId = getChannelByApplicationId;
 async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
     const channel = await getChannelDetails(vendorPortalApi, appSlug, { slug: channelSlug });
     const http = await vendorPortalApi.client();
@@ -23382,7 +23384,6 @@ async function findChannelDetailsInOutput(channels, { slug, name }) {
     }
     return Promise.reject({ "channel": null, "reason": `Could not find channel with slug ${slug} or name ${name}` });
 }
-exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 
 
 /***/ }),
@@ -23393,7 +23394,7 @@ exports.findChannelDetailsInOutput = findChannelDetailsInOutput;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.getClusterDetails = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.Cluster = void 0;
+exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.Cluster = void 0;
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -23453,7 +23454,6 @@ async function getClusterDetails(vendorPortalApi, clusterId) {
     const body = JSON.parse(await res.readBody());
     return { name: body.cluster.name, id: body.cluster.id, status: body.cluster.status };
 }
-exports.getClusterDetails = getClusterDetails;
 async function getKubeconfig(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/kubeconfig`;
@@ -23552,8 +23552,7 @@ exports.KubernetesDistribution = KubernetesDistribution;
 async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
-        const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
-        console.log('Creating customer on appId ' + app.id + ' and channelId ' + channel.id);
+        console.log('Creating customer on appId ' + app.id);
         const http = await vendorPortalApi.client();
         // 1. create the customer
         const createCustomerUri = `${vendorPortalApi.endpoint}/customer`;
@@ -23561,9 +23560,12 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
             name: name,
             email: email,
             type: licenseType,
-            channel_id: channel.id,
             app_id: app.id,
         };
+        if (channelSlug) {
+            const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
+            createCustomerReqBody['channel_id'] = channel.id;
+        }
         // expiresIn is in days, if it's 0 or less, ignore it - non-expiring license
         if (expiresIn > 0) {
             const now = new Date();

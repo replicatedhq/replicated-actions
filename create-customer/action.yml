@@ -21,8 +21,7 @@ inputs:
     default: 'dev'
   channel-slug:
     description: 'Channel to assign the customer to.'
-    required: true
-    default: '${GITHUB_REF}'
+    required: false
   expires-in:
     description: 'Expiration of the license in days. (default: 0 - never expires))'
     required: false

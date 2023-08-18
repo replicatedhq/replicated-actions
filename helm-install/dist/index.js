@@ -16,20 +16,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.installChart = exports.login = void 0;
+exports.templateChart = exports.installChart = exports.login = void 0;
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const fs = __nccwpck_require__(7147);
 const url = __nccwpck_require__(7310);
 const tmp_promise_1 = __nccwpck_require__(8065);
-function login(helmPath, username, password) {
+function login(helmPath, username, password, chart) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (!username || !password) {
                 core.info('No username or password provided, skipping login');
                 return;
             }
-            const parsed = url.parse(core.getInput('chart'));
+            const parsed = url.parse(chart);
             const loginOptions = {};
             loginOptions.listeners = {
                 stdout: (data) => {
@@ -55,11 +55,9 @@ function login(helmPath, username, password) {
     });
 }
 exports.login = login;
-function installChart(helmPath, valuesPath) {
+function installChart(helmPath, kubeconfig, chart, version, releaseName, namespace, valuesPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const kubeconfig = core.getInput('kubeconfig');
-            const namespace = core.getInput('namespace');
             // write the kubeconfig to a temp file
             const { fd, path: kubeconfigPath, cleanup } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
@@ -74,12 +72,11 @@ function installChart(helmPath, valuesPath) {
             };
             const params = [
                 'install',
-                `${core.getInput('name')}`,
+                releaseName,
                 '--kubeconfig', kubeconfigPath,
-                '--namespace', core.getInput('namespace'),
-                '--create-namespace',
-                `${core.getInput('chart')}`,
-                `--version`, `${core.getInput('version')}`,
+                '--namespace', namespace,
+                '--create-namespace', chart,
+                `--version`, version,
             ];
             if (valuesPath !== '') {
                 params.push('--values', valuesPath);
@@ -93,6 +90,37 @@ function installChart(helmPath, valuesPath) {
     });
 }
 exports.installChart = installChart;
+function templateChart(helmPath, chart, version, valuesPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const installOptions = {};
+            let templateOutput = '';
+            installOptions.listeners = {
+                stdout: (data) => {
+                    templateOutput += data.toString();
+                },
+                stderr: (data) => {
+                    core.info(data.toString());
+                }
+            };
+            const params = [
+                'template',
+                chart,
+                `--version`, version,
+            ];
+            if (valuesPath !== '') {
+                params.push('--values', valuesPath);
+            }
+            yield exec.exec(helmPath, params, installOptions);
+            return templateOutput;
+        }
+        catch (error) {
+            core.setFailed(error.message);
+            throw error;
+        }
+    });
+}
+exports.templateChart = templateChart;
 //# sourceMappingURL=helm.js.map
 
 /***/ }),
@@ -116,22 +144,147 @@ const core = __nccwpck_require__(2186);
 const helm_1 = __nccwpck_require__(8152);
 const tmp_promise_1 = __nccwpck_require__(8065);
 const fs = __nccwpck_require__(7147);
+const preflight_1 = __nccwpck_require__(975);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const helmPath = core.getInput('helm-path');
+        const kubeconfig = core.getInput('kubeconfig');
+        const namespace = core.getInput('namespace');
+        const registryUsername = core.getInput('registry-username');
+        const registryPassword = core.getInput('registry-password');
+        const runPreflights = core.getInput('run-preflights') === 'true';
+        const values = core.getInput('values');
+        const chart = core.getInput('chart');
+        const version = core.getInput('version');
+        const name = core.getInput('name');
         // Write the values
         let valuesFilePath = '';
-        if (core.getInput('values')) {
+        if (values) {
             const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-            fs.writeFileSync(valuesPath, core.getInput('values'));
+            fs.writeFileSync(valuesPath, values);
             valuesFilePath = valuesPath;
         }
-        yield (0, helm_1.login)(core.getInput('helm-path'), core.getInput('registry-username'), core.getInput('registry-password'));
-        yield (0, helm_1.installChart)(core.getInput('helm-path'), valuesFilePath);
-        // cleanupLicense();
+        // registry login
+        yield (0, helm_1.login)(helmPath, registryUsername, registryPassword, chart);
+        if (runPreflights) {
+            // install troubleshoot.sh preflight kubectl plugin
+            const preflightPath = yield (0, preflight_1.downloadPreflight)();
+            // run preflight checks
+            const templatedChart = yield (0, helm_1.templateChart)(helmPath, chart, version, valuesFilePath);
+            yield (0, preflight_1.runPreflight)(preflightPath, kubeconfig, templatedChart);
+        }
+        yield (0, helm_1.installChart)(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);
     });
 }
 run();
 //# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 975:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runPreflight = exports.downloadPreflight = void 0;
+const core = __nccwpck_require__(2186);
+const exec = __nccwpck_require__(1514);
+const httpClient = __nccwpck_require__(6255);
+const tmpPromise = __nccwpck_require__(8065);
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const tmp_promise_1 = __nccwpck_require__(8065);
+function downloadPreflight() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            core.info(`Downloading latest preflight`);
+            const http = new httpClient.HttpClient();
+            http.requestOptions = {
+                allowRedirects: true
+            };
+            const uri = `https://github.com/replicatedhq/troubleshoot/releases/latest/download/preflight_linux_amd64.tar.gz`;
+            const { fd, path: downloadPath, cleanup } = yield (0, tmpPromise.file)({
+                postfix: '.tar.gz'
+            });
+            core.debug(`Downloading preflight binary to temp file at ${downloadPath}`);
+            const f = fs.createWriteStream(downloadPath);
+            const res = yield http.get(uri);
+            const preflightPath = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                core.info('Downloaded preflight binary');
+                res.message.pipe(f).on('close', () => __awaiter(this, void 0, void 0, function* () {
+                    let tarOutput, tarError = '';
+                    const tarOptions = {};
+                    tarOptions.listeners = {
+                        stdout: (data) => {
+                            tarOutput += data.toString();
+                        },
+                        stderr: (data) => {
+                            tarError += data.toString();
+                        }
+                    };
+                    tarOptions.cwd = path.dirname(downloadPath);
+                    yield exec.exec('tar', [
+                        'xzf',
+                        downloadPath
+                    ], tarOptions);
+                    core.info('Extracted preflight archive');
+                    const preflightPath = path.resolve(path.join(path.dirname(downloadPath), 'preflight'));
+                    core.setOutput('preflight-path', preflightPath);
+                    resolve(preflightPath);
+                }));
+            }));
+            return preflightPath;
+        }
+        catch (error) {
+            core.setFailed(error.message);
+            throw error;
+        }
+    });
+}
+exports.downloadPreflight = downloadPreflight;
+function runPreflight(preflightPath, kubeconfig, templatedChart) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // write the kubeconfig to a temp file
+            const { fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            fs.writeFileSync(kubeconfigPath, kubeconfig);
+            // write the templatedChart to a temp file
+            const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            fs.writeFileSync(templatedChartPath, templatedChart);
+            const installOptions = {};
+            installOptions.listeners = {
+                stdout: (data) => {
+                    core.info(data.toString());
+                },
+                stderr: (data) => {
+                    core.info(data.toString());
+                }
+            };
+            const params = [
+                templatedChartPath,
+                '--kubeconfig', kubeconfigPath,
+            ];
+            yield exec.exec(preflightPath, params, installOptions);
+            cleanupKubeconfig();
+            cleanupTemplatedChart();
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.runPreflight = runPreflight;
+//# sourceMappingURL=preflight.js.map
 
 /***/ }),
 
