@@ -74,6 +74,7 @@ export async function downloadPreflight(): Promise<string> {
         const params = [
         templatedChartPath,
         '--kubeconfig',  kubeconfigPath,
+        '--interactive=false',
         ];
 
         await exec.exec(preflightPath, params, installOptions);
