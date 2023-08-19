@@ -277,6 +277,7 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
             const params = [
                 templatedChartPath,
                 '--kubeconfig', kubeconfigPath,
+                '--interactive=false',
             ];
             yield exec.exec(preflightPath, params, installOptions);
             cleanupKubeconfig();
