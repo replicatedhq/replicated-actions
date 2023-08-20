@@ -102,7 +102,7 @@ function templateChart(helmPath, chart, version, valuesPath) {
                     templateOutput += data.toString();
                 },
                 stderr: (data) => {
-                    core.info(data.toString());
+                    // ignore
                 }
             };
             const params = [
