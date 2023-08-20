@@ -77,8 +77,12 @@ try {
     ];
 
     await exec.exec(preflightPath, params, installOptions);
-    const strictFailures: boolean = await checkForStrictFailures(outputPath);
-    if (strictFailures) {
+    const strictFailures: string[] = await checkForStrictFailures(outputPath);
+    if (strictFailures.length > 0) {
+        core.error(`Found ${strictFailures.length} strict failures:`);
+        for (let failure of strictFailures) {
+            core.error(failure);
+        }
         throw new Error('Preflight checks failed');
     }
 
@@ -87,20 +91,22 @@ try {
 
 } catch (error) {
     core.setFailed(error.message);
+    throw error;
 }
 }
 
-async function checkForStrictFailures(resultPath: string): Promise<boolean> {
+async function checkForStrictFailures(resultPath: string): Promise<string[]> {
     try {
         const result = fs.readFileSync(resultPath, 'utf8');
         const report = JSON.parse(result);
-        let strictFailures = false;
+        // strictFailures will contain all failures as array of strings
+        let strictFailures: string[] = [];
 
         // if report contains 'fail' results, set strictFailures to true
         if (report.fail?.length > 0) {
             for (const fail of report.fail) {
                 if (fail.strict && fail.strict === true) {
-                    return true;
+                    strictFailures.push(fail.message);
                 }
             }
         }
