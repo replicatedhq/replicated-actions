@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as fs from 'fs';
 import * as url from 'url';
-import { file } from 'tmp-promise';
+import * as tmpPromise from 'tmp-promise';
 
 export async function login(helmPath: string, username: string, password: string, chart: string) {
   try {
@@ -41,7 +41,7 @@ export async function login(helmPath: string, username: string, password: string
 export async function installChart(helmPath: string, kubeconfig: string, chart: string, version: string, releaseName: string, namespace: string, valuesPath: string) {
   try {
     // write the kubeconfig to a temp file
-    const {fd, path: kubeconfigPath, cleanup} = await file({postfix: '.yaml'});
+    const {fd, path: kubeconfigPath, cleanup} = await tmpPromise.file({postfix: '.yaml'});
     fs.writeFileSync(kubeconfigPath, kubeconfig);
 
     const installOptions: any = {};
@@ -81,18 +81,20 @@ export async function templateChart(helmPath: string, chart: string, version: st
   try {
     const installOptions: any = {};
     let templateOutput : string = '';
+    const {path: tmpDir, cleanup} = await tmpPromise.dir( { unsafeCleanup: true });
     installOptions.listeners = {
       stdout: (data: Buffer) => {
         templateOutput += data.toString();
       },
       stderr: (data: Buffer) => {
-        // ignore
+        core.info(data.toString());
       }
     };
 
     const params = [
       'template',
       chart,
+      '--output-dir', tmpDir,
     ];
 
     if (version) {
@@ -104,6 +106,7 @@ export async function templateChart(helmPath: string, chart: string, version: st
     }
 
     await exec.exec(helmPath, params, installOptions);
+    cleanup()
     return templateOutput;
   } catch (error) {
     core.setFailed(error.message);
