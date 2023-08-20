@@ -92,13 +92,15 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
     });
 }
 exports.installChart = installChart;
-function templateChart(helmPath, chart, version, valuesPath, outputDir) {
+function templateChart(helmPath, chart, version, valuesPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const installOptions = {};
+            let templateOutput = '';
+            const { path: tmpDir, cleanup } = yield tmpPromise.dir({ unsafeCleanup: true });
             installOptions.listeners = {
                 stdout: (data) => {
-                    core.info(data.toString());
+                    templateOutput += data.toString();
                 },
                 stderr: (data) => {
                     core.error(data.toString());
@@ -107,7 +109,6 @@ function templateChart(helmPath, chart, version, valuesPath, outputDir) {
             const params = [
                 'template',
                 chart,
-                '--output-dir', outputDir,
             ];
             if (version) {
                 params.push(`--version`, version);
@@ -116,6 +117,8 @@ function templateChart(helmPath, chart, version, valuesPath, outputDir) {
                 params.push('--values', valuesPath);
             }
             yield exec.exec(helmPath, params, installOptions);
+            cleanup();
+            return templateOutput;
         }
         catch (error) {
             core.setFailed(error.message);
@@ -145,7 +148,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
 const helm_1 = __nccwpck_require__(8152);
-const tmpPromise = __nccwpck_require__(8065);
+const tmp_promise_1 = __nccwpck_require__(8065);
 const fs = __nccwpck_require__(7147);
 const preflight_1 = __nccwpck_require__(975);
 function run() {
@@ -163,20 +166,18 @@ function run() {
         // Write the values
         let valuesFilePath = '';
         if (values) {
-            const { fd, path: valuesPath, cleanup: cleanupValues } = yield tmpPromise.file({ postfix: '.yaml' });
+            const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             fs.writeFileSync(valuesPath, values);
             valuesFilePath = valuesPath;
         }
         // registry login
         yield (0, helm_1.login)(helmPath, registryUsername, registryPassword, chart);
         if (runPreflights) {
-            const { path: tmpDir, cleanup } = yield tmpPromise.dir({ unsafeCleanup: true });
             // install troubleshoot.sh preflight kubectl plugin
             const preflightPath = yield (0, preflight_1.downloadPreflight)();
             // run preflight checks
-            yield (0, helm_1.templateChart)(helmPath, chart, version, valuesFilePath, tmpDir);
-            yield (0, preflight_1.runPreflight)(preflightPath, kubeconfig, tmpDir);
-            cleanup();
+            const templatedChart = yield (0, helm_1.templateChart)(helmPath, chart, version, valuesFilePath);
+            yield (0, preflight_1.runPreflight)(preflightPath, kubeconfig, templatedChart);
         }
         yield (0, helm_1.installChart)(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);
     });
@@ -257,12 +258,15 @@ function downloadPreflight() {
     });
 }
 exports.downloadPreflight = downloadPreflight;
-function runPreflight(preflightPath, kubeconfig, inputDir) {
+function runPreflight(preflightPath, kubeconfig, templatedChart) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // write the kubeconfig to a temp file
             const { fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
+            // write the templatedChart to a temp file
+            const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            fs.writeFileSync(templatedChartPath, templatedChart);
             const installOptions = {};
             installOptions.listeners = {
                 stdout: (data) => {
@@ -273,12 +277,14 @@ function runPreflight(preflightPath, kubeconfig, inputDir) {
                 }
             };
             const params = [
-                inputDir,
+                templatedChartPath,
                 '--kubeconfig', kubeconfigPath,
                 '--interactive=false',
+                '--format', 'json',
             ];
             yield exec.exec(preflightPath, params, installOptions);
             cleanupKubeconfig();
+            cleanupTemplatedChart();
         }
         catch (error) {
             core.setFailed(error.message);
