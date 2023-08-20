@@ -266,7 +266,11 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
             ];
             yield exec.exec(preflightPath, params, installOptions);
             const strictFailures = yield checkForStrictFailures(outputPath);
-            if (strictFailures) {
+            if (strictFailures.length > 0) {
+                core.error(`Found ${strictFailures.length} strict failures:`);
+                for (let failure of strictFailures) {
+                    core.error(failure);
+                }
                 throw new Error('Preflight checks failed');
             }
             cleanupKubeconfig();
@@ -274,6 +278,7 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
         }
         catch (error) {
             core.setFailed(error.message);
+            throw error;
         }
     });
 }
@@ -284,12 +289,13 @@ function checkForStrictFailures(resultPath) {
         try {
             const result = fs.readFileSync(resultPath, 'utf8');
             const report = JSON.parse(result);
-            let strictFailures = false;
+            // strictFailures will contain all failures as array of strings
+            let strictFailures = [];
             // if report contains 'fail' results, set strictFailures to true
             if (((_a = report.fail) === null || _a === void 0 ? void 0 : _a.length) > 0) {
                 for (const fail of report.fail) {
                     if (fail.strict && fail.strict === true) {
-                        return true;
+                        strictFailures.push(fail.message);
                     }
                 }
             }
