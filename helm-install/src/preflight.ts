@@ -49,38 +49,67 @@ export async function downloadPreflight(): Promise<string> {
         core.setFailed(error.message);
         throw error;
     }
-  }
+}
 
-  export async function runPreflight(preflightPath: string, kubeconfig: string, templatedChart: string) {
+export async function runPreflight(preflightPath: string, kubeconfig: string, templatedChart: string) {
+try {
+    // write the kubeconfig to a temp file
+    const {fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig} = await file({postfix: '.yaml'});
+    fs.writeFileSync(kubeconfigPath, kubeconfig);
+
+    // write the templatedChart to a temp file
+    const {fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart} = await file({postfix: '.yaml'});
+    fs.writeFileSync(templatedChartPath, templatedChart);
+
+    // write the output to a temp file
+    const {path: outputPath} = await file({postfix: '.yaml'});
+
+    const installOptions: exec.ExecOptions = {};
+    installOptions.ignoreReturnCode = true;
+    installOptions.silent = false;
+
+    const params = [
+    templatedChartPath,
+    '--kubeconfig',  kubeconfigPath,
+    '--interactive=false',
+    '--format', 'json',
+    '--output', outputPath,
+    ];
+
+    await exec.exec(preflightPath, params, installOptions);
+    const strictFailures: boolean = await checkForStrictFailures(outputPath);
+    if (strictFailures) {
+        throw new Error('Preflight checks failed');
+    }
+
+    cleanupKubeconfig();
+    cleanupTemplatedChart();
+
+} catch (error) {
+    core.setFailed(error.message);
+}
+}
+
+async function checkForStrictFailures(resultPath: string): Promise<boolean> {
     try {
-        // write the kubeconfig to a temp file
-        const {fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig} = await file({postfix: '.yaml'});
-        fs.writeFileSync(kubeconfigPath, kubeconfig);
+        const result = fs.readFileSync(resultPath, 'utf8');
+        const report = JSON.parse(result);
+        let strictFailures = false;
 
-        // write the templatedChart to a temp file
-        const {fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart} = await file({postfix: '.yaml'});
-        fs.writeFileSync(templatedChartPath, templatedChart);
+        // if report contains 'fail' results, set strictFailures to true
+        if (report.fail?.length > 0) {
+            for (const fail of report.fail) {
+                if (fail.strict && fail.strict === true) {
+                    return true;
+                }
+            }
+        }
 
-        // write the output to a temp file
-        const {path: outputPath} = await file({postfix: '.yaml'});
-
-        const installOptions: exec.ExecOptions = {};
-        installOptions.ignoreReturnCode = true;
-        installOptions.silent = true;
-
-        const params = [
-        templatedChartPath,
-        '--kubeconfig',  kubeconfigPath,
-        '--interactive=false',
-        '--format', 'json',
-        '--output', outputPath,
-        ];
-
-        await exec.exec(preflightPath, params, installOptions);
-        cleanupKubeconfig();
-        cleanupTemplatedChart();
-
+        return strictFailures;
     } catch (error) {
         core.setFailed(error.message);
+        throw error;
+    } finally {
+        fs.unlinkSync(resultPath);
     }
-  }
+}

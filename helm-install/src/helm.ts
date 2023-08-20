@@ -13,15 +13,7 @@ export async function login(helmPath: string, username: string, password: string
 
     const parsed = url.parse(chart);
 
-    const loginOptions: any = {};
-    loginOptions.listeners = {
-      stdout: (data: Buffer) => {
-        core.info(data.toString());
-      },
-      stderr: (data: Buffer) => {
-        core.info(data.toString());
-      }
-    };
+    const loginOptions: exec.ExecOptions = {};
 
     const hostname: string = parsed.hostname || '';
     const params: string[] = [
@@ -44,15 +36,7 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
     const {fd, path: kubeconfigPath, cleanup} = await tmpPromise.file({postfix: '.yaml'});
     fs.writeFileSync(kubeconfigPath, kubeconfig);
 
-    const installOptions: any = {};
-    installOptions.listeners = {
-      stdout: (data: Buffer) => {
-        core.info(data.toString());
-      },
-      stderr: (data: Buffer) => {
-        core.info(data.toString());
-      }
-    };
+    const installOptions: exec.ExecOptions = {};
 
     const params = [
       'install',
@@ -79,15 +63,17 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
 
 export async function templateChart(helmPath: string, chart: string, version: string, valuesPath: string): Promise<string> {
   try {
-    const installOptions: any = {};
     let templateOutput : string = '';
     const {path: tmpDir, cleanup} = await tmpPromise.dir( { unsafeCleanup: true });
+
+    const installOptions: exec.ExecOptions = {};
+    installOptions.silent = true;
     installOptions.listeners = {
       stdout: (data: Buffer) => {
         templateOutput += data.toString();
       },
       stderr: (data: Buffer) => {
-        core.error(data.toString());
+        core.info(data.toString());
       }
     };
 
