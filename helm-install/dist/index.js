@@ -31,14 +31,6 @@ function login(helmPath, username, password, chart) {
             }
             const parsed = url.parse(chart);
             const loginOptions = {};
-            loginOptions.listeners = {
-                stdout: (data) => {
-                    core.info(data.toString());
-                },
-                stderr: (data) => {
-                    core.info(data.toString());
-                }
-            };
             const hostname = parsed.hostname || '';
             const params = [
                 'registry',
@@ -62,14 +54,6 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
             const { fd, path: kubeconfigPath, cleanup } = yield tmpPromise.file({ postfix: '.yaml' });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             const installOptions = {};
-            installOptions.listeners = {
-                stdout: (data) => {
-                    core.info(data.toString());
-                },
-                stderr: (data) => {
-                    core.info(data.toString());
-                }
-            };
             const params = [
                 'install',
                 releaseName,
@@ -95,15 +79,16 @@ exports.installChart = installChart;
 function templateChart(helmPath, chart, version, valuesPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const installOptions = {};
             let templateOutput = '';
             const { path: tmpDir, cleanup } = yield tmpPromise.dir({ unsafeCleanup: true });
+            const installOptions = {};
+            installOptions.silent = true;
             installOptions.listeners = {
                 stdout: (data) => {
                     templateOutput += data.toString();
                 },
                 stderr: (data) => {
-                    core.error(data.toString());
+                    core.info(data.toString());
                 }
             };
             const params = [
@@ -271,7 +256,7 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
             const { path: outputPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             const installOptions = {};
             installOptions.ignoreReturnCode = true;
-            installOptions.silent = true;
+            installOptions.silent = false;
             const params = [
                 templatedChartPath,
                 '--kubeconfig', kubeconfigPath,
@@ -280,6 +265,10 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
                 '--output', outputPath,
             ];
             yield exec.exec(preflightPath, params, installOptions);
+            const strictFailures = yield checkForStrictFailures(outputPath);
+            if (strictFailures) {
+                throw new Error('Preflight checks failed');
+            }
             cleanupKubeconfig();
             cleanupTemplatedChart();
         }
@@ -289,6 +278,32 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
     });
 }
 exports.runPreflight = runPreflight;
+function checkForStrictFailures(resultPath) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const result = fs.readFileSync(resultPath, 'utf8');
+            const report = JSON.parse(result);
+            let strictFailures = false;
+            // if report contains 'fail' results, set strictFailures to true
+            if (((_a = report.fail) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+                for (const fail of report.fail) {
+                    if (fail.strict && fail.strict === true) {
+                        return true;
+                    }
+                }
+            }
+            return strictFailures;
+        }
+        catch (error) {
+            core.setFailed(error.message);
+            throw error;
+        }
+        finally {
+            fs.unlinkSync(resultPath);
+        }
+    });
+}
 //# sourceMappingURL=preflight.js.map
 
 /***/ }),
