@@ -51,15 +51,11 @@ export async function downloadPreflight(): Promise<string> {
     }
   }
 
-  export async function runPreflight(preflightPath: string, kubeconfig: string, templatedChart: string) {
+  export async function runPreflight(preflightPath: string, kubeconfig: string, inputDir: string) {
     try {
         // write the kubeconfig to a temp file
         const {fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig} = await file({postfix: '.yaml'});
         fs.writeFileSync(kubeconfigPath, kubeconfig);
-
-        // write the templatedChart to a temp file
-        const {fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart} = await file({postfix: '.yaml'});
-        fs.writeFileSync(templatedChartPath, templatedChart);
 
         const installOptions: any = {};
         installOptions.listeners = {
@@ -72,14 +68,13 @@ export async function downloadPreflight(): Promise<string> {
         };
 
         const params = [
-        templatedChartPath,
+        inputDir,
         '--kubeconfig',  kubeconfigPath,
         '--interactive=false',
         ];
 
         await exec.exec(preflightPath, params, installOptions);
         cleanupKubeconfig();
-        cleanupTemplatedChart();
 
     } catch (error) {
         core.setFailed(error.message);

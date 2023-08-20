@@ -77,24 +77,22 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
 }
 
 
-export async function templateChart(helmPath: string, chart: string, version: string, valuesPath: string): Promise<string> {
+export async function templateChart(helmPath: string, chart: string, version: string, valuesPath: string, outputDir: string) {
   try {
     const installOptions: any = {};
-    let templateOutput : string = '';
-    const {path: tmpDir, cleanup} = await tmpPromise.dir( { unsafeCleanup: true });
     installOptions.listeners = {
       stdout: (data: Buffer) => {
-        templateOutput += data.toString();
+        core.info(data.toString());
       },
       stderr: (data: Buffer) => {
-        core.info(data.toString());
+        core.error(data.toString());
       }
     };
 
     const params = [
       'template',
       chart,
-      '--output-dir', tmpDir,
+      '--output-dir', outputDir,
     ];
 
     if (version) {
@@ -106,8 +104,6 @@ export async function templateChart(helmPath: string, chart: string, version: st
     }
 
     await exec.exec(helmPath, params, installOptions);
-    cleanup()
-    return templateOutput;
   } catch (error) {
     core.setFailed(error.message);
     throw error;
