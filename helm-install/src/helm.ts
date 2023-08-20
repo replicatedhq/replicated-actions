@@ -86,7 +86,7 @@ export async function templateChart(helmPath: string, chart: string, version: st
         templateOutput += data.toString();
       },
       stderr: (data: Buffer) => {
-        core.info(data.toString());
+        // ignore
       }
     };
 
