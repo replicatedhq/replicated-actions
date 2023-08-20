@@ -21,7 +21,7 @@ const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const fs = __nccwpck_require__(7147);
 const url = __nccwpck_require__(7310);
-const tmp_promise_1 = __nccwpck_require__(8065);
+const tmpPromise = __nccwpck_require__(8065);
 function login(helmPath, username, password, chart) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -59,7 +59,7 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // write the kubeconfig to a temp file
-            const { fd, path: kubeconfigPath, cleanup } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            const { fd, path: kubeconfigPath, cleanup } = yield tmpPromise.file({ postfix: '.yaml' });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             const installOptions = {};
             installOptions.listeners = {
@@ -97,17 +97,19 @@ function templateChart(helmPath, chart, version, valuesPath) {
         try {
             const installOptions = {};
             let templateOutput = '';
+            const { path: tmpDir, cleanup } = yield tmpPromise.dir({ unsafeCleanup: true });
             installOptions.listeners = {
                 stdout: (data) => {
                     templateOutput += data.toString();
                 },
                 stderr: (data) => {
-                    // ignore
+                    core.info(data.toString());
                 }
             };
             const params = [
                 'template',
                 chart,
+                '--output-dir', tmpDir,
             ];
             if (version) {
                 params.push(`--version`, version);
@@ -116,6 +118,7 @@ function templateChart(helmPath, chart, version, valuesPath) {
                 params.push('--values', valuesPath);
             }
             yield exec.exec(helmPath, params, installOptions);
+            cleanup();
             return templateOutput;
         }
         catch (error) {
