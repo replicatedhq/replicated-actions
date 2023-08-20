@@ -267,20 +267,17 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
             // write the templatedChart to a temp file
             const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             fs.writeFileSync(templatedChartPath, templatedChart);
+            // write the output to a temp file
+            const { path: outputPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             const installOptions = {};
-            installOptions.listeners = {
-                stdout: (data) => {
-                    core.info(data.toString());
-                },
-                stderr: (data) => {
-                    core.info(data.toString());
-                }
-            };
+            installOptions.ignoreReturnCode = true;
+            installOptions.silent = true;
             const params = [
                 templatedChartPath,
                 '--kubeconfig', kubeconfigPath,
                 '--interactive=false',
                 '--format', 'json',
+                '--output', outputPath,
             ];
             yield exec.exec(preflightPath, params, installOptions);
             cleanupKubeconfig();
