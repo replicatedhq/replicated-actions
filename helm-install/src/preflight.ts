@@ -61,21 +61,19 @@ export async function downloadPreflight(): Promise<string> {
         const {fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart} = await file({postfix: '.yaml'});
         fs.writeFileSync(templatedChartPath, templatedChart);
 
-        const installOptions: any = {};
-        installOptions.listeners = {
-        stdout: (data: Buffer) => {
-            core.info(data.toString());
-        },
-        stderr: (data: Buffer) => {
-            core.info(data.toString());
-        }
-        };
+        // write the output to a temp file
+        const {path: outputPath} = await file({postfix: '.yaml'});
+
+        const installOptions: exec.ExecOptions = {};
+        installOptions.ignoreReturnCode = true;
+        installOptions.silent = true;
 
         const params = [
         templatedChartPath,
         '--kubeconfig',  kubeconfigPath,
         '--interactive=false',
         '--format', 'json',
+        '--output', outputPath,
         ];
 
         await exec.exec(preflightPath, params, installOptions);
