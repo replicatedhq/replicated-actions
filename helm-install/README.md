@@ -15,6 +15,7 @@ version ---> install_a_helm_chart_to_a_cluster
 name ---> install_a_helm_chart_to_a_cluster
 namespace ---> install_a_helm_chart_to_a_cluster
 values ---> install_a_helm_chart_to_a_cluster
+run_preflights ---> install_a_helm_chart_to_a_cluster
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -24,10 +25,11 @@ values ---> install_a_helm_chart_to_a_cluster
 | registry-username |  | True | The registry username to log in with |
 | registry-password |  | True | The registry password to use |
 | chart |  | True | The chart to use |
-| version |  | True | The version of the chart to install |
+| version |  | False | The version of the chart to install |
 | name |  | True | The name of release to install |
 | namespace |  | True | The namespace to install the application to |
 | values |  | True | A values.yaml file to use |
+| run-preflights | false | False | Run preflight checks (true/false) |
 
 ## Outputs
 | Name | Description |
