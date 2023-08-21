@@ -1,7 +1,8 @@
 import * as core from '@actions/core';
-import { Channel, createChannel, getChannelDetails } from 'replicated-lib/dist/channels';
+import { createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease  } from 'replicated-lib';
+import { Channel } from 'replicated-lib/dist/channels'
 import { VendorPortalApi } from 'replicated-lib/dist/configuration';
-import { Release, createRelease, createReleaseFromChart, promoteRelease } from 'replicated-lib/dist/releases';
+import { Release } from 'replicated-lib/dist/releases';
 
 
 async function run() {

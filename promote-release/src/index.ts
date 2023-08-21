@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
-import { promoteRelease } from 'replicated-lib/dist/releases';
-import { Channel, getChannelDetails } from 'replicated-lib/dist/channels';
+import { promoteRelease, getChannelDetails } from 'replicated-lib';
+import { Channel } from 'replicated-lib/dist/channels';
 import { VendorPortalApi } from 'replicated-lib/dist/configuration';
 
 
