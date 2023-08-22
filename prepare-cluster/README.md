@@ -15,7 +15,10 @@ kubernetes_version ---> prepare_cluster
 ttl ---> prepare_cluster
 helm_values ---> prepare_cluster
 helm_chart_name ---> prepare_cluster
+helm_run_preflights ---> prepare_cluster
 kots_config_values ---> prepare_cluster
+prepare_cluster ---> cluster_id
+prepare_cluster ---> cluster_kubeconfig
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -29,9 +32,12 @@ kots_config_values ---> prepare_cluster
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | helm-values |  | False | A Helm values.yaml file to use |
 | helm-chart-name |  | False | The name of the Helm chart to use |
+| helm-run-preflights | true | False | Run preflight checks (true/false) |
 | kots-config-values |  | False | The KOTS config values to use |
 
 ## Outputs
 | Name | Description |
 | --- | --- |
+| cluster-id | Contains the cluster id. |
+| cluster-kubeconfig | Contains the kubeconfig to connect with the cluster. |
 
