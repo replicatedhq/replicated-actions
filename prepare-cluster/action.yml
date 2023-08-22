@@ -30,9 +30,20 @@ inputs:
   helm-chart-name:
     description: 'The name of the Helm chart to use'
     required: false
+  helm-run-preflights:
+    description: 'Run preflight checks (true/false)'
+    required: false
+    default: 'true'
   kots-config-values:
     description: 'The KOTS config values to use'
     required: false
+outputs:
+  cluster-id: # id of the cluster
+    description: 'Contains the cluster id.'
+    value: ${{ steps.create-cluster.outputs.cluster-id }}
+  cluster-kubeconfig: # kubeconfig of the cluster
+    description: 'Contains the kubeconfig to connect with the cluster.'
+    value: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
 runs:
   using: "composite"
   steps:
@@ -76,7 +87,7 @@ runs:
       name: ${{ inputs.app-slug }}
       namespace: 'default'
       values: ${{ inputs.helm-values }}
-      run-preflights: true
+      run-preflights: ${{ inputs.helm-run-preflights }}
   - name: Deploy the app with KOTS
     if: ${{ inputs.yaml-dir != '' }}
     uses: replicatedhq/compatibility-actions/kots-install@v1
