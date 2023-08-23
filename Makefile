@@ -1,7 +1,7 @@
 .PHONY: package-all
 package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
 			 package-create-release package-helm-install package-kots-install package-promote-release \
-			 package-remove-cluster package-get-customer-instances
+			 package-remove-cluster package-get-customer-instances package-report-compatibility-result
 
 .PHONY: package-archive-channel
 package-archive-channel:
@@ -53,10 +53,15 @@ package-get-customer-instances:
 	rm -rf ./get-customer-instances/build ./get-customer-instances/dist ./get-customer-instances/node_modules
 	cd ./get-customer-instances && npm install && npm run build && npm run package
 
+.PHONY: package-report-compatibility-result
+report-compatibility-result:
+	rm -rf ./report-compatibility-result/build ./report-compatibility-result/dist ./report-compatibility-result/node_modules
+	cd ./report-compatibility-result && npm install && npm run build && npm run package
+
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
 			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
-			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances
+			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances readme-report-compatibility-result
 
 .PHONE: pip-install
 pip-install:
@@ -105,3 +110,7 @@ readme-prepare-cluster: pip-install
 .PHONY: readme-get-customer-instances
 readme-get-customer-instances: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./get-customer-instances/action.yml > ./get-customer-instances/README.md
+
+.PHONY: readme-report-compatibility-result
+report-compatibility-result: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./report-compatibility-result/action.yml > ./report-compatibility-result/README.md

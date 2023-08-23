@@ -1,6 +1,5 @@
 import * as core from '@actions/core';
-import { removeCluster } from 'replicated-lib';
-import { VendorPortalApi } from 'replicated-lib/dist/configuration';
+import { VendorPortalApi, removeCluster } from 'replicated-lib';
 
 
 async function run() {

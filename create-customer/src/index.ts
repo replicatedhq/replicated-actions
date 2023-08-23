@@ -1,6 +1,5 @@
 import * as core from '@actions/core';
-import { createCustomer } from 'replicated-lib';
-import { VendorPortalApi } from 'replicated-lib/dist/configuration';
+import { VendorPortalApi, createCustomer } from 'replicated-lib';
 
 import { parse } from 'yaml'
 

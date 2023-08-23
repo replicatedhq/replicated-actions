@@ -1,0 +1,35 @@
+name: 'Report Compatibility Result'
+description: 'Report Compatibility Result'
+inputs:
+  app-slug:
+    description: 'App Slug.'
+    required: true
+    default: ''
+  api-token:
+    description: 'API Token.'
+    required: true
+    default: ''
+  release-sequence:
+    description: 'The release sequence number to report compatibility result for.'
+    required: true
+  kubernetes-distribution:
+    description: 'Kubernetes distribution of the cluster to report on.'
+    required: true
+  kubernetes-version:
+    description: 'Kubernetes version to report on (format is distribution dependent).'
+    required: true
+  success-at:
+    description: 'Timestamp for when the success compatibility result was reported (only success or failure can be used). '
+    required: false
+  success-notes:
+    description: 'Notes for the success compatibility result (only success or failure can be used).'
+    required: false
+  failure-at:
+    description: 'Timestamp for when the failure compatibility result was reported (only success or failure can be used).'
+    required: false
+  failure-notes:
+    description: 'Notes for the failure compatibility result (only success or failure can be used).'
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

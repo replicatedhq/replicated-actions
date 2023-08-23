@@ -2,8 +2,7 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { createCluster, getKubeconfig, pollForStatus } from 'replicated-lib';
-import { VendorPortalApi } from 'replicated-lib/dist/configuration';
+import { VendorPortalApi, createCluster, getKubeconfig, pollForStatus } from 'replicated-lib';
 
 
 async function run() {
