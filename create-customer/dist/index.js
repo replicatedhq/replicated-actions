@@ -30609,7 +30609,7 @@ exports.Customer = Customer;
 class KubernetesDistribution {
 }
 exports.KubernetesDistribution = KubernetesDistribution;
-async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues) {
+async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
         console.log('Creating customer on appId ' + app.id);
@@ -30622,6 +30622,9 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
             type: licenseType,
             app_id: app.id,
         };
+        if (isKotsInstallEnabled !== undefined) {
+            createCustomerReqBody['is_kots_install_enabled'] = isKotsInstallEnabled;
+        }
         if (channelSlug) {
             const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
             createCustomerReqBody['channel_id'] = channel.id;
