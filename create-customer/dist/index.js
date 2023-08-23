@@ -32,13 +32,17 @@ function run() {
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const expiresInDays = +(core.getInput('expires-in') || 0);
             const entitlements = core.getInput('entitlements');
+            let isKotsInstallEnabled = undefined;
+            if (core.getInput('is-kots-install-enabled') !== '') {
+                isKotsInstallEnabled = core.getInput('is-kots-install-enabled') === 'true';
+            }
             const apiClient = new configuration_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
             const entitlementsArray = processEntitlements(entitlements);
-            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray);
+            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled);
             core.setOutput('customer-id', customer.customerId);
             core.setOutput('license-id', customer.licenseId);
             core.setOutput('license-file', customer.license);
@@ -30609,7 +30613,7 @@ exports.Customer = Customer;
 class KubernetesDistribution {
 }
 exports.KubernetesDistribution = KubernetesDistribution;
-async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues) {
+async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
         console.log('Creating customer on appId ' + app.id);
@@ -30622,6 +30626,9 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
             type: licenseType,
             app_id: app.id,
         };
+        if (isKotsInstallEnabled !== undefined) {
+            createCustomerReqBody['is_kots_install_enabled'] = isKotsInstallEnabled;
+        }
         if (channelSlug) {
             const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
             createCustomerReqBody['channel_id'] = channel.id;
