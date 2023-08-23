@@ -14,6 +14,7 @@ license_type ---> create_customer
 channel_slug ---> create_customer
 expires_in ---> create_customer
 entitlements ---> create_customer
+is_kots_install_enabled ---> create_customer
 create_customer ---> customer_id
 create_customer ---> license_id
 create_customer ---> license_file
