@@ -13,7 +13,12 @@ async function run() {
     const channelSlug = core.getInput('channel-slug');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     const expiresInDays: number = +(core.getInput('expires-in') || 0);
-    const entitlements = core.getInput('entitlements')
+    const entitlements = core.getInput('entitlements');
+
+    let isKotsInstallEnabled: boolean | undefined = undefined;
+    if (core.getInput('is-kots-install-enabled') !== '') {
+      isKotsInstallEnabled = core.getInput('is-kots-install-enabled') === 'true';
+    }
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -22,9 +27,8 @@ async function run() {
       apiClient.endpoint = apiEndpoint
     }
 
-
     const entitlementsArray = processEntitlements(entitlements)
-    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray);
+    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled);
 
     core.setOutput('customer-id', customer.customerId);
     core.setOutput('license-id', customer.licenseId);
