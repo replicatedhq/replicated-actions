@@ -1,8 +1,9 @@
 import * as core from '@actions/core';
 import * as semver from 'semver';
-import { ClusterVersion, getClusterVersions } from 'replicated-lib/dist/clusters';
+import { getClusterVersions, getUsedKubernetesDistributions } from 'replicated-lib';
+import { ClusterVersion } from 'replicated-lib/dist/clusters';
 import { VendorPortalApi } from 'replicated-lib/dist/configuration';
-import { KubernetesDistribution, getUsedKubernetesDistributions } from 'replicated-lib/dist/customers';
+import { KubernetesDistribution } from 'replicated-lib/dist/customers';
 
 
 interface MatrixInstance {

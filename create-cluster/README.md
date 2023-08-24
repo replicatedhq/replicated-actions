@@ -12,6 +12,8 @@ kubernetes_version ---> create_cluster
 cluster_name ---> create_cluster
 ttl ---> create_cluster
 timeout_minutes ---> create_cluster
+kubeconfig_path ---> create_cluster
+export_kubeconfig ---> create_cluster
 create_cluster ---> cluster_id
 create_cluster ---> cluster_kubeconfig
 ```
@@ -24,6 +26,8 @@ create_cluster ---> cluster_kubeconfig
 | cluster-name |  | True | Name of the cluster to provision |
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
+| kubeconfig-path |  | False | If specified, the kubeconfig will be written to this path |
+| export-kubeconfig | false | False | Export the KUBECONFIG variable (true/false) |
 
 ## Outputs
 | Name | Description |

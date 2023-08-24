@@ -14,6 +14,7 @@ license_type ---> create_customer
 channel_slug ---> create_customer
 expires_in ---> create_customer
 entitlements ---> create_customer
+is_kots_install_enabled ---> create_customer
 create_customer ---> customer_id
 create_customer ---> license_id
 create_customer ---> license_file
@@ -26,9 +27,10 @@ create_customer ---> license_file
 | customer-name |  | True | Name of the customer. |
 | customer-email |  | False | Email of the customer. |
 | license-type | dev | True | License Type for the customer. |
-| channel-slug | ${GITHUB_REF} | True | Channel to assign the customer to. |
+| channel-slug |  | False | Channel to assign the customer to. |
 | expires-in | 0 | False | Expiration of the license in days. (default: 0 - never expires)) |
 | entitlements |  | False | Entitlements to assign to the customer. |
+| is-kots-install-enabled |  | False | If KOTS install should be enabled for the customer. |
 
 ## Outputs
 | Name | Description |

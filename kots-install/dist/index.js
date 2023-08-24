@@ -169,6 +169,7 @@ function installApp(kotsPath, licenseFilePath, configFilePath) {
                 "--shared-password",
                 password,
                 "--no-port-forward",
+                "--skip-preflights"
             ];
             params.push("--license-file", licenseFilePath);
             params.push("--kubeconfig", kubeconfigPath);

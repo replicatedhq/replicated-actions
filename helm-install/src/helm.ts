@@ -2,26 +2,18 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as fs from 'fs';
 import * as url from 'url';
-import { file } from 'tmp-promise';
+import * as tmpPromise from 'tmp-promise';
 
-export async function login(helmPath: string, username: string, password: string) {
+export async function login(helmPath: string, username: string, password: string, chart: string) {
   try {
     if (!username || !password) {
       core.info('No username or password provided, skipping login');
       return;
     }
 
-    const parsed = url.parse(core.getInput('chart'));
+    const parsed = url.parse(chart);
 
-    const loginOptions: any = {};
-    loginOptions.listeners = {
-      stdout: (data: Buffer) => {
-        core.info(data.toString());
-      },
-      stderr: (data: Buffer) => {
-        core.info(data.toString());
-      }
-    };
+    const loginOptions: exec.ExecOptions = {};
 
     const hostname: string = parsed.hostname || '';
     const params: string[] = [
@@ -38,35 +30,25 @@ export async function login(helmPath: string, username: string, password: string
   }
 }
 
-export async function installChart(helmPath: string, valuesPath: string) {
+export async function installChart(helmPath: string, kubeconfig: string, chart: string, version: string, releaseName: string, namespace: string, valuesPath: string) {
   try {
-    const kubeconfig = core.getInput('kubeconfig');
-    const namespace = core.getInput('namespace');
-
     // write the kubeconfig to a temp file
-    const {fd, path: kubeconfigPath, cleanup} = await file({postfix: '.yaml'});
+    const {fd, path: kubeconfigPath, cleanup} = await tmpPromise.file({postfix: '.yaml'});
     fs.writeFileSync(kubeconfigPath, kubeconfig);
 
-    const installOptions: any = {};
-    installOptions.listeners = {
-      stdout: (data: Buffer) => {
-        core.info(data.toString());
-      },
-      stderr: (data: Buffer) => {
-        core.info(data.toString());
-      }
-    };
+    const installOptions: exec.ExecOptions = {};
 
     const params = [
       'install',
-      `${core.getInput('name')}`,
+      releaseName,
       '--kubeconfig',  kubeconfigPath,
-      '--namespace', core.getInput('namespace'),
-      '--create-namespace',
-      `${core.getInput('chart')}`,
-      `--version`, `${core.getInput('version')}`,
+      '--namespace', namespace,
+      '--create-namespace', chart,
     ];
 
+    if (version) {
+      params.push(`--version`, version);
+    }
     if (valuesPath !== '') {
       params.push('--values', valuesPath);
     }
@@ -75,5 +57,44 @@ export async function installChart(helmPath: string, valuesPath: string) {
     cleanup();
   } catch (error) {
     core.setFailed(error.message);
+  }
+}
+
+
+export async function templateChart(helmPath: string, chart: string, version: string, valuesPath: string): Promise<string> {
+  try {
+    let templateOutput : string = '';
+    const {path: tmpDir, cleanup} = await tmpPromise.dir( { unsafeCleanup: true });
+
+    const installOptions: exec.ExecOptions = {};
+    installOptions.silent = true;
+    installOptions.listeners = {
+      stdout: (data: Buffer) => {
+        templateOutput += data.toString();
+      },
+      stderr: (data: Buffer) => {
+        core.info(data.toString());
+      }
+    };
+
+    const params = [
+      'template',
+      chart,
+    ];
+
+    if (version) {
+      params.push(`--version`, version);
+    }
+
+    if (valuesPath !== '') {
+      params.push('--values', valuesPath);
+    }
+
+    await exec.exec(helmPath, params, installOptions);
+    cleanup()
+    return templateOutput;
+  } catch (error) {
+    core.setFailed(error.message);
+    throw error;
   }
 }

@@ -22,6 +22,13 @@ inputs:
     description: 'Time to wait for the cluster to have a status of `running`'
     required: false
     default: '20'
+  kubeconfig-path:
+    description: 'If specified, the kubeconfig will be written to this path'
+    required: false
+  export-kubeconfig:
+    description: 'Export the KUBECONFIG variable (true/false)'
+    required: false
+    default: 'false'
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'

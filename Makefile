@@ -56,7 +56,7 @@ package-get-customer-instances:
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
 			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
-			 readme-remove-cluster smoke-test readme-get-customer-instances
+			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances
 
 .PHONE: pip-install
 pip-install:
@@ -98,9 +98,9 @@ readme-promote-release: pip-install
 readme-remove-cluster: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./remove-cluster/action.yml > ./remove-cluster/README.md
 
-.PHONY: readme-smoke-test
-readme-smoke-test: pip-install
-	python3 docs/generate-readme/action-to-mermaid.py ./smoke-test/action.yml > ./smoke-test/README.md
+.PHONY: readme-prepare-cluster
+readme-prepare-cluster: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./prepare-cluster/action.yml > ./prepare-cluster/README.md
 
 .PHONY: readme-get-customer-instances
 readme-get-customer-instances: pip-install

@@ -107,6 +107,7 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
           "--shared-password",
           password,
           "--no-port-forward",
+          "--skip-preflights"
       ];
       params.push("--license-file", licenseFilePath)
       params.push("--kubeconfig", kubeconfigPath)

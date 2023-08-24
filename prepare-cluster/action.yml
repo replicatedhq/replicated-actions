@@ -1,0 +1,99 @@
+name: 'Prepare Cluster'
+description: 'Prepare Cluster'
+inputs:
+  app-slug:
+    description: 'App Slug.'
+    required: true
+    default: ''
+  api-token:
+    description: 'API Token.'
+    required: true
+    default: ''
+  chart:
+    description: 'Path to the helm chart (One of `chart` or `yaml-dir` is required).'
+    required: false
+  yaml-dir:
+    description: 'The directory containing multiple yamls for a Replicated release.'
+    required: false
+  kubernetes-distribution:
+    description: 'Kubernetes distribution of the cluster to provision.'
+    required: true
+  kubernetes-version:
+    description: 'Kubernetes version to provision (format is distribution dependent).'
+    required: true
+  ttl:
+    description: 'Cluster TTL (duration, max 48h)'
+    required: false
+  helm-values:
+    description: 'A Helm values.yaml file to use'
+    required: false
+  helm-chart-name:
+    description: 'The name of the Helm chart to use'
+    required: false
+  helm-run-preflights:
+    description: 'Run preflight checks (true/false)'
+    required: false
+    default: 'true'
+  kots-config-values:
+    description: 'The KOTS config values to use'
+    required: false
+outputs:
+  cluster-id: # id of the cluster
+    description: 'Contains the cluster id.'
+    value: ${{ steps.create-cluster.outputs.cluster-id }}
+  cluster-kubeconfig: # kubeconfig of the cluster
+    description: 'Contains the kubeconfig to connect with the cluster.'
+    value: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+runs:
+  using: "composite"
+  steps:
+  - name: 'Create Release'
+    id: 'create-release'
+    uses: replicatedhq/compatibility-actions/create-release@v1
+    with:
+      app-slug: ${{ inputs.app-slug }}
+      api-token: ${{ inputs.api-token }}
+      yaml-dir: ${{ inputs.yaml-dir }}
+      chart: ${{ inputs.chart }}
+  - name: 'Create Customer'
+    id: 'create-customer'
+    uses: replicatedhq/compatibility-actions/create-customer@v1
+    with:
+      app-slug: ${{ inputs.app-slug }}
+      api-token: ${{ inputs.api-token }}
+      customer-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
+      customer-email: ${{ github.ref_name }}@example.com
+      license-type: "test"
+      channel-slug: ${{ steps.create-release.outputs.channel-slug }}
+  - name: Create Cluster
+    id: create-cluster
+    uses: replicatedhq/compatibility-actions/create-cluster@v1
+    with:
+      api-token: ${{ inputs.api-token }}
+      kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
+      kubernetes-version: ${{ inputs.kubernetes-version }}
+      cluster-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
+      ttl: ${{ inputs.ttl || '' }}
+      timeout-minutes: ${{ inputs.timeout-minutes || 20 }}
+  - name: Deploy the app with Helm
+    uses: replicatedhq/compatibility-actions/helm-install@v1
+    if: ${{ inputs.chart != '' }}
+    with:
+      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+      helm-path: "helm"
+      registry-username: ${{ github.ref_name }}@example.com
+      registry-password: ${{ steps.create-customer.outputs.license-id }}
+      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/release__${{ steps.create-release.outputs.release-sequence }}/${{ inputs.helm-chart-name }}
+      name: ${{ inputs.app-slug }}
+      namespace: 'default'
+      values: ${{ inputs.helm-values }}
+      run-preflights: ${{ inputs.helm-run-preflights }}
+  - name: Deploy the app with KOTS
+    if: ${{ inputs.yaml-dir != '' }}
+    uses: replicatedhq/compatibility-actions/kots-install@v1
+    with:
+      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+      app-slug: ${{ inputs.app-slug }}/test-channel
+      license-file: ${{ steps.create-customer.outputs.license-file }}
+      app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
+      config-values: ${{ inputs.kots-config-values }}
