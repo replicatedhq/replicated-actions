@@ -18,7 +18,7 @@ jobs:
 
       - name: Get Customer Instances
         id: get-customer-instances
-        uses: replicatedhq/compatibility-actions/get-customer-instances@v1
+        uses: replicatedhq/replicated-actions/get-customer-instances@v1
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
 
       - name: Prepare Cluster
         id: prepare-cluster
-        uses: replicatedhq/compatibility-actions/prepare-cluster@v1
+        uses: replicatedhq/replicated-actions/prepare-cluster@v1
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
