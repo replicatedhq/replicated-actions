@@ -21,7 +21,6 @@ const fs = __nccwpck_require__(7147);
 const path = __nccwpck_require__(1017);
 const os = __nccwpck_require__(2037);
 const replicated_lib_1 = __nccwpck_require__(4409);
-const configuration_1 = __nccwpck_require__(4995);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -34,7 +33,7 @@ function run() {
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             let kubeconfigPath = core.getInput('kubeconfig-path');
             const exportKubeconfig = core.getInput('export-kubeconfig') === 'true';
-            const apiClient = new configuration_1.VendorPortalApi();
+            const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
@@ -30510,6 +30509,10 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
         if (clusterDetails.status === expectedStatus) {
             return clusterDetails;
         }
+        // Once state is "error", it will never change. So we can shortcut polling.
+        if (clusterDetails.status === "error") {
+            throw new Error(`Cluster has entered error state.`);
+        }
         console.debug(`Cluster status is ${clusterDetails.status}, sleeping for ${sleeptime} seconds`);
         await new Promise(f => setTimeout(f, sleeptime * 1000));
     }
@@ -30621,7 +30624,7 @@ exports.Customer = Customer;
 class KubernetesDistribution {
 }
 exports.KubernetesDistribution = KubernetesDistribution;
-async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues) {
+async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
         console.log('Creating customer on appId ' + app.id);
@@ -30634,6 +30637,9 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
             type: licenseType,
             app_id: app.id,
         };
+        if (isKotsInstallEnabled !== undefined) {
+            createCustomerReqBody['is_kots_install_enabled'] = isKotsInstallEnabled;
+        }
         if (channelSlug) {
             const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
             createCustomerReqBody['channel_id'] = channel.id;
@@ -30730,20 +30736,25 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.getApplicationDetails = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+var configuration_1 = __nccwpck_require__(4995);
+Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(3770);
 Object.defineProperty(exports, "getApplicationDetails", ({ enumerable: true, get: function () { return applications_1.getApplicationDetails; } }));
 var channels_1 = __nccwpck_require__(7491);
+Object.defineProperty(exports, "Channel", ({ enumerable: true, get: function () { return channels_1.Channel; } }));
 Object.defineProperty(exports, "createChannel", ({ enumerable: true, get: function () { return channels_1.createChannel; } }));
 Object.defineProperty(exports, "getChannelDetails", ({ enumerable: true, get: function () { return channels_1.getChannelDetails; } }));
 Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: function () { return channels_1.archiveChannel; } }));
 var clusters_1 = __nccwpck_require__(5230);
+Object.defineProperty(exports, "ClusterVersion", ({ enumerable: true, get: function () { return clusters_1.ClusterVersion; } }));
 Object.defineProperty(exports, "createCluster", ({ enumerable: true, get: function () { return clusters_1.createCluster; } }));
 Object.defineProperty(exports, "pollForStatus", ({ enumerable: true, get: function () { return clusters_1.pollForStatus; } }));
 Object.defineProperty(exports, "getKubeconfig", ({ enumerable: true, get: function () { return clusters_1.getKubeconfig; } }));
 Object.defineProperty(exports, "removeCluster", ({ enumerable: true, get: function () { return clusters_1.removeCluster; } }));
 Object.defineProperty(exports, "getClusterVersions", ({ enumerable: true, get: function () { return clusters_1.getClusterVersions; } }));
 var customers_1 = __nccwpck_require__(8958);
+Object.defineProperty(exports, "KubernetesDistribution", ({ enumerable: true, get: function () { return customers_1.KubernetesDistribution; } }));
 Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
 Object.defineProperty(exports, "getUsedKubernetesDistributions", ({ enumerable: true, get: function () { return customers_1.getUsedKubernetesDistributions; } }));
@@ -30751,6 +30762,7 @@ var releases_1 = __nccwpck_require__(4873);
 Object.defineProperty(exports, "createRelease", ({ enumerable: true, get: function () { return releases_1.createRelease; } }));
 Object.defineProperty(exports, "createReleaseFromChart", ({ enumerable: true, get: function () { return releases_1.createReleaseFromChart; } }));
 Object.defineProperty(exports, "promoteRelease", ({ enumerable: true, get: function () { return releases_1.promoteRelease; } }));
+Object.defineProperty(exports, "reportCompatibilityResult", ({ enumerable: true, get: function () { return releases_1.reportCompatibilityResult; } }));
 
 
 /***/ }),
@@ -30761,13 +30773,22 @@ Object.defineProperty(exports, "promoteRelease", ({ enumerable: true, get: funct
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.promoteRelease = exports.exportedForTesting = exports.gzipData = exports.createReleaseFromChart = exports.createRelease = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.gzipData = exports.createReleaseFromChart = exports.createRelease = exports.exportedForTesting = void 0;
 const applications_1 = __nccwpck_require__(3770);
 const pako_1 = __nccwpck_require__(1726);
 const path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
 const util = __nccwpck_require__(3837);
 const base64 = __nccwpck_require__(6463);
+const date_fns_tz_1 = __nccwpck_require__(4960);
+exports.exportedForTesting = {
+    areReleaseChartsPushed,
+    getReleaseByAppId,
+    isReleaseReadyForInstall,
+    promoteReleaseByAppId,
+    readChart,
+    reportCompatibilityResultByAppId
+};
 async function createRelease(vendorPortalApi, appSlug, yamlDir) {
     var _a;
     const http = await vendorPortalApi.client();
@@ -30890,13 +30911,6 @@ async function readYAMLDir(yamlDir, prefix = "") {
     }
     return allKotsReleaseSpecs;
 }
-exports.exportedForTesting = {
-    areReleaseChartsPushed,
-    getReleaseByAppId,
-    isReleaseReadyForInstall,
-    promoteReleaseByAppId,
-    readChart,
-};
 async function readChart(chart) {
     const allKotsReleaseSpecs = [];
     if ((await stat(chart)).isDirectory()) {
@@ -30913,7 +30927,6 @@ function isSupportedExt(ext) {
     return supportedExts.includes(ext);
 }
 async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequence, version) {
-    const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. promote the release
@@ -30988,6 +31001,43 @@ async function getReleaseByAppId(vendorPortalApi, appId, releaseSequence) {
     }
     const body = JSON.parse(await res.readBody());
     return { sequence: body.release.sequence, charts: body.release.charts };
+}
+async function reportCompatibilityResult(vendorPortalApi, appSlug, releaseSequence, compatibilityResult) {
+    // 1. get the app id from the app slug
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    // 2. promote the release
+    await reportCompatibilityResultByAppId(vendorPortalApi, app.id, releaseSequence, compatibilityResult);
+}
+exports.reportCompatibilityResult = reportCompatibilityResult;
+async function reportCompatibilityResultByAppId(vendorPortalApi, appId, releaseSequence, compatibilityResult) {
+    const http = await vendorPortalApi.client();
+    const reqBody = {
+        "distribution": compatibilityResult.distribution,
+        "version": compatibilityResult.version,
+    };
+    if (compatibilityResult.successAt) {
+        const successAt = (0, date_fns_tz_1.zonedTimeToUtc)(compatibilityResult.successAt, 'UTC');
+        reqBody["successAt"] = successAt.toISOString();
+        reqBody["successNotes"] = compatibilityResult.successNotes;
+    }
+    if (compatibilityResult.failureAt) {
+        const failureAt = (0, date_fns_tz_1.zonedTimeToUtc)(compatibilityResult.failureAt, 'UTC');
+        reqBody["failureAt"] = failureAt.toISOString();
+        reqBody["failureNotes"] = compatibilityResult.failureNotes;
+    }
+    const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}/compatibility`;
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 201) {
+        // If res has a body, read it and add it to the error message
+        let body = "";
+        try {
+            body = await res.readBody();
+        }
+        catch (err) {
+            // ignore
+        }
+        throw new Error(`Failed to report compatibility results: Server responded with ${res.message.statusCode}: ${body}`);
+    }
 }
 
 
