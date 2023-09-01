@@ -26,10 +26,10 @@ async function run() {
 
     let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
+    core.setOutput('cluster-id', cluster.id);
+
     cluster = await pollForStatus(apiClient, cluster.id, 'running', timeoutMinutes*60);
     const kubeconfig = await getKubeconfig(apiClient, cluster.id);
-
-    core.setOutput('cluster-id', cluster.id);
     core.setOutput('cluster-kubeconfig', kubeconfig);
 
     if (kubeconfigPath) {

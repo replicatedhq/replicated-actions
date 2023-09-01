@@ -40,9 +40,9 @@ function run() {
             }
             let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
             core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
+            core.setOutput('cluster-id', cluster.id);
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
             const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
-            core.setOutput('cluster-id', cluster.id);
             core.setOutput('cluster-kubeconfig', kubeconfig);
             if (kubeconfigPath) {
                 writeFile(kubeconfigPath, kubeconfig);
@@ -1285,6 +1285,19 @@ class HttpClientResponse {
             }));
         });
     }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
+                });
+            }));
+        });
+    }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
@@ -1789,7 +1802,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -32356,14 +32375,14 @@ module.exports = _toPropertyKey, module.exports.__esModule = true, module.export
 /***/ 5605:
 /***/ ((module) => {
 
-function _typeof(obj) {
+function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(obj);
+  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
