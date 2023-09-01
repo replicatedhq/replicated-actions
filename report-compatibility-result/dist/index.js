@@ -27,34 +27,29 @@ function run() {
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const k8sDistribution = core.getInput('kubernetes-distribution');
             const k8sVersion = core.getInput('kubernetes-version');
-            const successAt = core.getInput('success-at');
-            const successNotes = core.getInput('success-notes');
-            const failureAt = core.getInput('failure-at');
-            const failureNotes = core.getInput('failure-notes');
+            const success = core.getInput('success') === 'true';
+            const notes = core.getInput('notes');
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            // both success and failure defined
-            if (successAt && failureAt) {
-                throw new Error("Cannot set both success and failure times");
-            }
-            // neither success or failure defined
-            if (!successAt && !failureAt) {
-                throw new Error("Must set either success or failure times");
-            }
             const c11yResult = {
                 distribution: k8sDistribution,
                 version: k8sVersion,
             };
-            if (successAt) {
-                c11yResult.successAt = new Date(successAt);
-                c11yResult.successNotes = successNotes;
+            const now = new Date();
+            if (success) {
+                c11yResult.successAt = now;
+                if (notes) {
+                    c11yResult.successNotes = notes;
+                }
             }
-            if (failureAt) {
-                c11yResult.failureAt = new Date(failureAt);
-                c11yResult.failureNotes = failureNotes;
+            else {
+                c11yResult.failureAt = now;
+                if (notes) {
+                    c11yResult.failureNotes = notes;
+                }
             }
             yield (0, replicated_lib_1.reportCompatibilityResult)(apiClient, appSlug, +releaseSequence, c11yResult);
         }

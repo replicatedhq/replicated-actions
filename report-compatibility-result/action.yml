@@ -18,17 +18,11 @@ inputs:
   kubernetes-version:
     description: 'Kubernetes version to report on (format is distribution dependent).'
     required: true
-  success-at:
-    description: 'Timestamp for when the success compatibility result was reported (only success or failure can be used). '
-    required: false
-  success-notes:
-    description: 'Notes for the success compatibility result (only success or failure can be used).'
-    required: false
-  failure-at:
-    description: 'Timestamp for when the failure compatibility result was reported (only success or failure can be used).'
-    required: false
-  failure-notes:
-    description: 'Notes for the failure compatibility result (only success or failure can be used).'
+  success:
+    description: 'If set to true, the result will be marked as successfull. If set to false, the result will be marked as failed. (true/false)'
+    required: true
+  notes:
+    description: 'Notes for the compatibility result.'
     required: false
 runs:
   using: 'node16'
