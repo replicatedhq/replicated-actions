@@ -54,7 +54,7 @@ package-get-customer-instances:
 	cd ./get-customer-instances && npm install && npm run build && npm run package
 
 .PHONY: package-report-compatibility-result
-report-compatibility-result:
+package-report-compatibility-result:
 	rm -rf ./report-compatibility-result/build ./report-compatibility-result/dist ./report-compatibility-result/node_modules
 	cd ./report-compatibility-result && npm install && npm run build && npm run package
 
@@ -112,5 +112,5 @@ readme-get-customer-instances: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./get-customer-instances/action.yml > ./get-customer-instances/README.md
 
 .PHONY: readme-report-compatibility-result
-report-compatibility-result: pip-install
+readme-report-compatibility-result: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./report-compatibility-result/action.yml > ./report-compatibility-result/README.md
