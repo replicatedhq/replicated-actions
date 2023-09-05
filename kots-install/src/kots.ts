@@ -83,12 +83,7 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
           postfix: '.yaml'
       });
       fs.writeFileSync(kubeconfigPath, kubeconfig);
-      const installOptions : any = {};
-      installOptions.listeners = {
-          stdout: (data)=>{
-              core.info(data.toString());
-          }
-      };
+      const installOptions : exec.ExecOptions = {};
 
       // Allow configuring the shared password
       const sharedPassword: string = core.getInput('shared-password');

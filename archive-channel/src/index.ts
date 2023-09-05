@@ -1,6 +1,5 @@
 import * as core from '@actions/core';
-import { archiveChannel } from 'replicated-lib';
-import { VendorPortalApi } from 'replicated-lib/dist/configuration';
+import { VendorPortalApi, archiveChannel } from 'replicated-lib';
 
 
 async function run() {

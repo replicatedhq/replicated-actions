@@ -147,11 +147,6 @@ function installApp(kotsPath, licenseFilePath, configFilePath) {
             });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             const installOptions = {};
-            installOptions.listeners = {
-                stdout: (data) => {
-                    core.info(data.toString());
-                }
-            };
             // Allow configuring the shared password
             const sharedPassword = core.getInput('shared-password');
             let password;
