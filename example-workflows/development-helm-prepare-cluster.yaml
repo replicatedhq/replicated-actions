@@ -25,7 +25,7 @@ jobs:
 
       - name: Prepare Cluster
         id: prepare-cluster
-        uses: replicatedhq/compatibility-actions/prepare-cluster@v1
+        uses: replicatedhq/replicated-actions/prepare-cluster@v1
         with:
           app-slug: ${{ secrets.REPLICATED_APP }}
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
