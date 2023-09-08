@@ -30466,7 +30466,7 @@ async function findChannelDetailsInOutput(channels, { slug, name }) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.Cluster = void 0;
+exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.Cluster = void 0;
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -30550,6 +30550,19 @@ async function removeCluster(vendorPortalApi, clusterId) {
     }
 }
 exports.removeCluster = removeCluster;
+async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
+    const http = await vendorPortalApi.client();
+    const reqBody = {
+        "kubernetes_version": k8sVersion,
+    };
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/upgrade`;
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 200) {
+        throw new Error(`Failed to upgrade cluster: Server responded with ${res.message.statusCode}`);
+    }
+    return getClusterDetails(vendorPortalApi, clusterId);
+}
+exports.upgradeCluster = upgradeCluster;
 async function getClusterVersions(vendorPortalApi) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/versions`;
@@ -30737,7 +30750,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.getClusterVersions = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(4995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(3770);
@@ -30753,6 +30766,7 @@ Object.defineProperty(exports, "createCluster", ({ enumerable: true, get: functi
 Object.defineProperty(exports, "pollForStatus", ({ enumerable: true, get: function () { return clusters_1.pollForStatus; } }));
 Object.defineProperty(exports, "getKubeconfig", ({ enumerable: true, get: function () { return clusters_1.getKubeconfig; } }));
 Object.defineProperty(exports, "removeCluster", ({ enumerable: true, get: function () { return clusters_1.removeCluster; } }));
+Object.defineProperty(exports, "upgradeCluster", ({ enumerable: true, get: function () { return clusters_1.upgradeCluster; } }));
 Object.defineProperty(exports, "getClusterVersions", ({ enumerable: true, get: function () { return clusters_1.getClusterVersions; } }));
 var customers_1 = __nccwpck_require__(8958);
 Object.defineProperty(exports, "KubernetesDistribution", ({ enumerable: true, get: function () { return customers_1.KubernetesDistribution; } }));
