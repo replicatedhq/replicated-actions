@@ -17,28 +17,56 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __nccwpck_require__(2186);
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const os = __nccwpck_require__(2037);
 const replicated_lib_1 = __nccwpck_require__(4409);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('app-slug');
             const apiToken = core.getInput('api-token');
-            const channelSlug = core.getInput('channel-to');
-            const releaseSequence = core.getInput('release-sequence');
-            const releaseVersion = core.getInput('release-version');
+            const clusterId = core.getInput('cluster-id');
+            const k8sVersion = core.getInput('kubernetes-version');
+            const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
             const apiEndpoint = core.getInput('replicated-api-endpoint');
+            let kubeconfigPath = core.getInput('kubeconfig-path');
+            const exportKubeconfig = core.getInput('export-kubeconfig') === 'true';
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            const channel = yield (0, replicated_lib_1.getChannelDetails)(apiClient, appSlug, { slug: channelSlug });
-            yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
+            let cluster = yield (0, replicated_lib_1.upgradeCluster)(apiClient, clusterId, k8sVersion);
+            core.info(`Upgrading cluster ${cluster.id} - waiting for it to be ready...`);
+            core.setOutput('cluster-id', cluster.id);
+            cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
+            const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
+            core.setOutput('cluster-kubeconfig', kubeconfig);
+            if (kubeconfigPath) {
+                writeFile(kubeconfigPath, kubeconfig);
+                core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
+            }
+            if (exportKubeconfig) {
+                if (!kubeconfigPath) {
+                    kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${cluster.id}`;
+                    writeFile(kubeconfigPath, kubeconfig);
+                    core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
+                }
+                core.exportVariable('KUBECONFIG', kubeconfigPath);
+                core.info(`Set KUBECONFIG=${kubeconfigPath}`);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
         }
     });
+}
+function writeFile(filePath, contents) {
+    const directoryPath = path.dirname(filePath);
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+    fs.writeFileSync(filePath, contents);
 }
 run();
 //# sourceMappingURL=index.js.map
@@ -1255,6 +1283,19 @@ class HttpClientResponse {
             }));
         });
     }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
+                });
+            }));
+        });
+    }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
@@ -1759,7 +1800,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -32340,14 +32387,14 @@ module.exports = _toPropertyKey, module.exports.__esModule = true, module.export
 /***/ 5605:
 /***/ ((module) => {
 
-function _typeof(obj) {
+function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(obj);
+  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 

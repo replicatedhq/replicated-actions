@@ -1,7 +1,8 @@
 .PHONY: package-all
 package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
 			 package-create-release package-helm-install package-kots-install package-promote-release \
-			 package-remove-cluster package-get-customer-instances package-report-compatibility-result
+			 package-remove-cluster package-get-customer-instances package-report-compatibility-result \
+			 package-upgrade-cluster
 
 .PHONY: package-archive-channel
 package-archive-channel:
@@ -58,10 +59,16 @@ package-report-compatibility-result:
 	rm -rf ./report-compatibility-result/build ./report-compatibility-result/dist ./report-compatibility-result/node_modules
 	cd ./report-compatibility-result && npm install && npm run build && npm run package
 
+.PHONY: package-upgrade-cluster
+package-upgrade-cluster:
+	rm -rf ./upgrade-cluster/build ./upgrade-cluster/dist ./upgrade-cluster/node_modules
+	cd ./upgrade-cluster && npm install && npm run build && npm run package
+
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
 			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
-			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances readme-report-compatibility-result
+			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances readme-report-compatibility-result \
+			 readme-upgrade-cluster
 
 .PHONE: pip-install
 pip-install:
@@ -114,3 +121,7 @@ readme-get-customer-instances: pip-install
 .PHONY: readme-report-compatibility-result
 readme-report-compatibility-result: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./report-compatibility-result/action.yml > ./report-compatibility-result/README.md
+
+.PHONY: readme-upgrade-cluster
+readme-upgrade-cluster: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./upgrade-cluster/action.yml > ./upgrade-cluster/README.md
