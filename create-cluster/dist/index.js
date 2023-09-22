@@ -29,6 +29,9 @@ function run() {
             const k8sDistribution = core.getInput('kubernetes-distribution');
             const k8sVersion = core.getInput('kubernetes-version');
             const k8sTTL = core.getInput('ttl');
+            const diskGib = +(core.getInput('disk-gib') || 50);
+            const nodeCount = +(core.getInput('node-count') || 1);
+            const instanceType = core.getInput('instance-type');
             const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             let kubeconfigPath = core.getInput('kubeconfig-path');
@@ -38,7 +41,7 @@ function run() {
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
+            let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType);
             core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
             core.setOutput('cluster-id', cluster.id);
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
@@ -30491,14 +30494,16 @@ exports.Cluster = Cluster;
 class ClusterVersion {
 }
 exports.ClusterVersion = ClusterVersion;
-async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL) {
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
         "kubernetes_distribution": k8sDistribution,
         "kubernetes_version": k8sVersion,
         "ttl": clusterTTL,
-        "disk_gib": 50,
+        "disk_gib": diskGib || 50,
+        "node_count": nodeCount || 1,
+        "instance_type": instanceType
     };
     const uri = `${vendorPortalApi.endpoint}/cluster`;
     const res = await http.post(uri, JSON.stringify(reqBody));
