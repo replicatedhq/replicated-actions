@@ -18,6 +18,15 @@ inputs:
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
+  disk-gib:
+    description: 'Disk size in GiB'
+    required: false
+  node-count:
+    description: 'Number of nodes to provision'
+    required: false
+  instance-type:
+    description: 'Instance type to provision'
+    required: false
   timeout-minutes:
     description: 'Time to wait for the cluster to have a status of `running`'
     required: false

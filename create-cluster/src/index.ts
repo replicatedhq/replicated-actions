@@ -12,6 +12,9 @@ async function run() {
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');
     const k8sTTL = core.getInput('ttl');
+    const diskGib: number = +(core.getInput('disk-gib') || 50);
+    const nodeCount: number = +(core.getInput('node-count') || 1);
+    const instanceType = core.getInput('instance-type');
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     let kubeconfigPath = core.getInput('kubeconfig-path');
@@ -24,7 +27,7 @@ async function run() {
       apiClient.endpoint = apiEndpoint
     }
 
-    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL);
+    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType);
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
     core.setOutput('cluster-id', cluster.id);
 
