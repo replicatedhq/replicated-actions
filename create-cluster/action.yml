@@ -18,10 +18,10 @@ inputs:
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
-  disk-gib:
+  disk:
     description: 'Disk size in GiB'
     required: false
-  node-count:
+  nodes:
     description: 'Number of nodes to provision'
     required: false
   instance-type:

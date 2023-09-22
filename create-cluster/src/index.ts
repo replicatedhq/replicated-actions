@@ -12,8 +12,8 @@ async function run() {
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');
     const k8sTTL = core.getInput('ttl');
-    const diskGib: number = +(core.getInput('disk-gib') || 50);
-    const nodeCount: number = +(core.getInput('node-count') || 1);
+    const diskGib: number = +(core.getInput('disk'));
+    const nodeCount: number = +(core.getInput('nodes'));
     const instanceType = core.getInput('instance-type');
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const apiEndpoint = core.getInput('replicated-api-endpoint')
