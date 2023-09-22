@@ -30501,8 +30501,8 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
         "kubernetes_distribution": k8sDistribution,
         "kubernetes_version": k8sVersion,
         "ttl": clusterTTL,
-        "disk_gib": diskGib || 50,
-        "node_count": nodeCount || 1,
+        "disk_gib": diskGib,
+        "node_count": nodeCount,
         "instance_type": instanceType
     };
     const uri = `${vendorPortalApi.endpoint}/cluster`;
