@@ -11,8 +11,8 @@ kubernetes_distribution ---> create_cluster
 kubernetes_version ---> create_cluster
 cluster_name ---> create_cluster
 ttl ---> create_cluster
-disk_gib ---> create_cluster
-node_count ---> create_cluster
+disk ---> create_cluster
+nodes ---> create_cluster
 instance_type ---> create_cluster
 timeout_minutes ---> create_cluster
 kubeconfig_path ---> create_cluster
@@ -28,8 +28,8 @@ create_cluster ---> cluster_kubeconfig
 | kubernetes-version |  | True | Kubernetes version to provision (format is distribution dependent). |
 | cluster-name |  | True | Name of the cluster to provision |
 | ttl |  | False | Cluster TTL (duration, max 48h) |
-| disk-gib |  | False | Disk size in GiB |
-| node-count |  | False | Number of nodes to provision |
+| disk |  | False | Disk size in GiB |
+| nodes |  | False | Number of nodes to provision |
 | instance-type |  | False | Instance type to provision |
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
 | kubeconfig-path |  | False | If specified, the kubeconfig will be written to this path |
