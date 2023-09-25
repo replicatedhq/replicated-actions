@@ -37,6 +37,9 @@ inputs:
   kots-config-values:
     description: 'The KOTS config values to use'
     required: false
+  kots-wait-duration:
+    description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
+    required: false
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'
@@ -97,3 +100,4 @@ runs:
       license-file: ${{ steps.create-customer.outputs.license-file }}
       app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
       config-values: ${{ inputs.kots-config-values }}
+      wait-duration: ${{ inputs.kots-wait-duration }}
