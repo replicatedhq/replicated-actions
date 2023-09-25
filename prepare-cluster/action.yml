@@ -93,7 +93,7 @@ runs:
       run-preflights: ${{ inputs.helm-run-preflights }}
   - name: Deploy the app with KOTS
     if: ${{ inputs.yaml-dir != '' }}
-    uses: replicatedhq/compatibility-actions/kots-install@v1
+    uses: replicatedhq/compatibility-actions/kots-install@joshd/kots-wait-duration 
     with:
       kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
       app-slug: ${{ inputs.app-slug }}/test-channel
