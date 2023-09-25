@@ -78,6 +78,7 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
       const slug = core.getInput('app-slug');
       const appVersionLabel = core.getInput('app-version-label');
       const namespace = core.getInput('namespace');
+      const waitDuration = core.getInput('wait-duration');
       // write the kubeconfig to a temp file
       const { fd , path: kubeconfigPath , cleanup  } = await (0, tmpPromise.file)({
           postfix: '.yaml'
@@ -107,10 +108,13 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
       params.push("--license-file", licenseFilePath)
       params.push("--kubeconfig", kubeconfigPath)
       if (configFilePath !== '') {
-          params.push("--config-values", configFilePath);
+        params.push("--config-values", configFilePath);
       }
       if (appVersionLabel) {
-          params.push("--app-version-label", appVersionLabel);
+        params.push("--app-version-label", appVersionLabel);
+      }
+      if (waitDuration) {
+        params.push("--wait-duration", waitDuration);
       }
       await exec.exec(kotsPath, params, installOptions);
       cleanup();

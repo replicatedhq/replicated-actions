@@ -17,6 +17,7 @@ helm_values ---> prepare_cluster
 helm_chart_name ---> prepare_cluster
 helm_run_preflights ---> prepare_cluster
 kots_config_values ---> prepare_cluster
+kots_wait_duration ---> prepare_cluster
 prepare_cluster ---> cluster_id
 prepare_cluster ---> cluster_kubeconfig
 ```
@@ -34,6 +35,7 @@ prepare_cluster ---> cluster_kubeconfig
 | helm-chart-name |  | False | The name of the Helm chart to use |
 | helm-run-preflights | true | False | Run preflight checks (true/false) |
 | kots-config-values |  | False | The KOTS config values to use |
+| kots-wait-duration |  | False | Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m") |
 
 ## Outputs
 | Name | Description |

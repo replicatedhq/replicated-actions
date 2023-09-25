@@ -14,6 +14,7 @@ shared_password ---> kots_install
 license_file ---> kots_install
 config_values ---> kots_install
 namespace ---> kots_install
+wait_duration ---> kots_install
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -26,6 +27,7 @@ namespace ---> kots_install
 | license-file |  | True | A license.yaml to use |
 | config-values |  | False | The config values to use |
 | namespace | default | False | The namespace to install the application to |
+| wait-duration |  | False | Timeout to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m") |
 
 ## Outputs
 | Name | Description |

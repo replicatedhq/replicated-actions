@@ -27,6 +27,9 @@ inputs:
     description: 'The namespace to install the application to'
     default: "default"
     required: false
+  wait-duration:
+    description: 'Timeout to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

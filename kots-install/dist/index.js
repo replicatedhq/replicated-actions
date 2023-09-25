@@ -141,6 +141,7 @@ function installApp(kotsPath, licenseFilePath, configFilePath) {
             const slug = core.getInput('app-slug');
             const appVersionLabel = core.getInput('app-version-label');
             const namespace = core.getInput('namespace');
+            const waitDuration = core.getInput('wait-duration');
             // write the kubeconfig to a temp file
             const { fd, path: kubeconfigPath, cleanup } = yield (0, tmpPromise.file)({
                 postfix: '.yaml'
@@ -173,6 +174,9 @@ function installApp(kotsPath, licenseFilePath, configFilePath) {
             }
             if (appVersionLabel) {
                 params.push("--app-version-label", appVersionLabel);
+            }
+            if (waitDuration) {
+                params.push("--wait-duration", waitDuration);
             }
             yield exec.exec(kotsPath, params, installOptions);
             cleanup();
