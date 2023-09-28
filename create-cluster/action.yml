@@ -10,7 +10,7 @@ inputs:
     required: true
   kubernetes-version:
     description: 'Kubernetes version to provision (format is distribution dependent).'
-    required: true
+    required: false
   cluster-name:
     description: 'Name of the cluster to provision'
     required: true
