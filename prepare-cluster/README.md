@@ -29,7 +29,7 @@ prepare_cluster ---> cluster_kubeconfig
 | chart |  | False | Path to the helm chart (One of `chart` or `yaml-dir` is required). |
 | yaml-dir |  | False | The directory containing multiple yamls for a Replicated release. |
 | kubernetes-distribution |  | True | Kubernetes distribution of the cluster to provision. |
-| kubernetes-version |  | True | Kubernetes version to provision (format is distribution dependent). |
+| kubernetes-version |  | False | Kubernetes version to provision (format is distribution dependent). |
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | helm-values |  | False | A Helm values.yaml file to use |
 | helm-chart-name |  | False | The name of the Helm chart to use |

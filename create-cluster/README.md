@@ -25,7 +25,7 @@ create_cluster ---> cluster_kubeconfig
 | --- | --- | --- | --- |
 | api-token |  | True | API Token. |
 | kubernetes-distribution |  | True | Kubernetes distribution of the cluster to provision. |
-| kubernetes-version |  | True | Kubernetes version to provision (format is distribution dependent). |
+| kubernetes-version |  | False | Kubernetes version to provision (format is distribution dependent). |
 | cluster-name |  | True | Name of the cluster to provision |
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | disk |  | False | Disk size in GiB |
