@@ -31013,22 +31013,23 @@ async function isReleaseReadyForInstall(vendorPortalApi, appId, releaseSequence)
 }
 function areReleaseChartsPushed(charts) {
     let pushedChartsCount = 0;
+    let chartsCount = 0;
     for (const chart of charts) {
         switch (chart.status) {
             case "pushed":
                 pushedChartsCount++;
+                chartsCount++;
                 break;
             case "unknown":
             case "pushing":
                 // wait for the chart to be pushed
+                chartsCount++;
                 continue;
             case "error":
                 throw new Error(`chart ${chart.name} failed to push: ${chart.error}`);
-            default:
-                throw new Error(`unknown release chart status ${chart.status}`);
         }
     }
-    return pushedChartsCount == charts.length;
+    return pushedChartsCount == chartsCount;
 }
 async function getReleaseByAppId(vendorPortalApi, appId, releaseSequence) {
     const http = await vendorPortalApi.client();
