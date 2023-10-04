@@ -20,7 +20,7 @@ inputs:
     required: true
   kubernetes-version:
     description: 'Kubernetes version to provision (format is distribution dependent).'
-    required: true
+    required: false
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
