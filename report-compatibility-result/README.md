@@ -6,6 +6,13 @@ title: Report Compatibility Result
 ---
 graph LR
 report_compatibility_result["Report Compatibility Result"]
+app_slug["app-slug"]
+api_token["api-token"]
+release_sequence["release-sequence"]
+kubernetes_distribution["kubernetes-distribution"]
+kubernetes_version["kubernetes-version"]
+success["success"]
+notes["notes"]
 app_slug ---> report_compatibility_result
 api_token ---> report_compatibility_result
 release_sequence ---> report_compatibility_result

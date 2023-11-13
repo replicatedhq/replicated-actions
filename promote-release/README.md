@@ -6,6 +6,11 @@ title: Promote Release
 ---
 graph LR
 promote_release["Promote Release"]
+app_slug["app-slug"]
+api_token["api-token"]
+channel_to["channel-to"]
+release_sequence["release-sequence"]
+release_version["release-version"]
 app_slug ---> promote_release
 api_token ---> promote_release
 channel_to ---> promote_release

@@ -12,24 +12,28 @@ def generate_mermaid(action_yaml_file):
         data = yaml.load(f, Loader=yaml.FullLoader)
 
     # Add action node
+    nodes = []
     action = Node(data['name'])
+    nodes.append(action)
     # Add input nodes
     inputs = []
     if 'inputs' in data:
         for input_name in data['inputs']:
-            input = Node(input_name)
+            input = Node(input_name, input_name)
+            nodes.append(input)
             inputs.append(Link(input, action))
 
     # Add output nodes
     outputs = []
     if 'outputs' in data:
         for output_name in data['outputs']:
-            output = Node(output_name)
+            output = Node(output_name, output_name)
+            nodes.append(output)
             outputs.append(Link(action, output))
 
     chart = MermaidDiagram(
         title=data['name'],
-        nodes=[action],
+        nodes=nodes,
         links=inputs+outputs,
         orientation = 'left to right'
     )
