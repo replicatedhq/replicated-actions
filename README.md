@@ -9,7 +9,7 @@ The next job will setup a compatibility matrix of clusters, deploy the app and e
 Based on your preference you can either use the simplified prepare-cluster version, or the highly customizable version.
 
 #### Prepare Cluster
-See the [example workflow](example-workflows/development-helm-smoke-test.yaml) for more details and also the [prepare-cluster](prepare-cluster) directory for the actual action.
+See the [example workflow](example-workflows/development-helm-prepare-cluster.yaml) for more details and also the [prepare-cluster](prepare-cluster) directory for the actual action.
 
 https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394238d5f872c1b8c65/example-workflows/development-helm-prepare-cluster.yaml#L1-L35
 
