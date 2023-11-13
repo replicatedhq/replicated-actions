@@ -6,6 +6,19 @@ title: Create Cluster
 ---
 graph LR
 create_cluster["Create Cluster"]
+api_token["api-token"]
+kubernetes_distribution["kubernetes-distribution"]
+kubernetes_version["kubernetes-version"]
+cluster_name["cluster-name"]
+ttl["ttl"]
+disk["disk"]
+nodes["nodes"]
+instance_type["instance-type"]
+timeout_minutes["timeout-minutes"]
+kubeconfig_path["kubeconfig-path"]
+export_kubeconfig["export-kubeconfig"]
+cluster_id["cluster-id"]
+cluster_kubeconfig["cluster-kubeconfig"]
 api_token ---> create_cluster
 kubernetes_distribution ---> create_cluster
 kubernetes_version ---> create_cluster

@@ -6,6 +6,18 @@ title: Create Customer
 ---
 graph LR
 create_customer["Create Customer"]
+app_slug["app-slug"]
+api_token["api-token"]
+customer_name["customer-name"]
+customer_email["customer-email"]
+license_type["license-type"]
+channel_slug["channel-slug"]
+expires_in["expires-in"]
+entitlements["entitlements"]
+is_kots_install_enabled["is-kots-install-enabled"]
+customer_id["customer-id"]
+license_id["license-id"]
+license_file["license-file"]
 app_slug ---> create_customer
 api_token ---> create_customer
 customer_name ---> create_customer

@@ -6,6 +6,15 @@ title: KOTS Install
 ---
 graph LR
 kots_install["KOTS Install"]
+kubeconfig["kubeconfig"]
+kots_version["kots-version"]
+app_slug["app-slug"]
+app_version_label["app-version-label"]
+shared_password["shared-password"]
+license_file["license-file"]
+config_values["config-values"]
+namespace["namespace"]
+wait_duration["wait-duration"]
 kubeconfig ---> kots_install
 kots_version ---> kots_install
 app_slug ---> kots_install

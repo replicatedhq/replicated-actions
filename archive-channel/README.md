@@ -6,6 +6,9 @@ title: Archive Channel
 ---
 graph LR
 archive_channel["Archive Channel"]
+app_slug["app-slug"]
+api_token["api-token"]
+channel_slug["channel-slug"]
 app_slug ---> archive_channel
 api_token ---> archive_channel
 channel_slug ---> archive_channel

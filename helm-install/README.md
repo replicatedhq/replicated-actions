@@ -6,6 +6,16 @@ title: Install a Helm chart to a cluster
 ---
 graph LR
 install_a_helm_chart_to_a_cluster["Install a Helm chart to a cluster"]
+helm_path["helm-path"]
+kubeconfig["kubeconfig"]
+registry_username["registry-username"]
+registry_password["registry-password"]
+chart["chart"]
+version["version"]
+name["name"]
+namespace["namespace"]
+values["values"]
+run_preflights["run-preflights"]
 helm_path ---> install_a_helm_chart_to_a_cluster
 kubeconfig ---> install_a_helm_chart_to_a_cluster
 registry_username ---> install_a_helm_chart_to_a_cluster

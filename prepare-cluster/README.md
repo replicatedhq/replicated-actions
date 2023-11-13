@@ -6,6 +6,20 @@ title: Prepare Cluster
 ---
 graph LR
 prepare_cluster["Prepare Cluster"]
+app_slug["app-slug"]
+api_token["api-token"]
+chart["chart"]
+yaml_dir["yaml-dir"]
+kubernetes_distribution["kubernetes-distribution"]
+kubernetes_version["kubernetes-version"]
+ttl["ttl"]
+helm_values["helm-values"]
+helm_chart_name["helm-chart-name"]
+helm_run_preflights["helm-run-preflights"]
+kots_config_values["kots-config-values"]
+kots_wait_duration["kots-wait-duration"]
+cluster_id["cluster-id"]
+cluster_kubeconfig["cluster-kubeconfig"]
 app_slug ---> prepare_cluster
 api_token ---> prepare_cluster
 chart ---> prepare_cluster

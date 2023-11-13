@@ -6,6 +6,14 @@ title: Upgrade Cluster
 ---
 graph LR
 upgrade_cluster["Upgrade Cluster"]
+api_token["api-token"]
+cluster_id["cluster-id"]
+kubernetes_version["kubernetes-version"]
+timeout_minutes["timeout-minutes"]
+kubeconfig_path["kubeconfig-path"]
+export_kubeconfig["export-kubeconfig"]
+cluster_id["cluster-id"]
+cluster_kubeconfig["cluster-kubeconfig"]
 api_token ---> upgrade_cluster
 cluster_id ---> upgrade_cluster
 kubernetes_version ---> upgrade_cluster

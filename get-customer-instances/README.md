@@ -6,6 +6,9 @@ title: Get Customer Instances
 ---
 graph LR
 get_customer_instances["Get Customer Instances"]
+app_slug["app-slug"]
+api_token["api-token"]
+matrix["matrix"]
 app_slug ---> get_customer_instances
 api_token ---> get_customer_instances
 get_customer_instances ---> matrix
