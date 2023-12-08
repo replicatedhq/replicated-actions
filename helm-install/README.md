@@ -10,6 +10,8 @@ helm_path["helm-path"]
 kubeconfig["kubeconfig"]
 registry_username["registry-username"]
 registry_password["registry-password"]
+repo_name["repo-name"]
+repo_url["repo-url"]
 chart["chart"]
 version["version"]
 name["name"]
@@ -20,6 +22,8 @@ helm_path ---> install_a_helm_chart_to_a_cluster
 kubeconfig ---> install_a_helm_chart_to_a_cluster
 registry_username ---> install_a_helm_chart_to_a_cluster
 registry_password ---> install_a_helm_chart_to_a_cluster
+repo_name ---> install_a_helm_chart_to_a_cluster
+repo_url ---> install_a_helm_chart_to_a_cluster
 chart ---> install_a_helm_chart_to_a_cluster
 version ---> install_a_helm_chart_to_a_cluster
 name ---> install_a_helm_chart_to_a_cluster
@@ -34,6 +38,8 @@ run_preflights ---> install_a_helm_chart_to_a_cluster
 | kubeconfig |  | True | A valid kubeconfig to connect to |
 | registry-username |  | True | The registry username to log in with |
 | registry-password |  | True | The registry password to use |
+| repo-name |  | False | The repo name to use (when not installing from local or oci) |
+| repo-url |  | False | The repo url to use (when not installing from local or oci) |
 | chart |  | True | The chart to use |
 | version |  | False | The version of the chart to install |
 | name |  | True | The name of release to install |
