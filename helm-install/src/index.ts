@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { installChart, login, templateChart } from './helm';
+import { installChart, login, repoAdd, templateChart } from './helm';
 import { file } from 'tmp-promise';
 import * as fs from 'fs';
 import { downloadPreflight, runPreflight } from './preflight';
@@ -12,6 +12,8 @@ async function run() {
   const registryPassword: string = core.getInput('registry-password');
   const runPreflights: boolean = core.getInput('run-preflights') === 'true';
   const values: string = core.getInput('values');
+  const repoName: string = core.getInput('repo-name');
+  const repoUrl: string = core.getInput('repo-url');
   const chart: string = core.getInput('chart');
   const version: string = core.getInput('version');
   const name: string = core.getInput('name');
@@ -23,7 +25,12 @@ async function run() {
     fs.writeFileSync(valuesPath, values);
     valuesFilePath = valuesPath;
   }
-  
+
+  // if there's a repo, this is not a oci or local chart
+  if (repoName && repoUrl) {
+    await repoAdd(helmPath, repoName, repoUrl);
+  }
+
   // registry login
   await login(helmPath, registryUsername, registryPassword, chart);
 

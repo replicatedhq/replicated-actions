@@ -4,6 +4,21 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as tmpPromise from 'tmp-promise';
 
+export async function repoAdd(helmPath: string, repoName: string, repoUrl: string) {
+  try {
+    const params: string[] = [
+      'repo',
+      'add',
+      repoName,
+      repoUrl,
+    ];
+
+    await exec.exec(helmPath, params);
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+}
+
 export async function login(helmPath: string, username: string, password: string, chart: string) {
   try {
     if (!username || !password) {

@@ -13,6 +13,12 @@ inputs:
   registry-password:
     description: 'The registry password to use'
     required: true
+  repo-name:
+    description: 'The repo name to use (when not installing from local or oci)'
+    required: false
+  repo-url:
+    description: 'The repo url to use (when not installing from local or oci)'
+    required: false
   chart:
     description: 'The chart to use'
     required: true

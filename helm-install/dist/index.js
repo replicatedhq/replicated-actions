@@ -16,12 +16,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.templateChart = exports.installChart = exports.login = void 0;
+exports.templateChart = exports.installChart = exports.login = exports.repoAdd = void 0;
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const fs = __nccwpck_require__(7147);
 const url = __nccwpck_require__(7310);
 const tmpPromise = __nccwpck_require__(8065);
+function repoAdd(helmPath, repoName, repoUrl) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const params = [
+                'repo',
+                'add',
+                repoName,
+                repoUrl,
+            ];
+            yield exec.exec(helmPath, params);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.repoAdd = repoAdd;
 function login(helmPath, username, password, chart) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -145,6 +162,8 @@ function run() {
         const registryPassword = core.getInput('registry-password');
         const runPreflights = core.getInput('run-preflights') === 'true';
         const values = core.getInput('values');
+        const repoName = core.getInput('repo-name');
+        const repoUrl = core.getInput('repo-url');
         const chart = core.getInput('chart');
         const version = core.getInput('version');
         const name = core.getInput('name');
@@ -154,6 +173,10 @@ function run() {
             const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
             fs.writeFileSync(valuesPath, values);
             valuesFilePath = valuesPath;
+        }
+        // if there's a repo, this is not a oci or local chart
+        if (repoName && repoUrl) {
+            yield (0, helm_1.repoAdd)(helmPath, repoName, repoUrl);
         }
         // registry login
         yield (0, helm_1.login)(helmPath, registryUsername, registryPassword, chart);
