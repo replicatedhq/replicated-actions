@@ -73,7 +73,7 @@ function processTags(tags: string): [] | undefined {
     
     // for each tag in tagsYAML, convert to json and add to array
     const tagsArray = tagsYAML.map((tag: any) => {
-      return {name: tag.key, value: tag.value}
+      return {key: tag.key, value: tag.value}
     })
     return tagsArray
   }
