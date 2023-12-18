@@ -15,6 +15,7 @@ disk["disk"]
 nodes["nodes"]
 instance_type["instance-type"]
 timeout_minutes["timeout-minutes"]
+tags["tags"]
 kubeconfig_path["kubeconfig-path"]
 export_kubeconfig["export-kubeconfig"]
 cluster_id["cluster-id"]
@@ -28,6 +29,7 @@ disk ---> create_cluster
 nodes ---> create_cluster
 instance_type ---> create_cluster
 timeout_minutes ---> create_cluster
+tags ---> create_cluster
 kubeconfig_path ---> create_cluster
 export_kubeconfig ---> create_cluster
 create_cluster ---> cluster_id
@@ -45,6 +47,7 @@ create_cluster ---> cluster_kubeconfig
 | nodes |  | False | Number of nodes to provision |
 | instance-type |  | False | Instance type to provision |
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
+| tags |  | False | Tags to assign to the cluster. |
 | kubeconfig-path |  | False | If specified, the kubeconfig will be written to this path |
 | export-kubeconfig | false | False | Export the KUBECONFIG variable (true/false) |
 
