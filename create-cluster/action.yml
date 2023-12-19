@@ -36,7 +36,7 @@ inputs:
       Tags to assign to the cluster.
       Example:
       ```
-      tags: |
+      tags: \|
         - key: "department"
           value: "engineering"
       ```
