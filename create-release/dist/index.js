@@ -30473,7 +30473,7 @@ exports.Cluster = Cluster;
 class ClusterVersion {
 }
 exports.ClusterVersion = ClusterVersion;
-async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType) {
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType, tags) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
@@ -30484,6 +30484,9 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
         "node_count": nodeCount,
         "instance_type": instanceType
     };
+    if (tags) {
+        reqBody['tags'] = tags;
+    }
     const uri = `${vendorPortalApi.endpoint}/cluster`;
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 201) {

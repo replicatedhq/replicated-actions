@@ -81,6 +81,9 @@ jobs:
           cluster-name: ${{ github.ref_name }}-${{ matrix.cluster.distribution }}-${{ matrix.cluster.version }}
           timeout-minutes: 2
           ttl: 10m
+          tags: |
+            - key: "department"
+              value: "engineering"
 
       - name: Deploy the app
         uses: replicatedhq/replicated-actions/helm-install@v1

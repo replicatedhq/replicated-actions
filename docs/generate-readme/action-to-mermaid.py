@@ -1,3 +1,4 @@
+import re
 import sys
 import yaml
 from python_mermaid.diagram import (
@@ -54,9 +55,12 @@ def generate_inputs(action_yaml_file):
             defaultVal = data['inputs'][input_name]['default'] if 'default' in data['inputs'][input_name] else ""
             requiredVal = data['inputs'][input_name]['required'] if 'required' in data['inputs'][input_name] else True
             descriptionVal = data['inputs'][input_name]['description'] if 'description' in data['inputs'][input_name] else ""
-            inputs += "| " + input_name + " | " + defaultVal + " | " + str(requiredVal) + " | " + descriptionVal + " |\n"
+            inputs += "| " + input_name + " | " + defaultVal + " | " + str(requiredVal) + " | " + multiline_description(descriptionVal) + " |\n"
 
     return inputs
+
+def multiline_description(description):
+    return description.replace("\n", "<br>")
 
 def generate_outputs(action_yaml_file):
     # Load YAML file
