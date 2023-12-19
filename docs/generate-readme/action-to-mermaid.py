@@ -54,7 +54,7 @@ def generate_inputs(action_yaml_file):
             defaultVal = data['inputs'][input_name]['default'] if 'default' in data['inputs'][input_name] else ""
             requiredVal = data['inputs'][input_name]['required'] if 'required' in data['inputs'][input_name] else True
             descriptionVal = data['inputs'][input_name]['description'] if 'description' in data['inputs'][input_name] else ""
-            inputs += "| " + input_name + " | " + defaultVal + " | " + str(requiredVal) + " | " + descriptionVal + " |\n"
+            inputs += "| " + input_name + " | " + defaultVal + " | " + str(requiredVal) + " | " + descriptionVal.replace('\n','<br>') + " |\n"
 
     return inputs
 
