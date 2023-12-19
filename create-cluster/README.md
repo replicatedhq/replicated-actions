@@ -47,11 +47,7 @@ create_cluster ---> cluster_kubeconfig
 | nodes |  | False | Number of nodes to provision |
 | instance-type |  | False | Instance type to provision |
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
-| tags |  | False | Tags to assign to the cluster.<br>Example:<br>```
-tags: \|
-  - key: "department"
-    value: "engineering"
-```<br> |
+| tags |  | False | Tags to assign to the cluster.<br>Example:<br><pre>tags: \|<br>  - key: "department"<br>    value: "engineering"</pre><br> |
 | kubeconfig-path |  | False | If specified, the kubeconfig will be written to this path |
 | export-kubeconfig | false | False | Export the KUBECONFIG variable (true/false) |
 

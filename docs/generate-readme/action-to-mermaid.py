@@ -60,12 +60,7 @@ def generate_inputs(action_yaml_file):
     return inputs
 
 def multiline_description(description):
-    # Define a regular expression pattern to match text between triple backticks
-    pattern = re.compile(r'```.*?```|(\n)', re.DOTALL)
-
-    # Replace newlines outside of triple backticks with <br>
-    modified_string = pattern.sub(lambda match: '<br>' if match.group(1) else match.group(0), description)
-    return modified_string
+    return description.replace("\n", "<br>")
 
 def generate_outputs(action_yaml_file):
     # Load YAML file
