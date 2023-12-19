@@ -33,7 +33,8 @@ inputs:
     default: '20'
   tags:
     description: |
-      Tags to assign to the cluster. Example: ```
+      Tags to assign to the cluster. Example: <br>
+      ```
       tags: \|
         - key: "department"
           value: "engineering"
