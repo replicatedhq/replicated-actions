@@ -28,22 +28,6 @@ inputs:
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
-  helm-values:
-    description: 'A Helm values.yaml file to use'
-    required: false
-  helm-chart-name:
-    description: 'The name of the Helm chart to use'
-    required: false
-  helm-run-preflights:
-    description: 'Run preflight checks (true/false)'
-    required: false
-    default: 'true'
-  kots-config-values:
-    description: 'The KOTS config values to use'
-    required: false
-  kots-wait-duration:
-    description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
-    required: false
   disk:
     description: 'Disk size in GiB'
     required: false
@@ -72,6 +56,22 @@ inputs:
     description: 'Export the KUBECONFIG variable (true/false)'
     required: false
     default: 'false'
+  helm-values:
+    description: 'A Helm values.yaml file to use'
+    required: false
+  helm-chart-name:
+    description: 'The name of the Helm chart to use'
+    required: false
+  helm-run-preflights:
+    description: 'Run preflight checks (true/false)'
+    required: false
+    default: 'true'
+  kots-config-values:
+    description: 'The KOTS config values to use'
+    required: false
+  kots-wait-duration:
+    description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
+    required: false
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'
