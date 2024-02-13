@@ -12,6 +12,9 @@ inputs:
   chart:
     description: 'Path to the helm chart (One of `chart` or `yaml-dir` is required).'
     required: false
+  helm-chart-name:
+    description: 'Name of the helm chart when uploading to the registry (For use with `chart`).'
+    required: false
   yaml-dir:
     description: 'The directory containing multiple yamls for a Replicated release.'
     required: false
