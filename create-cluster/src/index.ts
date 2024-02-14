@@ -33,7 +33,7 @@ async function run() {
     const tagsArray = processTags(tags)
     const nodeGroupsArray = processNodeGroups(nodeGroups)
 
-    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, tagsArray);
+    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, nodeGroupsArray, tagsArray);
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
     core.setOutput('cluster-id', cluster.id);
 
