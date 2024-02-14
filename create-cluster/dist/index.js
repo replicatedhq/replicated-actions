@@ -46,7 +46,7 @@ function run() {
             }
             const tagsArray = processTags(tags);
             const nodeGroupsArray = processNodeGroups(nodeGroups);
-            let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, tagsArray);
+            let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, nodeGroupsArray, tagsArray);
             core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
             core.setOutput('cluster-id', cluster.id);
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
