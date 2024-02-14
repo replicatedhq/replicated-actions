@@ -34,6 +34,7 @@ function run() {
             const nodeCount = +(core.getInput('nodes'));
             const instanceType = core.getInput('instance-type');
             const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
+            const nodeGroups = core.getInput('node-groups');
             const tags = core.getInput('tags');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             let kubeconfigPath = core.getInput('kubeconfig-path');
@@ -44,6 +45,7 @@ function run() {
                 apiClient.endpoint = apiEndpoint;
             }
             const tagsArray = processTags(tags);
+            const nodeGroupsArray = processNodeGroups(nodeGroups);
             let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, tagsArray);
             core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
             core.setOutput('cluster-id', cluster.id);
@@ -84,6 +86,17 @@ function processTags(tags) {
             return { key: tag.key, value: tag.value };
         });
         return tagsArray;
+    }
+    return undefined;
+}
+function processNodeGroups(nodeGroups) {
+    if (nodeGroups) {
+        const nodeGroupsYAML = (0, yaml_1.parse)(nodeGroups);
+        // for each nodeGroup in nodeGroupsYAML, convert to json and add to array
+        const nodeGroupsArray = nodeGroupsYAML.map((nodegroup) => {
+            return { name: nodegroup.name, node_count: nodegroup.nodes, instance_type: nodegroup['instance-type'], disk_gib: nodegroup.disk };
+        });
+        return nodeGroupsArray;
     }
     return undefined;
 }
@@ -30508,7 +30521,7 @@ exports.Cluster = Cluster;
 class ClusterVersion {
 }
 exports.ClusterVersion = ClusterVersion;
-async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType, tags) {
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType, nodeGroups, tags) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
@@ -30519,6 +30532,9 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
         "node_count": nodeCount,
         "instance_type": instanceType
     };
+    if (nodeGroups) {
+        reqBody['node_groups'] = nodeGroups;
+    }
     if (tags) {
         reqBody['tags'] = tags;
     }

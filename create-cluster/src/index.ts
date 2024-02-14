@@ -17,6 +17,7 @@ async function run() {
     const nodeCount: number = +(core.getInput('nodes'));
     const instanceType = core.getInput('instance-type');
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
+    const nodeGroups = core.getInput('node-groups');
     const tags = core.getInput('tags');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     let kubeconfigPath = core.getInput('kubeconfig-path');
@@ -30,6 +31,7 @@ async function run() {
     }
 
     const tagsArray = processTags(tags)
+    const nodeGroupsArray = processNodeGroups(nodeGroups)
 
     let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, tagsArray);
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
@@ -76,6 +78,19 @@ function processTags(tags: string): [] | undefined {
       return {key: tag.key, value: tag.value}
     })
     return tagsArray
+  }
+  return undefined
+}
+
+function processNodeGroups(nodeGroups: string): [] | undefined {
+  if (nodeGroups) {
+    const nodeGroupsYAML = parse(nodeGroups)
+    
+    // for each nodeGroup in nodeGroupsYAML, convert to json and add to array
+    const nodeGroupsArray = nodeGroupsYAML.map((nodegroup: any) => {
+      return {name: nodegroup.name, node_count: nodegroup.nodes, instance_type: nodegroup['instance-type'], disk_gib: nodegroup.disk}
+    })
+    return nodeGroupsArray
   }
   return undefined
 }
