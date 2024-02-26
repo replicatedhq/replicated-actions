@@ -54,11 +54,13 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
     const installOptions: exec.ExecOptions = {};
 
     const params = [
-      'install',
+      'upgrade',
       releaseName,
+      '--install',
       '--kubeconfig',  kubeconfigPath,
       '--namespace', namespace,
       '--create-namespace', chart,
+      '--wait'
     ];
 
     if (version) {
