@@ -72,11 +72,13 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             const installOptions = {};
             const params = [
-                'install',
+                'upgrade',
                 releaseName,
+                '--install',
                 '--kubeconfig', kubeconfigPath,
                 '--namespace', namespace,
                 '--create-namespace', chart,
+                '--wait'
             ];
             if (version) {
                 params.push(`--version`, version);
