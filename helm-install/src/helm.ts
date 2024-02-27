@@ -81,7 +81,6 @@ export async function installChart(
       namespace,
       "--create-namespace",
       chart,
-      "--atomic",
     ];
 
     if (version) {
