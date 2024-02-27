@@ -40,7 +40,7 @@ function run() {
             }
             else {
                 const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-                fs.writeFileSync(valuesPath, core.getInput('config-values'));
+                fs.writeFileSync(valuesPath, configValuesInput);
                 valuesFilePath = valuesPath;
             }
         }
