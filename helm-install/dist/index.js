@@ -20,17 +20,12 @@ exports.templateChart = exports.installChart = exports.login = exports.repoAdd =
 const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const fs = __nccwpck_require__(7147);
-const url = __nccwpck_require__(7310);
 const tmpPromise = __nccwpck_require__(8065);
+const url = __nccwpck_require__(7310);
 function repoAdd(helmPath, repoName, repoUrl) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const params = [
-                'repo',
-                'add',
-                repoName,
-                repoUrl,
-            ];
+            const params = ["repo", "add", repoName, repoUrl];
             yield exec.exec(helmPath, params);
         }
         catch (error) {
@@ -43,18 +38,20 @@ function login(helmPath, username, password, chart) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             if (!username || !password) {
-                core.info('No username or password provided, skipping login');
+                core.info("No username or password provided, skipping login");
                 return;
             }
             const parsed = url.parse(chart);
             const loginOptions = {};
-            const hostname = parsed.hostname || '';
+            const hostname = parsed.hostname || "";
             const params = [
-                'registry',
-                'login',
+                "registry",
+                "login",
                 hostname,
-                '--username', username,
-                '--password', password,
+                "--username",
+                username,
+                "--password",
+                password,
             ];
             yield exec.exec(helmPath, params, loginOptions);
         }
@@ -68,21 +65,25 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // write the kubeconfig to a temp file
-            const { fd, path: kubeconfigPath, cleanup } = yield tmpPromise.file({ postfix: '.yaml' });
+            const { fd, path: kubeconfigPath, cleanup, } = yield tmpPromise.file({ postfix: ".yaml" });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             const installOptions = {};
             const params = [
-                'install',
+                "upgrade",
                 releaseName,
-                '--kubeconfig', kubeconfigPath,
-                '--namespace', namespace,
-                '--create-namespace', chart,
+                "--install",
+                "--kubeconfig",
+                kubeconfigPath,
+                "--namespace",
+                namespace,
+                "--create-namespace",
+                chart,
             ];
             if (version) {
                 params.push(`--version`, version);
             }
-            if (valuesPath !== '') {
-                params.push('--values', valuesPath);
+            if (valuesPath !== "") {
+                params.push("--values", valuesPath);
             }
             yield exec.exec(helmPath, params, installOptions);
             cleanup();
@@ -96,8 +97,10 @@ exports.installChart = installChart;
 function templateChart(helmPath, chart, version, valuesPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let templateOutput = '';
-            const { path: tmpDir, cleanup } = yield tmpPromise.dir({ unsafeCleanup: true });
+            let templateOutput = "";
+            const { path: tmpDir, cleanup } = yield tmpPromise.dir({
+                unsafeCleanup: true,
+            });
             const installOptions = {};
             installOptions.silent = true;
             installOptions.listeners = {
@@ -106,17 +109,14 @@ function templateChart(helmPath, chart, version, valuesPath) {
                 },
                 stderr: (data) => {
                     core.info(data.toString());
-                }
+                },
             };
-            const params = [
-                'template',
-                chart,
-            ];
+            const params = ["template", chart];
             if (version) {
                 params.push(`--version`, version);
             }
-            if (valuesPath !== '') {
-                params.push('--values', valuesPath);
+            if (valuesPath !== "") {
+                params.push("--values", valuesPath);
             }
             yield exec.exec(helmPath, params, installOptions);
             cleanup();

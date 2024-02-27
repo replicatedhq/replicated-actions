@@ -1,17 +1,16 @@
-import * as core from '@actions/core';
-import * as exec from '@actions/exec';
-import * as fs from 'fs';
-import * as url from 'url';
-import * as tmpPromise from 'tmp-promise';
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
+import * as fs from "fs";
+import * as tmpPromise from "tmp-promise";
+import * as url from "url";
 
-export async function repoAdd(helmPath: string, repoName: string, repoUrl: string) {
+export async function repoAdd(
+  helmPath: string,
+  repoName: string,
+  repoUrl: string
+) {
   try {
-    const params: string[] = [
-      'repo',
-      'add',
-      repoName,
-      repoUrl,
-    ];
+    const params: string[] = ["repo", "add", repoName, repoUrl];
 
     await exec.exec(helmPath, params);
   } catch (error) {
@@ -19,10 +18,15 @@ export async function repoAdd(helmPath: string, repoName: string, repoUrl: strin
   }
 }
 
-export async function login(helmPath: string, username: string, password: string, chart: string) {
+export async function login(
+  helmPath: string,
+  username: string,
+  password: string,
+  chart: string
+) {
   try {
     if (!username || !password) {
-      core.info('No username or password provided, skipping login');
+      core.info("No username or password provided, skipping login");
       return;
     }
 
@@ -30,13 +34,15 @@ export async function login(helmPath: string, username: string, password: string
 
     const loginOptions: exec.ExecOptions = {};
 
-    const hostname: string = parsed.hostname || '';
+    const hostname: string = parsed.hostname || "";
     const params: string[] = [
-      'registry',
-      'login',
+      "registry",
+      "login",
       hostname,
-      '--username', username,
-      '--password', password,
+      "--username",
+      username,
+      "--password",
+      password,
     ];
 
     await exec.exec(helmPath, params, loginOptions);
@@ -45,27 +51,43 @@ export async function login(helmPath: string, username: string, password: string
   }
 }
 
-export async function installChart(helmPath: string, kubeconfig: string, chart: string, version: string, releaseName: string, namespace: string, valuesPath: string) {
+export async function installChart(
+  helmPath: string,
+  kubeconfig: string,
+  chart: string,
+  version: string,
+  releaseName: string,
+  namespace: string,
+  valuesPath: string
+) {
   try {
     // write the kubeconfig to a temp file
-    const {fd, path: kubeconfigPath, cleanup} = await tmpPromise.file({postfix: '.yaml'});
+    const {
+      fd,
+      path: kubeconfigPath,
+      cleanup,
+    } = await tmpPromise.file({ postfix: ".yaml" });
     fs.writeFileSync(kubeconfigPath, kubeconfig);
 
     const installOptions: exec.ExecOptions = {};
 
     const params = [
-      'install',
+      "upgrade",
       releaseName,
-      '--kubeconfig',  kubeconfigPath,
-      '--namespace', namespace,
-      '--create-namespace', chart,
+      "--install",
+      "--kubeconfig",
+      kubeconfigPath,
+      "--namespace",
+      namespace,
+      "--create-namespace",
+      chart,
     ];
 
     if (version) {
       params.push(`--version`, version);
     }
-    if (valuesPath !== '') {
-      params.push('--values', valuesPath);
+    if (valuesPath !== "") {
+      params.push("--values", valuesPath);
     }
 
     await exec.exec(helmPath, params, installOptions);
@@ -75,11 +97,17 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
   }
 }
 
-
-export async function templateChart(helmPath: string, chart: string, version: string, valuesPath: string): Promise<string> {
+export async function templateChart(
+  helmPath: string,
+  chart: string,
+  version: string,
+  valuesPath: string
+): Promise<string> {
   try {
-    let templateOutput : string = '';
-    const {path: tmpDir, cleanup} = await tmpPromise.dir( { unsafeCleanup: true });
+    let templateOutput: string = "";
+    const { path: tmpDir, cleanup } = await tmpPromise.dir({
+      unsafeCleanup: true,
+    });
 
     const installOptions: exec.ExecOptions = {};
     installOptions.silent = true;
@@ -89,24 +117,21 @@ export async function templateChart(helmPath: string, chart: string, version: st
       },
       stderr: (data: Buffer) => {
         core.info(data.toString());
-      }
+      },
     };
 
-    const params = [
-      'template',
-      chart,
-    ];
+    const params = ["template", chart];
 
     if (version) {
       params.push(`--version`, version);
     }
 
-    if (valuesPath !== '') {
-      params.push('--values', valuesPath);
+    if (valuesPath !== "") {
+      params.push("--values", valuesPath);
     }
 
     await exec.exec(helmPath, params, installOptions);
-    cleanup()
+    cleanup();
     return templateOutput;
   } catch (error) {
     core.setFailed(error.message);
