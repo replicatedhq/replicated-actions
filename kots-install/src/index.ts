@@ -5,18 +5,26 @@ import * as fs from 'fs';
 
 async function run() {
 
-  // Write the license
+  const licenseFileInput = core.getInput('license-file')
   let licenseFilePath = '';
-  const {fd, path: licensePath, cleanup: cleanupValues} = await file({postfix: '.yaml'});
-  fs.writeFileSync(licensePath, core.getInput('license-file'));
-  licenseFilePath = licensePath;
+  if (fs.existsSync(licenseFileInput)) {
+    licenseFilePath = licenseFileInput;
+  } else {
+    const {path: licensePath} = await file({postfix: '.yaml'});
+    fs.writeFileSync(licensePath, licenseFileInput);
+    licenseFilePath = licensePath;
+  }
 
-  // Write the values if any
+  const configValuesInput = core.getInput('config-values')
   let valuesFilePath = '';
-  if (core.getInput('config-values')) {
-    const {fd, path: valuesPath, cleanup: cleanupValues} = await file({postfix: '.yaml'});
-    fs.writeFileSync(valuesPath, core.getInput('config-values'));
-    valuesFilePath = valuesPath;
+  if (configValuesInput) {
+    if (fs.existsSync(configValuesInput)) {
+      valuesFilePath = configValuesInput;
+    } else {
+      const {path: valuesPath} = await file({postfix: '.yaml'});
+      fs.writeFileSync(valuesPath, core.getInput('config-values'));
+      valuesFilePath = valuesPath;
+    }
   }
 
 

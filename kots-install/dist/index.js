@@ -22,17 +22,27 @@ const tmp_promise_1 = __nccwpck_require__(8065);
 const fs = __nccwpck_require__(7147);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        // Write the license
+        const licenseFileInput = core.getInput('license-file');
         let licenseFilePath = '';
-        const { fd, path: licensePath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-        fs.writeFileSync(licensePath, core.getInput('license-file'));
-        licenseFilePath = licensePath;
-        // Write the values if any
+        if (fs.existsSync(licenseFileInput)) {
+            licenseFilePath = licenseFileInput;
+        }
+        else {
+            const { path: licensePath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            fs.writeFileSync(licensePath, licenseFileInput);
+            licenseFilePath = licensePath;
+        }
+        const configValuesInput = core.getInput('config-values');
         let valuesFilePath = '';
-        if (core.getInput('config-values')) {
-            const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-            fs.writeFileSync(valuesPath, core.getInput('config-values'));
-            valuesFilePath = valuesPath;
+        if (configValuesInput) {
+            if (fs.existsSync(configValuesInput)) {
+                valuesFilePath = configValuesInput;
+            }
+            else {
+                const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+                fs.writeFileSync(valuesPath, core.getInput('config-values'));
+                valuesFilePath = valuesPath;
+            }
         }
         const kostPath = yield (0, kots_1.downloadKots)(core.getInput('kots-version'));
         yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath);

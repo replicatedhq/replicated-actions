@@ -18,10 +18,10 @@ inputs:
     description: 'Shared password to use when deploying the admin console. If not specified, a random password is generated.'
     required: false
   license-file:
-    description: 'A license.yaml to use'
+    description: 'A license.yaml to use. This can be a path to a file or the contents of the file.'
     required: true
   config-values:
-    description: 'The config values to use'
+    description: 'The config values to use. This can be a path to a file or the contents of the file.'
     required: false
   namespace:
     description: 'The namespace to install the application to'
