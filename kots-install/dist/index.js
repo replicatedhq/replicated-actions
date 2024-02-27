@@ -22,32 +22,27 @@ const tmp_promise_1 = __nccwpck_require__(8065);
 const fs = __nccwpck_require__(7147);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const licenseFileInput = core.getInput('license-file');
         let licenseFilePath = '';
-        if (core.getInput('license-file')) {
-            // Write the license
+        if (fs.existsSync(licenseFileInput)) {
+            licenseFilePath = licenseFileInput;
+        }
+        else {
             const { path: licensePath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-            fs.writeFileSync(licensePath, core.getInput('license-file'));
+            fs.writeFileSync(licensePath, licenseFileInput);
             licenseFilePath = licensePath;
         }
-        else {
-            // Fall back to the license file path
-            licenseFilePath = core.getInput('license-file-path');
-        }
-        // License file is required for an automated install
-        if (!licenseFilePath) {
-            core.setFailed('No license file provided. Please provide a license-file or a license-file-path.');
-            return;
-        }
+        const configValuesInput = core.getInput('config-values');
         let valuesFilePath = '';
-        if (core.getInput('config-values')) {
-            // Write the values if any
-            const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-            fs.writeFileSync(valuesPath, core.getInput('config-values'));
-            valuesFilePath = valuesPath;
-        }
-        else {
-            // Fall back to the values file path
-            valuesFilePath = core.getInput('config-values-path');
+        if (configValuesInput) {
+            if (fs.existsSync(configValuesInput)) {
+                valuesFilePath = configValuesInput;
+            }
+            else {
+                const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+                fs.writeFileSync(valuesPath, core.getInput('config-values'));
+                valuesFilePath = valuesPath;
+            }
         }
         const kostPath = yield (0, kots_1.downloadKots)(core.getInput('kots-version'));
         yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath);
