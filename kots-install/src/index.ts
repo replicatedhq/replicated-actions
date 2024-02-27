@@ -5,7 +5,7 @@ import * as fs from 'fs';
 
 async function run() {
 
-  const licenseFileInput = core.getInput('license-file')
+  const licenseFileInput = core.getInput('license-file');
   let licenseFilePath = '';
   if (fs.existsSync(licenseFileInput)) {
     licenseFilePath = licenseFileInput;
@@ -15,14 +15,14 @@ async function run() {
     licenseFilePath = licensePath;
   }
 
-  const configValuesInput = core.getInput('config-values')
+  const configValuesInput = core.getInput('config-values');
   let valuesFilePath = '';
   if (configValuesInput) {
     if (fs.existsSync(configValuesInput)) {
       valuesFilePath = configValuesInput;
     } else {
       const {path: valuesPath} = await file({postfix: '.yaml'});
-      fs.writeFileSync(valuesPath, core.getInput('config-values'));
+      fs.writeFileSync(valuesPath, configValuesInput);
       valuesFilePath = valuesPath;
     }
   }
