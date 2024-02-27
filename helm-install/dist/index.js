@@ -78,7 +78,6 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
                 namespace,
                 "--create-namespace",
                 chart,
-                "--atomic",
             ];
             if (version) {
                 params.push(`--version`, version);
