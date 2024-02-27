@@ -5,32 +5,26 @@ import * as fs from 'fs';
 
 async function run() {
 
+  const licenseFileInput = core.getInput('license-file')
   let licenseFilePath = '';
-  if (core.getInput('license-file')) {
-    // Write the license
+  if (fs.existsSync(licenseFileInput)) {
+    licenseFilePath = licenseFileInput;
+  } else {
     const {path: licensePath} = await file({postfix: '.yaml'});
-    fs.writeFileSync(licensePath, core.getInput('license-file'));
+    fs.writeFileSync(licensePath, licenseFileInput);
     licenseFilePath = licensePath;
-  } else {
-    // Fall back to the license file path
-    licenseFilePath = core.getInput('license-file-path');
   }
 
-  // License file is required for an automated install
-  if (!licenseFilePath) {
-    core.setFailed('No license file provided. Please provide a license-file or a license-file-path.');
-    return;
-  }
-
+  const configValuesInput = core.getInput('config-values')
   let valuesFilePath = '';
-  if (core.getInput('config-values')) {
-    // Write the values if any
-    const {path: valuesPath} = await file({postfix: '.yaml'});
-    fs.writeFileSync(valuesPath, core.getInput('config-values'));
-    valuesFilePath = valuesPath;
-  } else {
-    // Fall back to the values file path
-    valuesFilePath = core.getInput('config-values-path');
+  if (configValuesInput) {
+    if (fs.existsSync(configValuesInput)) {
+      valuesFilePath = configValuesInput;
+    } else {
+      const {path: valuesPath} = await file({postfix: '.yaml'});
+      fs.writeFileSync(valuesPath, core.getInput('config-values'));
+      valuesFilePath = valuesPath;
+    }
   }
 
 
