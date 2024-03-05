@@ -24,6 +24,12 @@ inputs:
   nodes:
     description: 'Number of nodes to provision'
     required: false
+  min-nodes:
+    description: 'Minimum number of nodes to provision'
+    required: false
+  max-nodes:
+    description: 'Maximum number of nodes to provision'
+    required: false
   instance-type:
     description: 'Instance type to provision'
     required: false

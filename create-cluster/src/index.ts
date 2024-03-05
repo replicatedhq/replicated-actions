@@ -15,6 +15,8 @@ async function run() {
     const k8sTTL = core.getInput('ttl');
     const diskGib: number = +(core.getInput('disk'));
     const nodeCount: number = +(core.getInput('nodes'));
+    const minNodeCount: number = +(core.getInput('min-nodes'));
+    const maxNodeCount: number = +(core.getInput('max-nodes'));
     const instanceType = core.getInput('instance-type');
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const nodeGroups = core.getInput('node-groups');
@@ -33,7 +35,8 @@ async function run() {
     const tagsArray = processTags(tags)
     const nodeGroupsArray = processNodeGroups(nodeGroups)
 
-    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, nodeGroupsArray, tagsArray);
+    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount,
+                                      instanceType, nodeGroupsArray, tagsArray);
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
     core.setOutput('cluster-id', cluster.id);
 
