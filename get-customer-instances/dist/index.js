@@ -30529,17 +30529,29 @@ class StatusError extends Error {
     }
 }
 exports.StatusError = StatusError;
-async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType, nodeGroups, tags) {
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
         "kubernetes_distribution": k8sDistribution,
         "kubernetes_version": k8sVersion,
         "ttl": clusterTTL,
-        "disk_gib": diskGib,
-        "node_count": nodeCount,
-        "instance_type": instanceType
     };
+    if (diskGib) {
+        reqBody['disk_gib'] = diskGib;
+    }
+    if (instanceType) {
+        reqBody['instance_type'] = instanceType;
+    }
+    if (nodeCount) {
+        reqBody['node_count'] = nodeCount;
+    }
+    if (minNodeCount) {
+        reqBody['min_node_count'] = minNodeCount;
+    }
+    if (maxNodeCount) {
+        reqBody['max_node_count'] = maxNodeCount;
+    }
     if (nodeGroups) {
         reqBody['node_groups'] = nodeGroups;
     }

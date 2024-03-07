@@ -13,6 +13,8 @@ cluster_name["cluster-name"]
 ttl["ttl"]
 disk["disk"]
 nodes["nodes"]
+min_nodes["min-nodes"]
+max_nodes["max-nodes"]
 instance_type["instance-type"]
 timeout_minutes["timeout-minutes"]
 node_groups["node-groups"]
@@ -28,6 +30,8 @@ cluster_name ---> create_cluster
 ttl ---> create_cluster
 disk ---> create_cluster
 nodes ---> create_cluster
+min_nodes ---> create_cluster
+max_nodes ---> create_cluster
 instance_type ---> create_cluster
 timeout_minutes ---> create_cluster
 node_groups ---> create_cluster
@@ -47,6 +51,8 @@ create_cluster ---> cluster_kubeconfig
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | disk |  | False | Disk size in GiB |
 | nodes |  | False | Number of nodes to provision |
+| min-nodes |  | False | Minimum number of nodes to provision |
+| max-nodes |  | False | Maximum number of nodes to provision |
 | instance-type |  | False | Instance type to provision |
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
 | node-groups |  | False | Node groups to provision.<br>Example:<br><pre>node-groups: \|<br>  - name: "worker"<br>    instance-type: "t3.medium"<br>    disk: 100<br>    nodes: 3</pre><br> |
