@@ -32,6 +32,8 @@ function run() {
             const k8sTTL = core.getInput('ttl');
             const diskGib = +(core.getInput('disk'));
             const nodeCount = +(core.getInput('nodes'));
+            const minNodeCount = +(core.getInput('min-nodes'));
+            const maxNodeCount = +(core.getInput('max-nodes'));
             const instanceType = core.getInput('instance-type');
             const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
             const nodeGroups = core.getInput('node-groups');
@@ -46,7 +48,7 @@ function run() {
             }
             const tagsArray = processTags(tags);
             const nodeGroupsArray = processNodeGroups(nodeGroups);
-            let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, instanceType, nodeGroupsArray, tagsArray);
+            let cluster = yield (0, replicated_lib_1.createCluster)(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroupsArray, tagsArray);
             core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
             core.setOutput('cluster-id', cluster.id);
             cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
@@ -30528,17 +30530,29 @@ class StatusError extends Error {
     }
 }
 exports.StatusError = StatusError;
-async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, instanceType, nodeGroups, tags) {
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
         "kubernetes_distribution": k8sDistribution,
         "kubernetes_version": k8sVersion,
         "ttl": clusterTTL,
-        "disk_gib": diskGib,
-        "node_count": nodeCount,
-        "instance_type": instanceType
     };
+    if (diskGib) {
+        reqBody['disk_gib'] = diskGib;
+    }
+    if (instanceType) {
+        reqBody['instance_type'] = instanceType;
+    }
+    if (nodeCount) {
+        reqBody['node_count'] = nodeCount;
+    }
+    if (minNodeCount) {
+        reqBody['min_node_count'] = minNodeCount;
+    }
+    if (maxNodeCount) {
+        reqBody['max_node_count'] = maxNodeCount;
+    }
     if (nodeGroups) {
         reqBody['node_groups'] = nodeGroups;
     }
