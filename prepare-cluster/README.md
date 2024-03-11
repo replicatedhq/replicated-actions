@@ -85,7 +85,7 @@ prepare_cluster ---> cluster_kubeconfig
 | helm-run-preflights | true | False | Run preflight checks (true/false) |
 | kots-config-values |  | False | The KOTS config values to use |
 | kots-wait-duration |  | False | Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m") |
-| customer-entitlements |  | False | Entitlements to assign to the customer.<br>Example:<br><pre>customer-entitlements: \|<br>  - name: "number-of-users"<br>    value: "10"</pre>.'<br> |
+| customer-entitlements |  | False | Entitlements to assign to the customer.<br>Example:<br><pre>customer-entitlements: \|<br>  - name: "number-of-users"<br>    value: "10"</pre><br> |
 
 ## Outputs
 | Name | Description |
