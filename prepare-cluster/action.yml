@@ -92,7 +92,7 @@ inputs:
     description: |
       Entitlements to assign to the customer.
       Example:
-      <pre>entitlements: \|
+      <pre>customer-entitlements: \|
         - name: "number-of-users"
           value: "10"</pre>.'
     required: false
