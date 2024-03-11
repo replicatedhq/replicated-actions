@@ -89,7 +89,12 @@ inputs:
     description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
     required: false
   customer-entitlements:
-    description: 'Entitlements to assign to the customer.'
+    description: |
+      Entitlements to assign to the customer.
+      Example:
+      <pre>entitlements: \|
+        - name: "number-of-users"
+          value: "10"</pre>.'
     required: false
 outputs:
   cluster-id: # id of the cluster
