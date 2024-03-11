@@ -94,7 +94,7 @@ inputs:
       Example:
       <pre>customer-entitlements: \|
         - name: "number-of-users"
-          value: "10"</pre>.'
+          value: "10"</pre>
     required: false
 outputs:
   cluster-id: # id of the cluster
