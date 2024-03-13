@@ -9,6 +9,7 @@ create_cluster["Create Cluster"]
 api_token["api-token"]
 kubernetes_distribution["kubernetes-distribution"]
 kubernetes_version["kubernetes-version"]
+license_id["license-id"]
 cluster_name["cluster-name"]
 ttl["ttl"]
 disk["disk"]
@@ -26,6 +27,7 @@ cluster_kubeconfig["cluster-kubeconfig"]
 api_token ---> create_cluster
 kubernetes_distribution ---> create_cluster
 kubernetes_version ---> create_cluster
+license_id ---> create_cluster
 cluster_name ---> create_cluster
 ttl ---> create_cluster
 disk ---> create_cluster
@@ -47,6 +49,7 @@ create_cluster ---> cluster_kubeconfig
 | api-token |  | True | API Token. |
 | kubernetes-distribution |  | True | Kubernetes distribution of the cluster to provision. |
 | kubernetes-version |  | False | Kubernetes version to provision (format is distribution dependent). |
+| license-id |  | False | License ID to use for the installation (required for Embedded Cluster distribution). |
 | cluster-name |  | True | Name of the cluster to provision |
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | disk |  | False | Disk size in GiB |
