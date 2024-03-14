@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { VendorPortalApi, createCluster, getKubeconfig, pollForStatus } from 'replicated-lib';
+import { VendorPortalApi, createClusterWithLicense, getKubeconfig, pollForStatus } from 'replicated-lib';
 
 import { parse } from 'yaml'
 
@@ -12,6 +12,7 @@ async function run() {
     const name = core.getInput('cluster-name');
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');
+    const licenseId = core.getInput('license-id');
     const k8sTTL = core.getInput('ttl');
     const diskGib: number = +(core.getInput('disk'));
     const nodeCount: number = +(core.getInput('nodes'));
@@ -35,8 +36,11 @@ async function run() {
     const tagsArray = processTags(tags)
     const nodeGroupsArray = processNodeGroups(nodeGroups)
 
-    let cluster = await createCluster(apiClient, name, k8sDistribution, k8sVersion, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount,
-                                      instanceType, nodeGroupsArray, tagsArray);
+    let cluster = await createClusterWithLicense(
+        apiClient, name, k8sDistribution, k8sVersion, licenseId,
+        k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount,
+        instanceType, nodeGroupsArray, tagsArray,
+    );
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
     core.setOutput('cluster-id', cluster.id);
 

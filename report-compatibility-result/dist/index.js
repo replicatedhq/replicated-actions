@@ -30453,7 +30453,7 @@ async function findChannelDetailsInOutput(channels, { slug, name }) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.StatusError = exports.ClusterVersion = exports.Cluster = void 0;
+exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterVersion = exports.Cluster = void 0;
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -30468,6 +30468,10 @@ class StatusError extends Error {
 }
 exports.StatusError = StatusError;
 async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
+    return await createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, "", clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags);
+}
+exports.createCluster = createCluster;
+async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, licenseId, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         "name": clusterName,
@@ -30475,6 +30479,9 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
         "kubernetes_version": k8sVersion,
         "ttl": clusterTTL,
     };
+    if (licenseId) {
+        reqBody['license_id'] = licenseId;
+    }
     if (diskGib) {
         reqBody['disk_gib'] = diskGib;
     }
@@ -30511,7 +30518,7 @@ async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sV
     const body = JSON.parse(await res.readBody());
     return { name: body.cluster.name, id: body.cluster.id, status: body.cluster.status };
 }
-exports.createCluster = createCluster;
+exports.createClusterWithLicense = createClusterWithLicense;
 async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
     // get clusters from the api, look for the status of the id to be ${status}
     // if it's not ${status}, sleep for 5 seconds and try again
@@ -30798,7 +30805,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(4995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(3770);
@@ -30811,6 +30818,7 @@ Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: funct
 var clusters_1 = __nccwpck_require__(5230);
 Object.defineProperty(exports, "ClusterVersion", ({ enumerable: true, get: function () { return clusters_1.ClusterVersion; } }));
 Object.defineProperty(exports, "createCluster", ({ enumerable: true, get: function () { return clusters_1.createCluster; } }));
+Object.defineProperty(exports, "createClusterWithLicense", ({ enumerable: true, get: function () { return clusters_1.createClusterWithLicense; } }));
 Object.defineProperty(exports, "pollForStatus", ({ enumerable: true, get: function () { return clusters_1.pollForStatus; } }));
 Object.defineProperty(exports, "getKubeconfig", ({ enumerable: true, get: function () { return clusters_1.getKubeconfig; } }));
 Object.defineProperty(exports, "removeCluster", ({ enumerable: true, get: function () { return clusters_1.removeCluster; } }));
