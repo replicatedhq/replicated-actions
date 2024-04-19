@@ -1,44 +1,50 @@
-## Create Object Store
+## Create Postgres
 
 ```mermaid
 ---
-title: Create Object Store
+title: Create Postgres
 ---
 graph LR
-create_object_store["Create Object Store"]
+create_postgres["Create Postgres"]
 api_token["api-token"]
 cluster_id["cluster-id"]
-bucket_name["bucket-name"]
+version["version"]
+instance_type["instance-type"]
+disk["disk"]
 timeout_minutes["timeout-minutes"]
-bucket_name["bucket-name"]
-bucket_prefix["bucket-prefix"]
-service_account_name["service_account_name"]
-service_account_name_read_only["service_account_name_read_only"]
-service_account_namespace["service_account_namespace"]
-api_token ---> create_object_store
-cluster_id ---> create_object_store
-bucket_name ---> create_object_store
-timeout_minutes ---> create_object_store
-create_object_store ---> bucket_name
-create_object_store ---> bucket_prefix
-create_object_store ---> service_account_name
-create_object_store ---> service_account_name_read_only
-create_object_store ---> service_account_namespace
+addon_id["addon-id"]
+version["version"]
+instance_type["instance-type"]
+disk["disk"]
+uri["uri"]
+api_token ---> create_postgres
+cluster_id ---> create_postgres
+version ---> create_postgres
+instance_type ---> create_postgres
+disk ---> create_postgres
+timeout_minutes ---> create_postgres
+create_postgres ---> addon_id
+create_postgres ---> version
+create_postgres ---> instance_type
+create_postgres ---> disk
+create_postgres ---> uri
 ```
 ## Inputs
 | Name | Default | Required | Description |
 | --- | --- | --- | --- |
 | api-token |  | True | API Token. |
-| cluster-id |  | True | Cluster id to attach object store to |
-| bucket-name |  | True | Name of the bucket to create |
-| timeout-minutes | 20 | False | Time to wait for the object store to have a status of `running` |
+| cluster-id |  | True | Cluster id to attach postgres to |
+| version |  | False | Postgres version to provision. |
+| instance-type |  | False | Instance type to provision |
+| disk |  | False | Disk size in GiB |
+| timeout-minutes | 20 | False | Time to wait for the postgres to have a status of `ready` |
 
 ## Outputs
 | Name | Description |
 | --- | --- |
-| bucket-name | Contains the final bucket name. |
-| bucket-prefix | Contains the prefix of the bucket. |
-| service_account_name | Contains the name of the service account. |
-| service_account_name_read_only | Contains the name of the read only service account. |
-| service_account_namespace | Contains the namespace of the service account. |
+| addon-id | Contains the id of the addon. |
+| version | Contains the provisioned postgres version. |
+| instance-type | Contains the instance type of postgres. |
+| disk | Contains the disk size of postgres. |
+| uri | Contains the URI of the postgres to connect to. |
 
