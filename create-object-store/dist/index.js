@@ -24,7 +24,7 @@ function run() {
         try {
             const apiToken = core.getInput("api-token");
             const clusterId = core.getInput("cluster-id");
-            const bucketName = core.getInput("bucket-name");
+            const bucketPrefix = core.getInput("bucket-prefix");
             const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
             const apiEndpoint = core.getInput("replicated-api-endpoint");
             const apiClient = new replicated_lib_1.VendorPortalApi();
@@ -32,7 +32,7 @@ function run() {
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            let addon = yield (0, replicated_lib_1.createAddonObjectStore)(apiClient, clusterId, bucketName);
+            let addon = yield (0, replicated_lib_1.createAddonObjectStore)(apiClient, clusterId, bucketPrefix);
             core.info(`Created Object Store ${addon.id} - waiting for it to be ready...`);
             core.setOutput("addon-id", addon.id);
             addon = yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
