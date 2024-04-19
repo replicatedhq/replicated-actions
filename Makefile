@@ -1,8 +1,8 @@
 .PHONY: package-all
-package-all: package-archive-channel package-archive-customer package-create-cluster package-create-customer \
-			 package-create-release package-helm-install package-kots-install package-promote-release \
-			 package-remove-cluster package-get-customer-instances package-report-compatibility-result \
-			 package-upgrade-cluster
+package-all: package-archive-channel package-archive-customer package-create-cluster package-create-object-store \
+			 package-create-postgres package-expose-port package-create-customer package-create-release \
+			 package-helm-install package-kots-install package-promote-release package-remove-cluster \
+			 package-get-customer-instances package-report-compatibility-result package-upgrade-cluster
 
 .PHONY: package-archive-channel
 package-archive-channel:
@@ -18,6 +18,21 @@ package-archive-customer:
 package-create-cluster:
 	rm -rf ./create-cluster/build ./create-cluster/dist ./create-cluster/node_modules
 	cd ./create-cluster && npm install && npm run build && npm run package
+
+.PHONY: package-create-object-store
+package-create-object-store:
+	rm -rf ./create-object-store/build ./create-object-store/dist ./create-object-store/node_modules
+	cd ./create-object-store && npm install && npm run build && npm run package
+
+.PHONY: package-create-postgres
+package-create-postgres:
+	rm -rf ./create-postgres/build ./create-postgres/dist ./create-postgres/node_modules
+	cd ./create-postgres && npm install && npm run build && npm run package
+
+.PHONY: package-expose-port
+package-expose-port:
+	rm -rf ./expose-port/build ./expose-port/dist ./expose-port/node_modules
+	cd ./expose-port && npm install && npm run build && npm run package
 
 .PHONY: package-create-customer
 package-create-customer:
@@ -65,9 +80,10 @@ package-upgrade-cluster:
 	cd ./upgrade-cluster && npm install && npm run build && npm run package
 
 .PHONY: readme-all
-readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-customer \
-			 readme-create-release readme-helm-install readme-kots-install readme-promote-release \
-			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances readme-report-compatibility-result \
+readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
+			 readme-create-postgres readme-expose-port readme-create-customer readme-create-release readme-helm-install \
+			 readme-kots-install readme-promote-release readme-remove-cluster readme-prepare-cluster \
+			 readme-get-customer-instances readme-report-compatibility-result \
 			 readme-upgrade-cluster
 
 .PHONE: pip-install
@@ -85,6 +101,18 @@ readme-archive-customer: pip-install
 .PHONY: readme-create-cluster
 readme-create-cluster: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./create-cluster/action.yml > ./create-cluster/README.md
+
+.PHONY: readme-create-object-store
+readme-create-object-store: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./create-object-store/action.yml > ./create-object-store/README.md
+
+.PHONY: readme-create-postgres
+readme-create-postgres: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./create-postgres/action.yml > ./create-postgres/README.md
+
+.PHONY: readme-expose-port
+readme-expose-port: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./expose-port/action.yml > ./expose-port/README.md
 
 .PHONY: readme-create-customer
 readme-create-customer: pip-install

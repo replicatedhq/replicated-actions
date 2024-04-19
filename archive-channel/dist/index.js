@@ -30315,7 +30315,7 @@ exports.Application = Application;
 async function getApplicationDetails(vendorPortalApi, appSlug) {
     const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
-    console.log('Getting app id from app slug...');
+    console.log("Getting app id from app slug...");
     const listAppsUri = `${vendorPortalApi.endpoint}/apps`;
     const listAppsRes = await http.get(listAppsUri);
     if (listAppsRes.message.statusCode != 200) {
@@ -30352,7 +30352,7 @@ class Channel {
 exports.Channel = Channel;
 exports.exportedForTesting = {
     getChannelByApplicationId,
-    findChannelDetailsInOutput,
+    findChannelDetailsInOutput
 };
 async function createChannel(vendorPortalApi, appSlug, channelName) {
     const http = await vendorPortalApi.client();
@@ -30361,7 +30361,7 @@ async function createChannel(vendorPortalApi, appSlug, channelName) {
     // 2. create the channel
     console.log(`Creating channel ${channelName}...`);
     const reqBody = {
-        "name": channelName
+        name: channelName
     };
     const createChannelUri = `${vendorPortalApi.endpoint}/app/${app.id}/channel`;
     const createChannelRes = await http.post(createChannelUri, JSON.stringify(reqBody));
@@ -30377,7 +30377,7 @@ async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
     const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
-    if (typeof slug === 'undefined' && typeof name === 'undefined') {
+    if (typeof slug === "undefined" && typeof name === "undefined") {
         throw new Error(`Must provide either a channel slug or channel name`);
     }
     // 2. get the channel id from the channel slug
@@ -30420,7 +30420,7 @@ async function findChannelDetailsInOutput(channels, { slug, name }) {
             return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence };
         }
     }
-    return Promise.reject({ "channel": null, "reason": `Could not find channel with slug ${slug} or name ${name}` });
+    return Promise.reject({ channel: null, reason: `Could not find channel with slug ${slug} or name ${name}` });
 }
 
 
@@ -30432,13 +30432,28 @@ async function findChannelDetailsInOutput(channels, { slug, name }) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterVersion = exports.Cluster = void 0;
+exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonPostgres = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
 class Cluster {
 }
 exports.Cluster = Cluster;
 class ClusterVersion {
 }
 exports.ClusterVersion = ClusterVersion;
+class Addon {
+}
+exports.Addon = Addon;
+class ObjectStore {
+}
+exports.ObjectStore = ObjectStore;
+class Postgres {
+}
+exports.Postgres = Postgres;
+class ClusterPort {
+}
+exports.ClusterPort = ClusterPort;
+class ClusterExposedPort {
+}
+exports.ClusterExposedPort = ClusterExposedPort;
 class StatusError extends Error {
     constructor(message, statusCode) {
         super(message);
@@ -30453,34 +30468,34 @@ exports.createCluster = createCluster;
 async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, licenseId, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
     const http = await vendorPortalApi.client();
     const reqBody = {
-        "name": clusterName,
-        "kubernetes_distribution": k8sDistribution,
-        "kubernetes_version": k8sVersion,
-        "ttl": clusterTTL,
+        name: clusterName,
+        kubernetes_distribution: k8sDistribution,
+        kubernetes_version: k8sVersion,
+        ttl: clusterTTL
     };
     if (licenseId) {
-        reqBody['license_id'] = licenseId;
+        reqBody["license_id"] = licenseId;
     }
     if (diskGib) {
-        reqBody['disk_gib'] = diskGib;
+        reqBody["disk_gib"] = diskGib;
     }
     if (instanceType) {
-        reqBody['instance_type'] = instanceType;
+        reqBody["instance_type"] = instanceType;
     }
     if (nodeCount) {
-        reqBody['node_count'] = nodeCount;
+        reqBody["node_count"] = nodeCount;
     }
     if (minNodeCount) {
-        reqBody['min_node_count'] = minNodeCount;
+        reqBody["min_node_count"] = minNodeCount;
     }
     if (maxNodeCount) {
-        reqBody['max_node_count'] = maxNodeCount;
+        reqBody["max_node_count"] = maxNodeCount;
     }
     if (nodeGroups) {
-        reqBody['node_groups'] = nodeGroups;
+        reqBody["node_groups"] = nodeGroups;
     }
     if (tags) {
-        reqBody['tags'] = tags;
+        reqBody["tags"] = tags;
     }
     const uri = `${vendorPortalApi.endpoint}/cluster`;
     const res = await http.post(uri, JSON.stringify(reqBody));
@@ -30495,7 +30510,11 @@ async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistrib
         throw new Error(`Failed to queue cluster create: Server responded with ${res.message.statusCode}: ${body}`);
     }
     const body = JSON.parse(await res.readBody());
-    return { name: body.cluster.name, id: body.cluster.id, status: body.cluster.status };
+    return {
+        name: body.cluster.name,
+        id: body.cluster.id,
+        status: body.cluster.status
+    };
 }
 exports.createClusterWithLicense = createClusterWithLicense;
 async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
@@ -30504,7 +30523,7 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
     // if it is ${status}, return the cluster with that status
     await new Promise(f => setTimeout(f, sleeptimeMs)); // sleep for 5 seconds before polling as the cluster takes a few seconds to start provisioning
     // iterate for timeout/sleeptime times
-    const iterations = timeout * 1000 / sleeptimeMs;
+    const iterations = (timeout * 1000) / sleeptimeMs;
     for (let i = 0; i < iterations; i++) {
         try {
             const clusterDetails = await getClusterDetails(vendorPortalApi, clusterId);
@@ -30545,7 +30564,11 @@ async function getClusterDetails(vendorPortalApi, clusterId) {
         throw new StatusError(`Failed to get cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
     const body = JSON.parse(await res.readBody());
-    return { name: body.cluster.name, id: body.cluster.id, status: body.cluster.status };
+    return {
+        name: body.cluster.name,
+        id: body.cluster.id,
+        status: body.cluster.status
+    };
 }
 async function getKubeconfig(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
@@ -30570,7 +30593,7 @@ exports.removeCluster = removeCluster;
 async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     const http = await vendorPortalApi.client();
     const reqBody = {
-        "kubernetes_version": k8sVersion,
+        kubernetes_version: k8sVersion
     };
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/upgrade`;
     const res = await http.post(uri, JSON.stringify(reqBody));
@@ -30590,7 +30613,7 @@ async function getClusterVersions(vendorPortalApi) {
     const body = JSON.parse(await res.readBody());
     // 2. Convert body into ClusterVersion[]
     let clusterVersions = [];
-    for (const cluster of body['cluster-versions']) {
+    for (const cluster of body["cluster-versions"]) {
         for (const version of cluster.versions) {
             clusterVersions.push({
                 name: cluster.short_name,
@@ -30601,6 +30624,181 @@ async function getClusterVersions(vendorPortalApi) {
     return clusterVersions;
 }
 exports.getClusterVersions = getClusterVersions;
+async function createAddonObjectStore(vendorPortalApi, clusterId, bucketName) {
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons/objectstore`;
+    const reqBody = {
+        bucket: bucketName
+    };
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 201) {
+        let body = "";
+        try {
+            body = await res.readBody();
+        }
+        catch (err) {
+            // ignore
+        }
+        throw new Error(`Failed to queue add-on create: Server responded with ${res.message.statusCode}: ${body}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    var addon = { id: body.addon.id, status: body.addon.status };
+    if (body.addon.object_store) {
+        addon.object_store = {
+            bucket_name: body.addon.object_store.bucket_name,
+            bucket_prefix: body.addon.object_store.bucket_prefix,
+            service_account_name: body.addon.object_store.service_account_name,
+            service_account_name_read_only: body.addon.object_store.service_account_name_read_only,
+            service_account_namespace: body.addon.object_store.service_account_namespace
+        };
+    }
+    return addon;
+}
+exports.createAddonObjectStore = createAddonObjectStore;
+async function createAddonPostgres(vendorPortalApi, clusterId, version, instanceType, diskGib) {
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons/postgres`;
+    const reqBody = {};
+    if (version) {
+        reqBody["version"] = version;
+    }
+    if (instanceType) {
+        reqBody["instance_type"] = instanceType;
+    }
+    if (diskGib) {
+        reqBody["disk_gib"] = diskGib;
+    }
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 201) {
+        let body = "";
+        try {
+            body = await res.readBody();
+        }
+        catch (err) {
+            // ignore
+        }
+        throw new Error(`Failed to queue add-on create: Server responded with ${res.message.statusCode}: ${body}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    var addon = { id: body.addon.id, status: body.addon.status };
+    if (body.addon.postgres) {
+        addon.postgres = {
+            uri: body.addon.postgres.uri,
+            version: body.addon.postgres.version,
+            instance_type: body.addon.postgres.instance_type,
+            disk_gib: body.addon.postgres.disk_gib
+        };
+    }
+    return addon;
+}
+exports.createAddonPostgres = createAddonPostgres;
+async function pollForAddonStatus(vendorPortalApi, clusterId, addonId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
+    // get add-ons from the api, look for the status of the id to be ${status}
+    // if it's not ${status}, sleep for 5 seconds and try again
+    // if it is ${status}, return the add-on with that status
+    await new Promise(f => setTimeout(f, sleeptimeMs)); // sleep for sleeptimeMs seconds before polling as the add-on takes a few seconds to start provisioning
+    // iterate for timeout/sleeptime times
+    const iterations = (timeout * 1000) / sleeptimeMs;
+    for (let i = 0; i < iterations; i++) {
+        try {
+            const addonDetails = await getAddonDetails(vendorPortalApi, clusterId, addonId);
+            if (addonDetails.status === expectedStatus) {
+                return addonDetails;
+            }
+            // Once state is "error", it will never change. So we can shortcut polling.
+            if (addonDetails.status === "error") {
+                throw new Error(`Add-on has entered error state.`);
+            }
+            console.debug(`Cluster Add-on status is ${addonDetails.status}, sleeping for ${sleeptimeMs / 1000} seconds`);
+        }
+        catch (err) {
+            if (err instanceof StatusError) {
+                if (err.statusCode >= 500) {
+                    // 5xx errors are likely transient, so we should retry
+                    console.debug(`Got HTTP error with status ${err.statusCode}, sleeping for ${sleeptimeMs / 1000} seconds`);
+                }
+                else {
+                    console.debug(`Got HTTP error with status ${err.statusCode}, exiting`);
+                    throw err;
+                }
+            }
+            else {
+                throw err;
+            }
+        }
+        await new Promise(f => setTimeout(f, sleeptimeMs));
+    }
+    throw new Error(`Add-on did not reach state ${expectedStatus} within ${timeout} seconds`);
+}
+exports.pollForAddonStatus = pollForAddonStatus;
+async function getAddonDetails(vendorPortalApi, clusterId, addonId) {
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        throw new StatusError(`Failed to get add-on: Server responded with ${res.message.statusCode}`, res.message.statusCode);
+    }
+    const body = JSON.parse(await res.readBody());
+    for (const addon of body.addons) {
+        if (addon.id === addonId) {
+            var addonObj = { id: addon.id, status: addon.status };
+            if (addon.object_store) {
+                addonObj.object_store = {
+                    bucket_name: addon.object_store.bucket_name,
+                    bucket_prefix: addon.object_store.bucket_prefix,
+                    service_account_name: addon.object_store.service_account_name,
+                    service_account_name_read_only: addon.object_store.service_account_name_read_only,
+                    service_account_namespace: addon.object_store.service_account_namespace
+                };
+            }
+            if (addon.postgres) {
+                addonObj.postgres = {
+                    uri: addon.postgres.uri,
+                    version: addon.postgres.version,
+                    instance_type: addon.postgres.instance_type,
+                    disk_gib: addon.postgres.disk_gib
+                };
+            }
+            return addonObj;
+        }
+    }
+    throw new Error(`Add-on with id ${addonId} not found`);
+}
+async function exposeClusterPort(vendorPortalApi, clusterId, port, protocols) {
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/port`;
+    const reqBody = {
+        port: port,
+        protocols: protocols
+    };
+    const res = await http.post(uri, JSON.stringify(reqBody));
+    if (res.message.statusCode != 201) {
+        let body = "";
+        try {
+            body = await res.readBody();
+        }
+        catch (err) {
+            // ignore
+        }
+        throw new Error(`Failed to expose cluster port: Server responded with ${res.message.statusCode}: ${body}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    var exposedPorts = [];
+    for (const exposed_port of body.port.exposed_ports) {
+        const exposedPort = {
+            protocol: exposed_port.protocol,
+            exposed_port: exposed_port.exposed_port
+        };
+        exposedPorts.push(exposedPort);
+    }
+    var portObj = {
+        upstream_port: body.port.upstream_port,
+        hostname: body.port.hostname,
+        exposed_ports: exposedPorts
+    };
+    return portObj;
+}
+exports.exposeClusterPort = exposeClusterPort;
 
 
 /***/ }),
@@ -30616,16 +30814,16 @@ exports.VendorPortalApi = void 0;
 const httpClient = __nccwpck_require__(6255);
 class VendorPortalApi {
     constructor() {
-        this.endpoint = 'https://api.replicated.com/vendor/v3';
+        this.endpoint = "https://api.replicated.com/vendor/v3";
         // apiToken with default value
-        this.apiToken = 'default';
+        this.apiToken = "default";
     }
     async client() {
         const http = new httpClient.HttpClient();
         const headers = {
-            "Authorization": this.apiToken,
+            Authorization: this.apiToken,
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            Accept: "application/json"
         };
         // while this is specifically a github action, we still check
         // for the github actions environment variables
@@ -30645,7 +30843,7 @@ class VendorPortalApi {
             headers["X-Replicated-GitHubRepository"] = process.env.GITHUB_REPOSITORY;
         }
         http.requestOptions = {
-            headers,
+            headers
         };
         return http;
     }
@@ -30675,7 +30873,7 @@ exports.KubernetesDistribution = KubernetesDistribution;
 async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
-        console.log('Creating customer on appId ' + app.id);
+        console.log("Creating customer on appId " + app.id);
         const http = await vendorPortalApi.client();
         // 1. create the customer
         const createCustomerUri = `${vendorPortalApi.endpoint}/customer`;
@@ -30683,23 +30881,23 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
             name: name,
             email: email,
             type: licenseType,
-            app_id: app.id,
+            app_id: app.id
         };
         if (isKotsInstallEnabled !== undefined) {
-            createCustomerReqBody['is_kots_install_enabled'] = isKotsInstallEnabled;
+            createCustomerReqBody["is_kots_install_enabled"] = isKotsInstallEnabled;
         }
         if (channelSlug) {
             const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
-            createCustomerReqBody['channel_id'] = channel.id;
+            createCustomerReqBody["channel_id"] = channel.id;
         }
         // expiresIn is in days, if it's 0 or less, ignore it - non-expiring license
         if (expiresIn > 0) {
             const now = new Date();
-            const expiresAt = (0, date_fns_tz_1.zonedTimeToUtc)((0, date_fns_1.add)(now, { days: expiresIn }), 'UTC');
-            createCustomerReqBody['expires_at'] = expiresAt.toISOString();
+            const expiresAt = (0, date_fns_tz_1.zonedTimeToUtc)((0, date_fns_1.add)(now, { days: expiresIn }), "UTC");
+            createCustomerReqBody["expires_at"] = expiresAt.toISOString();
         }
         if (entitlementValues) {
-            createCustomerReqBody['entitlementValues'] = entitlementValues;
+            createCustomerReqBody["entitlementValues"] = entitlementValues;
         }
         const createCustomerRes = await http.post(createCustomerUri, JSON.stringify(createCustomerReqBody));
         if (createCustomerRes.message.statusCode != 201) {
@@ -30784,7 +30982,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonPostgres = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(4995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(3770);
@@ -30803,6 +31001,10 @@ Object.defineProperty(exports, "getKubeconfig", ({ enumerable: true, get: functi
 Object.defineProperty(exports, "removeCluster", ({ enumerable: true, get: function () { return clusters_1.removeCluster; } }));
 Object.defineProperty(exports, "upgradeCluster", ({ enumerable: true, get: function () { return clusters_1.upgradeCluster; } }));
 Object.defineProperty(exports, "getClusterVersions", ({ enumerable: true, get: function () { return clusters_1.getClusterVersions; } }));
+Object.defineProperty(exports, "createAddonObjectStore", ({ enumerable: true, get: function () { return clusters_1.createAddonObjectStore; } }));
+Object.defineProperty(exports, "createAddonPostgres", ({ enumerable: true, get: function () { return clusters_1.createAddonPostgres; } }));
+Object.defineProperty(exports, "pollForAddonStatus", ({ enumerable: true, get: function () { return clusters_1.pollForAddonStatus; } }));
+Object.defineProperty(exports, "exposeClusterPort", ({ enumerable: true, get: function () { return clusters_1.exposeClusterPort; } }));
 var customers_1 = __nccwpck_require__(8958);
 Object.defineProperty(exports, "KubernetesDistribution", ({ enumerable: true, get: function () { return customers_1.KubernetesDistribution; } }));
 Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
@@ -30847,7 +31049,7 @@ async function createRelease(vendorPortalApi, appSlug, yamlDir) {
     // 2. create the release
     const createReleasePayload = await readYAMLDir(yamlDir);
     const reqBody = {
-        "spec_gzip": (0, exports.gzipData)(createReleasePayload),
+        spec_gzip: (0, exports.gzipData)(createReleasePayload)
     };
     const createReleaseUri = `${vendorPortalApi.endpoint}/app/${app.id}/release`;
     const createReleaseRes = await http.post(createReleaseUri, JSON.stringify(reqBody));
@@ -30875,7 +31077,7 @@ async function createReleaseFromChart(vendorPortalApi, appSlug, chart) {
     // 2. create the release
     const createReleasePayload = await readChart(chart);
     const reqBody = {
-        "spec_gzip": (0, exports.gzipData)(createReleasePayload),
+        spec_gzip: (0, exports.gzipData)(createReleasePayload)
     };
     const createReleaseUri = `${vendorPortalApi.endpoint}/app/${app.id}/release`;
     const createReleaseRes = await http.post(createReleaseUri, JSON.stringify(reqBody));
@@ -30949,7 +31151,12 @@ async function readYAMLDir(yamlDir, prefix = "") {
         if ((await stat(path.join(yamlDir, file))).isDirectory()) {
             const subdir = await readYAMLDir(path.join(yamlDir, file), path.join(prefix, file));
             if (subdir) {
-                allKotsReleaseSpecs.push({ name: file, path: path.join(prefix, file), content: "", children: subdir });
+                allKotsReleaseSpecs.push({
+                    name: file,
+                    path: path.join(prefix, file),
+                    content: "",
+                    children: subdir
+                });
             }
         }
         else {
@@ -30973,7 +31180,7 @@ async function readChart(chart) {
     return allKotsReleaseSpecs;
 }
 function isSupportedExt(ext) {
-    const supportedExts = [".tgz", ".gz", ".yaml", ".yml", ".css", ".woff", ".woff2", ".ttf", ".otf", ".eot", ".svg",];
+    const supportedExts = [".tgz", ".gz", ".yaml", ".yml", ".css", ".woff", ".woff2", ".ttf", ".otf", ".eot", ".svg"];
     return supportedExts.includes(ext);
 }
 async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequence, version) {
@@ -30986,8 +31193,8 @@ exports.promoteRelease = promoteRelease;
 async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version) {
     const http = await vendorPortalApi.client();
     const reqBody = {
-        "versionLabel": version,
-        "channelIds": [channelId],
+        versionLabel: version,
+        channelIds: [channelId]
     };
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}/promote`;
     const res = await http.post(uri, JSON.stringify(reqBody));
@@ -31063,16 +31270,16 @@ exports.reportCompatibilityResult = reportCompatibilityResult;
 async function reportCompatibilityResultByAppId(vendorPortalApi, appId, releaseSequence, compatibilityResult) {
     const http = await vendorPortalApi.client();
     const reqBody = {
-        "distribution": compatibilityResult.distribution,
-        "version": compatibilityResult.version,
+        distribution: compatibilityResult.distribution,
+        version: compatibilityResult.version
     };
     if (compatibilityResult.successAt) {
-        const successAt = (0, date_fns_tz_1.zonedTimeToUtc)(compatibilityResult.successAt, 'UTC');
+        const successAt = (0, date_fns_tz_1.zonedTimeToUtc)(compatibilityResult.successAt, "UTC");
         reqBody["successAt"] = successAt.toISOString();
         reqBody["successNotes"] = compatibilityResult.successNotes;
     }
     if (compatibilityResult.failureAt) {
-        const failureAt = (0, date_fns_tz_1.zonedTimeToUtc)(compatibilityResult.failureAt, 'UTC');
+        const failureAt = (0, date_fns_tz_1.zonedTimeToUtc)(compatibilityResult.failureAt, "UTC");
         reqBody["failureAt"] = failureAt.toISOString();
         reqBody["failureNotes"] = compatibilityResult.failureNotes;
     }

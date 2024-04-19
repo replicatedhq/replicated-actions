@@ -1,0 +1,38 @@
+name: "Create Postgres"
+description: "Create Postgres"
+inputs:
+  api-token:
+    description: "API Token."
+    required: true
+    default: ""
+  cluster-id:
+    description: "Cluster id to attach postgres to"
+    required: true
+    default: ""
+  version:
+    description: "Postgres version to provision."
+    required: false
+  instance-type:
+    description: "Instance type to provision"
+    required: false
+  disk:
+    description: "Disk size in GiB"
+    required: false
+  timeout-minutes:
+    description: "Time to wait for the postgres to have a status of `ready`"
+    required: false
+    default: "20"
+outputs:
+  addon-id: # id of the addon
+    description: "Contains the id of the addon."
+  version: # Version of postgres
+    description: "Contains the provisioned postgres version."
+  instance-type: # Instance type of postgres
+    description: "Contains the instance type of postgres."
+  disk: # disk size of postgres
+    description: "Contains the disk size of postgres."
+  uri: # URI of the postgres to connect to
+    description: "Contains the URI of the postgres to connect to."
+runs:
+  using: "node16"
+  main: "dist/index.js"
