@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import {
   VendorPortalApi,
-  createAddonObjectStore,
+  createAddonPostgres,
   pollForAddonStatus,
 } from "replicated-lib";
 
@@ -9,7 +9,9 @@ async function run() {
   try {
     const apiToken = core.getInput("api-token");
     const clusterId = core.getInput("cluster-id");
-    const bucketName = core.getInput("bucket-name");
+    const version = core.getInput("version");
+    const instanceType = core.getInput("instance-type");
+    const diskGib = +core.getInput("disk");
     const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
     const apiEndpoint = core.getInput("replicated-api-endpoint");
 
@@ -20,10 +22,14 @@ async function run() {
       apiClient.endpoint = apiEndpoint;
     }
 
-    let addon = await createAddonObjectStore(apiClient, clusterId, bucketName);
-    core.info(
-      `Created Object Store ${addon.id} - waiting for it to be ready...`
+    let addon = await createAddonPostgres(
+      apiClient,
+      clusterId,
+      version,
+      instanceType,
+      diskGib
     );
+    core.info(`Created Postgres ${addon.id} - waiting for it to be ready...`);
     core.setOutput("addon-id", addon.id);
 
     addon = await pollForAddonStatus(
@@ -35,20 +41,10 @@ async function run() {
     );
 
     core.info(`Addon ${addon.id} is ready!`);
-    core.setOutput("bucket-name", addon.object_store?.bucket_name);
-    core.setOutput("bucket-prefix", addon.object_store?.bucket_prefix);
-    core.setOutput(
-      "service-account-name",
-      addon.object_store?.service_account_name
-    );
-    core.setOutput(
-      "service-account-name-read-only",
-      addon.object_store?.service_account_name_read_only
-    );
-    core.setOutput(
-      "service-account-namespace",
-      addon.object_store?.service_account_namespace
-    );
+    core.setOutput("version", addon.postgres?.version);
+    core.setOutput("instance-type", addon.postgres?.instance_type);
+    core.setOutput("disk", addon.postgres?.disk_gib);
+    core.setOutput("uri", addon.postgres?.uri);
   } catch (error) {
     core.setFailed(error.message);
   }
