@@ -1,7 +1,7 @@
 .PHONY: package-all
 package-all: package-archive-channel package-archive-customer package-create-cluster package-create-object-store \
-			 package-create-customer package-create-release package-helm-install package-kots-install \
-			 package-promote-release package-remove-cluster package-get-customer-instances \
+			 package-create-postgres package-create-customer package-create-release package-helm-install \
+			 package-kots-install package-promote-release package-remove-cluster package-get-customer-instances \
 			 package-report-compatibility-result package-upgrade-cluster
 
 .PHONY: package-archive-channel
@@ -23,6 +23,11 @@ package-create-cluster:
 package-create-object-store:
 	rm -rf ./create-object-store/build ./create-object-store/dist ./create-object-store/node_modules
 	cd ./create-object-store && npm install && npm run build && npm run package
+
+.PHONY: package-create-postgres
+package-create-postgres:
+	rm -rf ./create-postgres/build ./create-postgres/dist ./create-postgres/node_modules
+	cd ./create-postgres && npm install && npm run build && npm run package
 
 .PHONY: package-create-customer
 package-create-customer:
@@ -71,8 +76,9 @@ package-upgrade-cluster:
 
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
-			 readme-create-customer readme-create-release readme-helm-install readme-kots-install readme-promote-release \
-			 readme-remove-cluster readme-prepare-cluster readme-get-customer-instances readme-report-compatibility-result \
+			 readme-create-postgres	readme-create-customer readme-create-release readme-helm-install \
+			 readme-kots-install readme-promote-release readme-remove-cluster readme-prepare-cluster \
+			 readme-get-customer-instances readme-report-compatibility-result \
 			 readme-upgrade-cluster
 
 .PHONE: pip-install
@@ -94,6 +100,10 @@ readme-create-cluster: pip-install
 .PHONY: readme-create-object-store
 readme-create-object-store: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./create-object-store/action.yml > ./create-object-store/README.md
+
+.PHONY: readme-create-postgres
+readme-create-postgres: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./create-postgres/action.yml > ./create-postgres/README.md
 
 .PHONY: readme-create-customer
 readme-create-customer: pip-install
