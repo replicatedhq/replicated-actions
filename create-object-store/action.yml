@@ -5,26 +5,29 @@ inputs:
     description: "API Token."
     required: true
     default: ""
-  cluster-name:
-    description: "Name of the cluster to provision"
+  cluster-id:
+    description: "Cluster id to attach object store to"
     required: true
     default: ""
-  disk:
-    description: "Disk size in GiB"
+  bucket-name:
+    description: "Name of the bucket to create"
+    required: true
+    default: ""
+  timeout-minutes:
+    description: "Time to wait for the object store to have a status of `running`"
     required: false
-  tags:
-    description: |
-      Tags to assign to the cluster.
-      Example:
-      <pre>tags: \|
-        - key: "department"
-          value: "engineering"</pre>
-    required: false
+    default: "20"
 outputs:
-  cluster-id: # id of the cluster
-    description: "Contains the cluster id."
-  cluster-kubeconfig: # kubeconfig of the cluster
-    description: "Contains the kubeconfig to connect with the cluster."
+  bucket-name: # final name of the bucket
+    description: "Contains the final bucket name."
+  bucket-prefix: # prefix of the bucket
+    description: "Contains the prefix of the bucket."
+  service_account_name: # name of the service account
+    description: "Contains the name of the service account."
+  service_account_name_read_only: # name of the read only service account
+    description: "Contains the name of the read only service account."
+  service_account_namespace: # namespace of the service account
+    description: "Contains the namespace of the service account."
 runs:
   using: "node16"
   main: "dist/index.js"
