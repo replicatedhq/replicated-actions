@@ -20,29 +20,20 @@ const core = __nccwpck_require__(42186);
 const replicated_lib_1 = __nccwpck_require__(34409);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d;
         try {
             const apiToken = core.getInput("api-token");
             const clusterId = core.getInput("cluster-id");
-            const version = core.getInput("version");
-            const instanceType = core.getInput("instance-type");
-            const diskGib = +core.getInput("disk");
-            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            const port = core.getInput("port");
+            const protocols = core.getInput("protocols").split(",");
             const apiEndpoint = core.getInput("replicated-api-endpoint");
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            let addon = yield (0, replicated_lib_1.createAddonPostgres)(apiClient, clusterId, version, instanceType, diskGib);
-            core.info(`Created Postgres ${addon.id} - waiting for it to be ready...`);
-            core.setOutput("addon-id", addon.id);
-            addon = yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
-            core.info(`Addon ${addon.id} is ready!`);
-            core.setOutput("version", (_a = addon.postgres) === null || _a === void 0 ? void 0 : _a.version);
-            core.setOutput("instance-type", (_b = addon.postgres) === null || _b === void 0 ? void 0 : _b.instance_type);
-            core.setOutput("disk", (_c = addon.postgres) === null || _c === void 0 ? void 0 : _c.disk_gib);
-            core.setOutput("uri", (_d = addon.postgres) === null || _d === void 0 ? void 0 : _d.uri);
+            let exposedPort = yield (0, replicated_lib_1.exposeClusterPort)(apiClient, clusterId, Number(port), protocols);
+            core.info(`Exposed Port on ${exposedPort.hostname}`);
+            core.setOutput("hostname", exposedPort.hostname);
         }
         catch (error) {
             core.setFailed(error.message);

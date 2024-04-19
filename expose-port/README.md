@@ -1,50 +1,32 @@
-## Create Postgres
+## Expose Port
 
 ```mermaid
 ---
-title: Create Postgres
+title: Expose Port
 ---
 graph LR
-create_postgres["Create Postgres"]
+expose_port["Expose Port"]
 api_token["api-token"]
 cluster_id["cluster-id"]
-version["version"]
-instance_type["instance-type"]
-disk["disk"]
-timeout_minutes["timeout-minutes"]
-addon_id["addon-id"]
-version["version"]
-instance_type["instance-type"]
-disk["disk"]
-uri["uri"]
-api_token ---> create_postgres
-cluster_id ---> create_postgres
-version ---> create_postgres
-instance_type ---> create_postgres
-disk ---> create_postgres
-timeout_minutes ---> create_postgres
-create_postgres ---> addon_id
-create_postgres ---> version
-create_postgres ---> instance_type
-create_postgres ---> disk
-create_postgres ---> uri
+port["port"]
+protocols["protocols"]
+hostname["hostname"]
+api_token ---> expose_port
+cluster_id ---> expose_port
+port ---> expose_port
+protocols ---> expose_port
+expose_port ---> hostname
 ```
 ## Inputs
 | Name | Default | Required | Description |
 | --- | --- | --- | --- |
 | api-token |  | True | API Token. |
-| cluster-id |  | True | Cluster id to attach postgres to |
-| version |  | False | Postgres version to provision. |
-| instance-type |  | False | Instance type to provision |
-| disk |  | False | Disk size in GiB |
-| timeout-minutes | 20 | False | Time to wait for the postgres to have a status of `ready` |
+| cluster-id |  | True | Cluster id to expose port for |
+| port |  | True | Cluster Port to expose. |
+| protocols | https | False | Protocols to expose port for. Default is `https`. Possible values are `http`, `https`, `http,https`. |
 
 ## Outputs
 | Name | Description |
 | --- | --- |
-| addon-id | Contains the id of the addon. |
-| version | Contains the provisioned postgres version. |
-| instance-type | Contains the instance type of postgres. |
-| disk | Contains the disk size of postgres. |
-| uri | Contains the URI of the postgres to connect to. |
+| hostname | Contains the hostname of the exposed port. |
 
