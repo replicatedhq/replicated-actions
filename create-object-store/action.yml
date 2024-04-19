@@ -9,8 +9,8 @@ inputs:
     description: "Cluster id to attach object store to"
     required: true
     default: ""
-  bucket-name:
-    description: "Name of the bucket to create"
+  bucket:
+    description: "A prefix for the bucket name to be created."
     required: true
     default: ""
   timeout-minutes:
