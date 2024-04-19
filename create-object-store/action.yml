@@ -14,19 +14,21 @@ inputs:
     required: true
     default: ""
   timeout-minutes:
-    description: "Time to wait for the object store to have a status of `running`"
+    description: "Time to wait for the object store to have a status of `ready`"
     required: false
     default: "20"
 outputs:
+  addon-id: # id of the addon
+    description: "Contains the id of the addon."
   bucket-name: # final name of the bucket
     description: "Contains the final bucket name."
   bucket-prefix: # prefix of the bucket
     description: "Contains the prefix of the bucket."
-  service_account_name: # name of the service account
+  service-account-name: # name of the service account
     description: "Contains the name of the service account."
-  service_account_name_read_only: # name of the read only service account
+  service-account-name-read-only: # name of the read only service account
     description: "Contains the name of the read only service account."
-  service_account_namespace: # namespace of the service account
+  service-account-namespace: # namespace of the service account
     description: "Contains the namespace of the service account."
 runs:
   using: "node16"
