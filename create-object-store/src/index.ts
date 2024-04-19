@@ -9,7 +9,7 @@ async function run() {
   try {
     const apiToken = core.getInput("api-token");
     const clusterId = core.getInput("cluster-id");
-    const bucketName = core.getInput("bucket-name");
+    const bucketPrefix = core.getInput("bucket-prefix");
     const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
     const apiEndpoint = core.getInput("replicated-api-endpoint");
 
@@ -20,7 +20,11 @@ async function run() {
       apiClient.endpoint = apiEndpoint;
     }
 
-    let addon = await createAddonObjectStore(apiClient, clusterId, bucketName);
+    let addon = await createAddonObjectStore(
+      apiClient,
+      clusterId,
+      bucketPrefix
+    );
     core.info(
       `Created Object Store ${addon.id} - waiting for it to be ready...`
     );
