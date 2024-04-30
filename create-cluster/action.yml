@@ -1,45 +1,45 @@
-name: 'Create Cluster'
-description: 'Create Cluster'
+name: "Create Cluster"
+description: "Create Cluster"
 inputs:
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   kubernetes-distribution:
-    description: 'Kubernetes distribution of the cluster to provision.'
+    description: "Kubernetes distribution of the cluster to provision."
     required: true
   kubernetes-version:
-    description: 'Kubernetes version to provision (format is distribution dependent).'
+    description: "Kubernetes version to provision (format is distribution dependent)."
     required: false
   license-id:
-    description: 'License ID to use for the installation (required for Embedded Cluster distribution).'
+    description: "License ID to use for the installation (required for Embedded Cluster distribution)."
     required: false
   cluster-name:
-    description: 'Name of the cluster to provision'
+    description: "Name of the cluster to provision"
     required: true
-    default: ''
+    default: ""
   ttl:
-    description: 'Cluster TTL (duration, max 48h)'
+    description: "Cluster TTL (duration, max 48h)"
     required: false
   disk:
-    description: 'Disk size in GiB'
+    description: "Disk size in GiB"
     required: false
   nodes:
-    description: 'Number of nodes to provision'
+    description: "Number of nodes to provision"
     required: false
   min-nodes:
-    description: 'Minimum number of nodes to provision'
+    description: "Minimum number of nodes to provision"
     required: false
   max-nodes:
-    description: 'Maximum number of nodes to provision'
+    description: "Maximum number of nodes to provision"
     required: false
   instance-type:
-    description: 'Instance type to provision'
+    description: "Instance type to provision"
     required: false
   timeout-minutes:
-    description: 'Time to wait for the cluster to have a status of `running`'
+    description: "Time to wait for the cluster to have a status of `running`"
     required: false
-    default: '20'
+    default: "20"
   node-groups:
     description: |
       Node groups to provision.
@@ -59,17 +59,17 @@ inputs:
           value: "engineering"</pre>
     required: false
   kubeconfig-path:
-    description: 'If specified, the kubeconfig will be written to this path'
+    description: "If specified, the kubeconfig will be written to this path"
     required: false
   export-kubeconfig:
-    description: 'Export the KUBECONFIG variable (true/false)'
+    description: "Export the KUBECONFIG variable (true/false)"
     required: false
-    default: 'false'
+    default: "false"
 outputs:
   cluster-id: # id of the cluster
-    description: 'Contains the cluster id.'
+    description: "Contains the cluster id."
   cluster-kubeconfig: # kubeconfig of the cluster
-    description: 'Contains the kubeconfig to connect with the cluster.'
+    description: "Contains the kubeconfig to connect with the cluster."
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

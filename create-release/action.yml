@@ -1,31 +1,31 @@
-name: 'Replicated create release'
-description: 'Create a Replicated release on a channel'
+name: "Replicated create release"
+description: "Create a Replicated release on a channel"
 inputs:
   app-slug:
-    description: 'App Slug.'
+    description: "App Slug."
     required: true
-    default: ''
+    default: ""
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   chart:
-    description: 'Path to the helm chart (One of `chart` or `yaml-dir` is required).'
+    description: "Path to the helm chart (One of `chart` or `yaml-dir` is required)."
     required: false
   yaml-dir:
-    description: 'The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required).'
+    description: "The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required)."
     required: false
   promote-channel:
-    description: 'Channel name or id to promote this release to.'
+    description: "Channel name or id to promote this release to."
     required: false
   version:
-    description: 'Release version'
+    description: "Release version"
     required: false
 outputs:
   channel-slug: # slug of the channel
-    description: 'Contains the channel slug.'
+    description: "Contains the channel slug."
   release-sequence: # sequence number of the release
-    description: 'Sequence number of the release.'
+    description: "Sequence number of the release."
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

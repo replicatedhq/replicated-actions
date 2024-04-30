@@ -1,13 +1,13 @@
-name: 'Archive Customer'
-description: 'Archive a customer'
+name: "Archive Customer"
+description: "Archive a customer"
 inputs:
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   customer-id:
-    description: 'The id of the customer.'
+    description: "The id of the customer."
     required: true
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

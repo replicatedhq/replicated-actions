@@ -1,35 +1,35 @@
-name: 'KOTS Install'
-description: 'Install a application using KOTS'
+name: "KOTS Install"
+description: "Install a application using KOTS"
 inputs:
   kubeconfig:
-    description: 'A valid kubeconfig to connect to'
+    description: "A valid kubeconfig to connect to"
     required: true
   kots-version:
-    description: 'The version of KOTS to use'
+    description: "The version of KOTS to use"
     required: true
     default: "latest"
   app-slug:
-    description: 'App Slug.'
+    description: "App Slug."
     required: true
   app-version-label:
-    description: 'The application version label to install. If not specified, the latest version is installed.'
+    description: "The application version label to install. If not specified, the latest version is installed."
     required: false
   shared-password:
-    description: 'Shared password to use when deploying the admin console. If not specified, a random password is generated.'
+    description: "Shared password to use when deploying the admin console. If not specified, a random password is generated."
     required: false
   license-file:
-    description: 'A license.yaml to use. This can be a path to a file or the contents of the file.'
+    description: "A license.yaml to use. This can be a path to a file or the contents of the file."
     required: true
   config-values:
-    description: 'The config values to use. This can be a path to a file or the contents of the file.'
+    description: "The config values to use. This can be a path to a file or the contents of the file."
     required: false
   namespace:
-    description: 'The namespace to install the application to'
+    description: "The namespace to install the application to"
     default: "default"
     required: false
   wait-duration:
     description: 'Timeout to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
     required: false
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

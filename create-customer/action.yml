@@ -1,31 +1,31 @@
-name: 'Create Customer'
-description: 'Create Customer'
+name: "Create Customer"
+description: "Create Customer"
 inputs:
   app-slug:
-    description: 'App Slug.'
+    description: "App Slug."
     required: true
-    default: ''
+    default: ""
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   customer-name:
-    description: 'Name of the customer.'
+    description: "Name of the customer."
     required: true
   customer-email:
-    description: 'Email of the customer.'
+    description: "Email of the customer."
     required: false
   license-type:
-    description: 'License Type for the customer.'
+    description: "License Type for the customer."
     required: true
-    default: 'dev'
+    default: "dev"
   channel-slug:
-    description: 'Channel to assign the customer to.'
+    description: "Channel to assign the customer to."
     required: false
   expires-in:
-    description: 'Expiration of the license in days. (default: 0 - never expires))'
+    description: "Expiration of the license in days. (default: 0 - never expires))"
     required: false
-    default: '0'
+    default: "0"
   entitlements:
     description: |
       Entitlements to assign to the customer.
@@ -35,15 +35,15 @@ inputs:
           value: "10"</pre>
     required: false
   is-kots-install-enabled:
-    description: 'If KOTS install should be enabled for the customer.'
+    description: "If KOTS install should be enabled for the customer."
     required: false
 outputs:
   customer-id: # id of the customer
-    description: 'Contains the customer id.'
+    description: "Contains the customer id."
   license-id: # id of the license
-    description: 'Contains the license id.'
+    description: "Contains the license id."
   license-file: # contains the license file
-    description: 'Contains he license file.' 
+    description: "Contains he license file."
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

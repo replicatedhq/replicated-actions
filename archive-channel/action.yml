@@ -1,17 +1,17 @@
-name: 'Archive Channel'
-description: 'Archive a channel'
+name: "Archive Channel"
+description: "Archive a channel"
 inputs:
   app-slug:
-    description: 'App Slug.'
+    description: "App Slug."
     required: true
-    default: ''
+    default: ""
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   channel-slug:
-    description: 'The slug of the channel to archive.'
+    description: "The slug of the channel to archive."
     required: true
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

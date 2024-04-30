@@ -1,13 +1,13 @@
-name: 'Remove cluster'
-description: 'Remove a cluster'
+name: "Remove cluster"
+description: "Remove a cluster"
 inputs:
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   cluster-id:
-    description: 'Cluster id to remove.'
+    description: "Cluster id to remove."
     required: true
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

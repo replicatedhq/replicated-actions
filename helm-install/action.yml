@@ -1,42 +1,42 @@
-name: 'Install a Helm chart to a cluster'
-description: 'Install a Helm chart to a cluster'
+name: "Install a Helm chart to a cluster"
+description: "Install a Helm chart to a cluster"
 inputs:
   helm-path:
-    description: 'The path to the helm binary to use'
+    description: "The path to the helm binary to use"
     required: true
   kubeconfig:
-    description: 'A valid kubeconfig to connect to'
+    description: "A valid kubeconfig to connect to"
     required: true
   registry-username:
-    description: 'The registry username to log in with'
+    description: "The registry username to log in with"
     required: true
   registry-password:
-    description: 'The registry password to use'
+    description: "The registry password to use"
     required: true
   repo-name:
-    description: 'The repo name to use (when not installing from local or oci)'
+    description: "The repo name to use (when not installing from local or oci)"
     required: false
   repo-url:
-    description: 'The repo url to use (when not installing from local or oci)'
+    description: "The repo url to use (when not installing from local or oci)"
     required: false
   chart:
-    description: 'The chart to use'
+    description: "The chart to use"
     required: true
   version:
-    description: 'The version of the chart to install'
+    description: "The version of the chart to install"
     required: false
   name:
-    description: 'The name of release to install'
+    description: "The name of release to install"
     required: true
   namespace:
-    description: 'The namespace to install the application to'
+    description: "The namespace to install the application to"
     required: true
   values:
-    description: 'A values.yaml file to use'
+    description: "A values.yaml file to use"
   run-preflights:
-    description: 'Run preflight checks (true/false)'
+    description: "Run preflight checks (true/false)"
     required: false
-    default: 'false'
+    default: "false"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

@@ -1,32 +1,32 @@
-name: 'Upgrade Cluster'
-description: 'Upgrade Cluster'
+name: "Upgrade Cluster"
+description: "Upgrade Cluster"
 inputs:
   api-token:
-    description: 'API Token.'
+    description: "API Token."
     required: true
-    default: ''
+    default: ""
   cluster-id:
-    description: 'Cluster id to upgrade.'
+    description: "Cluster id to upgrade."
     required: true
   kubernetes-version:
-    description: 'Kubernetes version to provision (format is distribution dependent).'
+    description: "Kubernetes version to provision (format is distribution dependent)."
     required: true
   timeout-minutes:
-    description: 'Time to wait for the cluster to have a status of `running` again'
+    description: "Time to wait for the cluster to have a status of `running` again"
     required: false
-    default: '20'
+    default: "20"
   kubeconfig-path:
-    description: 'If specified, the kubeconfig will be written to this path'
+    description: "If specified, the kubeconfig will be written to this path"
     required: false
   export-kubeconfig:
-    description: 'Export the KUBECONFIG variable (true/false)'
+    description: "Export the KUBECONFIG variable (true/false)"
     required: false
-    default: 'false'
+    default: "false"
 outputs:
   cluster-id: # id of the cluster
-    description: 'Contains the cluster id.'
+    description: "Contains the cluster id."
   cluster-kubeconfig: # kubeconfig of the cluster
-    description: 'Contains the kubeconfig to connect with the cluster.'
+    description: "Contains the kubeconfig to connect with the cluster."
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"
