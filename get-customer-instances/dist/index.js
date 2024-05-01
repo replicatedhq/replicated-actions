@@ -30492,6 +30492,8 @@ async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
     if (archiveChannelRes.message.statusCode != 200) {
         throw new Error(`Failed to archive channel: Server responded with ${archiveChannelRes.message.statusCode}`);
     }
+    // discard the response body
+    await archiveChannelRes.readBody();
 }
 exports.archiveChannel = archiveChannel;
 async function findChannelDetailsInOutput(channels, { slug, name }) {
@@ -30671,6 +30673,8 @@ async function removeCluster(vendorPortalApi, clusterId) {
     if (res.message.statusCode != 200) {
         throw new StatusError(`Failed to remove cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
+    // discard the response body
+    await res.readBody();
 }
 exports.removeCluster = removeCluster;
 async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
@@ -30682,6 +30686,10 @@ async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 200) {
         throw new StatusError(`Failed to upgrade cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
+    }
+    else {
+        // discard the response body
+        await res.readBody();
     }
     return getClusterDetails(vendorPortalApi, clusterId);
 }
@@ -31005,6 +31013,10 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         if (downloadLicenseRes.message.statusCode == 200) {
             downloadLicenseBody = await downloadLicenseRes.readBody();
         }
+        else {
+            // discard the response body
+            await downloadLicenseRes.readBody();
+        }
         return { name: name, customerId: createCustomerBody.customer.id, licenseId: createCustomerBody.customer.installationId, license: downloadLicenseBody };
     }
     catch (error) {
@@ -31022,6 +31034,8 @@ async function archiveCustomer(vendorPortalApi, customerId) {
     if (archiveCustomerRes.message.statusCode != 204) {
         throw new Error(`Failed to archive customer: Server responded with ${archiveCustomerRes.message.statusCode}`);
     }
+    // discard the response body
+    await archiveCustomerRes.readBody();
 }
 exports.archiveCustomer = archiveCustomer;
 async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
@@ -31292,6 +31306,8 @@ async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseS
         }
         throw new Error(`Failed to promote release: Server responded with ${res.message.statusCode}: ${body}`);
     }
+    // discard the response body
+    await res.readBody();
 }
 async function isReleaseReadyForInstall(vendorPortalApi, appId, releaseSequence) {
     var _a;
@@ -31379,6 +31395,8 @@ async function reportCompatibilityResultByAppId(vendorPortalApi, appId, releaseS
         }
         throw new Error(`Failed to report compatibility results: Server responded with ${res.message.statusCode}: ${body}`);
     }
+    // discard the response body
+    await res.readBody();
 }
 
 
