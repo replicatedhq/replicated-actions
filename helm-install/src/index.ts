@@ -10,7 +10,7 @@ async function run() {
   const namespace: string = core.getInput('namespace');
   const registryUsername: string = core.getInput('registry-username');
   const registryPassword: string = core.getInput('registry-password');
-  const runPreflights: boolean = core.getInput('run-preflights') === 'true';
+  const runPreflights: boolean = core.getBooleanInput('run-preflights');
   const values: string = core.getInput('values');
   const repoName: string = core.getInput('repo-name');
   const repoUrl: string = core.getInput('repo-url');

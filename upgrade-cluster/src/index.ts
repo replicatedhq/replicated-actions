@@ -13,7 +13,7 @@ async function run() {
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     let kubeconfigPath = core.getInput('kubeconfig-path');
-    const exportKubeconfig = core.getInput('export-kubeconfig') === 'true';
+    const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;

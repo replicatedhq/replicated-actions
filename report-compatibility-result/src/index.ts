@@ -10,7 +10,7 @@ async function run() {
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     const k8sDistribution = core.getInput('kubernetes-distribution');
     const k8sVersion = core.getInput('kubernetes-version');
-    const success = core.getInput('success') === 'true';
+    const success = core.getBooleanInput('success');
     const notes = core.getInput('notes');
     
     const apiClient = new VendorPortalApi();

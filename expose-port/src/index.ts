@@ -8,6 +8,7 @@ async function run() {
     const port = core.getInput("port");
     const protocols = core.getInput("protocols").split(",");
     const apiEndpoint = core.getInput("replicated-api-endpoint");
+    const isWildcard = core.getBooleanInput("wildcard");
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -20,7 +21,8 @@ async function run() {
       apiClient,
       clusterId,
       Number(port),
-      protocols
+      protocols,
+      isWildcard
     );
     core.info(`Exposed Port on ${exposedPort.hostname}`);
     core.setOutput("hostname", exposedPort.hostname);
