@@ -17,6 +17,10 @@ inputs:
     description: "Protocols to expose port for. Default is `https`. Possible values are `http`, `https`, `http,https`."
     required: false
     default: "https"
+  wildcard:
+    description: "Create a wildcard DNS entry and TLS certificate for this port (will take extra time to provision)."
+    required: false
+    default: "false"
 outputs:
   hostname: # hostname of the exposed port
     description: "Contains the hostname of the exposed port."

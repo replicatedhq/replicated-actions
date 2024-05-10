@@ -24,7 +24,7 @@ async function run() {
     const tags = core.getInput('tags');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     let kubeconfigPath = core.getInput('kubeconfig-path');
-    const exportKubeconfig = core.getInput('export-kubeconfig') === 'true';
+    const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
