@@ -160,7 +160,7 @@ function run() {
         const namespace = core.getInput('namespace');
         const registryUsername = core.getInput('registry-username');
         const registryPassword = core.getInput('registry-password');
-        const runPreflights = core.getInput('run-preflights') === 'true';
+        const runPreflights = core.getBooleanInput('run-preflights');
         const values = core.getInput('values');
         const repoName = core.getInput('repo-name');
         const repoUrl = core.getInput('repo-url');

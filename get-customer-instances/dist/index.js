@@ -30670,7 +30670,7 @@ async function removeCluster(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
     const res = await http.del(uri);
-    if (res.message.statusCode != 200) {
+    if (res.message.statusCode != 201) {
         throw new StatusError(`Failed to remove cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
     // discard the response body
@@ -30855,12 +30855,13 @@ async function getAddonDetails(vendorPortalApi, clusterId, addonId) {
     }
     throw new Error(`Add-on with id ${addonId} not found`);
 }
-async function exposeClusterPort(vendorPortalApi, clusterId, port, protocols) {
+async function exposeClusterPort(vendorPortalApi, clusterId, port, protocols, isWildcard) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/port`;
     const reqBody = {
         port: port,
-        protocols: protocols
+        protocols: protocols,
+        is_wildcard: isWildcard
     };
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 201) {
@@ -30883,9 +30884,11 @@ async function exposeClusterPort(vendorPortalApi, clusterId, port, protocols) {
         exposedPorts.push(exposedPort);
     }
     var portObj = {
+        addon_id: body.port.addon_id,
         upstream_port: body.port.upstream_port,
         hostname: body.port.hostname,
-        exposed_ports: exposedPorts
+        exposed_ports: exposedPorts,
+        is_wildcard: body.port.is_wildcard
     };
     return portObj;
 }
