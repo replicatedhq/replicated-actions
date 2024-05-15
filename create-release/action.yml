@@ -28,4 +28,4 @@ outputs:
     description: "Sequence number of the release."
 runs:
   using: "node20"
-  main: "dist/index.js"
+  main: "index.js"

@@ -1,0 +1,42 @@
+name: test - create-release
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - create-release/**
+
+concurrency:
+  group: test-create-release-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      WORDPRESS_CHART_VERSION: 22.2.8
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-create-release
+
+      - name: pull helm chart
+        run: |
+          helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
+
+      - name: test create-release
+        id: create-release
+        uses: ./create-release
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          chart: wordpress-${{ env.WORDPRESS_CHART_VERSION }}.tgz

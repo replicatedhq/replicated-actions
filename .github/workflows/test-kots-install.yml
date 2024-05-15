@@ -1,0 +1,92 @@
+name: test - kots-install
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - kots-install/**
+
+concurrency:
+  group: test-kots-install-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      WORDPRESS_CHART_VERSION: 22.2.8
+      APP_SLUG: replicated-actions-ci # from the Replicated QA team
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-kots-install
+
+      - name: pull helm chart
+        run: |
+          helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
+
+      - name: create-release
+        id: create-release
+        uses: replicatedhq/compatibility-actions/create-release@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: ${{ env.APP_SLUG }}
+          chart: wordpress-${{ env.WORDPRESS_CHART_VERSION }}.tgz
+
+      - name: create-customer
+        id: create-customer
+        uses: replicatedhq/compatibility-actions/create-customer@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: ${{ github.sha }}@example.com
+          license-type: test
+
+      - name: create-cluster
+        id: create-cluster
+        uses: replicatedhq/compatibility-actions/create-cluster@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          kubernetes-distribution: kind
+          timeout-minutes: 5
+
+      - name: helm-install
+        id: helm-install
+        uses: replicatedhq/compatibility-actions/helm-install@v1
+        with:
+          kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+          helm-path: helm
+          registry-username: ${{ github.ref_name }}@example.com
+          registry-password: ${{ steps.create-customer.outputs.license-id }}
+          chart: oci://registry.replicated.com/${{ env.APP_SLUG }}/release__${{ steps.create-release.outputs.release-sequence }}/wordpress
+          name: wordpress
+          namespace: default
+          run-preflights: false
+
+      - name: test kots-install
+        id: kots-install
+        uses: ./kots-install
+        with:
+          kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+          app-slug: ${{ env.APP_SLUG }}/${{ steps.create-release.outputs.channel-slug }}
+          license-file: ${{ steps.create-customer.outputs.license-file }}
+          app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
+
+      - name: remove cluster
+        id: remove-cluster
+        if: always()
+        uses: replicatedhq/compatibility-actions/remove-cluster@v1
+        continue-on-error: true # It could be that the cluster is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}

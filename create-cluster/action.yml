@@ -72,4 +72,4 @@ outputs:
     description: "Contains the kubeconfig to connect with the cluster."
 runs:
   using: "node20"
-  main: "dist/index.js"
+  main: "index.js"

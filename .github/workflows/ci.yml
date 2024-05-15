@@ -1,25 +1,33 @@
-name: CI
+name: ci
 
-on: push
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the
-      # added or changed files to the repository.
-      contents: write
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
 
-    - name: package
-      run: make package-all
+      - name: build
+        run: make
 
-    - name: readme
-      run: make readme-all
-
-    # Commit all changed files back to the repository (dist and readme files)
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Automated commit of npm build result and updated readme files
+      - name: fail if files changed
+        run: |
+          if ! git diff --quiet --exit-code ; then
+            echo "Please run 'make package-all' and 'make readme-all' locally and commit the changes."
+            exit 1
+          fi
