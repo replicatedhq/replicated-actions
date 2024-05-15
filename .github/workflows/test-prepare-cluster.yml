@@ -1,0 +1,64 @@
+name: test - prepare-cluster
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - prepare-cluster/**
+      - create-release/**
+      - create-customer/**
+      - create-cluster/**
+      - helm-install/**
+      - kots-install/**
+
+concurrency:
+  group: test-prepare-cluster-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      WORDPRESS_CHART_VERSION: 22.2.8
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: |
+          set -e
+          make package-create-release
+          make package-create-customer
+          make package-create-cluster
+          make package-helm-install
+          make package-kots-install
+
+      - name: pull helm chart
+        run: |
+          helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
+
+      - name: test prepare-cluster
+        id: prepare-cluster
+        uses: ./prepare-cluster
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          chart: wordpress-${{ env.WORDPRESS_CHART_VERSION }}.tgz
+          kubernetes-distribution: kind
+          helm-chart-name: wordpress
+          helm-run-preflights: false
+
+      - name: remove cluster
+        id: remove-cluster
+        if: always()
+        uses: replicatedhq/compatibility-actions/remove-cluster@v1
+        continue-on-error: true # It could be that the cluster is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.prepare-cluster.outputs.cluster-id }}

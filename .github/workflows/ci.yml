@@ -11,15 +11,20 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
 
-    - name: package
-      run: make package-all
+      - name: package
+        run: make package-all
 
-    - name: readme
-      run: make readme-all
+      - name: readme
+        run: make readme-all
 
-    # Commit all changed files back to the repository (dist and readme files)
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Automated commit of npm build result and updated readme files
+      # Commit all changed files back to the repository (dist and readme files)
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Automated commit of npm build result and updated readme files
