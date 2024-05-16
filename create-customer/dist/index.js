@@ -22,16 +22,20 @@ const yaml_1 = __nccwpck_require__(4083);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('api-token');
-            const name = core.getInput('customer-name');
-            const email = core.getInput('customer-email');
-            const licenseType = core.getInput('license-type');
-            const channelSlug = core.getInput('channel-slug');
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
-            const expiresInDays = +(core.getInput('expires-in') || 0);
-            const entitlements = core.getInput('entitlements');
-            const isKotsInstallEnabled = core.getBooleanInput('is-kots-install-enabled');
+            const appSlug = core.getInput("app-slug");
+            const apiToken = core.getInput("api-token");
+            const name = core.getInput("customer-name");
+            const email = core.getInput("customer-email");
+            const licenseType = core.getInput("license-type");
+            const channelSlug = core.getInput("channel-slug");
+            const apiEndpoint = core.getInput("replicated-api-endpoint");
+            const expiresInDays = +(core.getInput("expires-in") || 0);
+            const entitlements = core.getInput("entitlements");
+            let isKotsInstallEnabled = undefined;
+            if (core.getInput("is-kots-install-enabled") !== "") {
+                isKotsInstallEnabled =
+                    core.getInput("is-kots-install-enabled") === "true";
+            }
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
@@ -39,9 +43,9 @@ function run() {
             }
             const entitlementsArray = processEntitlements(entitlements);
             const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled);
-            core.setOutput('customer-id', customer.customerId);
-            core.setOutput('license-id', customer.licenseId);
-            core.setOutput('license-file', customer.license);
+            core.setOutput("customer-id", customer.customerId);
+            core.setOutput("license-id", customer.licenseId);
+            core.setOutput("license-file", customer.license);
         }
         catch (error) {
             core.setFailed(error.message);
