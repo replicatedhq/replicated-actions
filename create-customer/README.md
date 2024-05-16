@@ -42,7 +42,7 @@ create_customer ---> license_file
 | channel-slug |  | False | Channel to assign the customer to. |
 | expires-in | 0 | False | Expiration of the license in days. (default: 0 - never expires)) |
 | entitlements |  | False | Entitlements to assign to the customer.<br>Example:<br><pre>entitlements: \|<br>  - name: "number-of-users"<br>    value: "10"</pre><br> |
-| is-kots-install-enabled | false | False | If KOTS install should be enabled for the customer. |
+| is-kots-install-enabled | true | False | If KOTS install should be enabled for the customer. |
 
 ## Outputs
 | Name | Description |
