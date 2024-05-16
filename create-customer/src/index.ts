@@ -15,6 +15,8 @@ async function run() {
     const expiresInDays: number = +(core.getInput("expires-in") || 0);
     const entitlements = core.getInput("entitlements");
 
+    // The default for isKotsInstallEnabled is undefined, which means it will not be set
+    // As such we can not use core.getBooleanInput
     let isKotsInstallEnabled: boolean | undefined = undefined;
     if (core.getInput("is-kots-install-enabled") !== "") {
       isKotsInstallEnabled =
