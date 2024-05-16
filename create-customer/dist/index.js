@@ -31,7 +31,13 @@ function run() {
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const expiresInDays = +(core.getInput('expires-in') || 0);
             const entitlements = core.getInput('entitlements');
-            const isKotsInstallEnabled = core.getBooleanInput('is-kots-install-enabled');
+            // The default for isKotsInstallEnabled is undefined, which means it will not be set
+            // As such we can not use core.getBooleanInput
+            let isKotsInstallEnabled = undefined;
+            if (core.getInput("is-kots-install-enabled") !== "") {
+                isKotsInstallEnabled =
+                    core.getInput("is-kots-install-enabled") === "true";
+            }
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
