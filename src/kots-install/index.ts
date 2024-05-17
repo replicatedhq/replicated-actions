@@ -26,6 +26,6 @@ export async function actionKotsInstall() {
     }
   }
 
-  const kostPath: string = await downloadKots(core.getInput('kots-version'));
+  const kostPath: string = await downloadKots(core.getInput('kots-version') || 'latest');
   await installApp(kostPath, licenseFilePath, valuesFilePath);
 }

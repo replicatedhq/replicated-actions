@@ -9,6 +9,10 @@ inputs:
     description: 'API Token.'
     required: true
     default: ''
+  namespace:
+    description: 'The namespace to install the application to'
+    default: 'default'
+    required: true
   chart:
     description: 'Path to the helm chart (One of `chart` or `yaml-dir` is required).'
     required: false
@@ -158,7 +162,7 @@ runs:
       INPUT_REGISTRY-PASSWORD: ${{ steps.create-customer.outputs.license-id }}
       INPUT_CHART: oci://registry.replicated.com/${{ inputs.app-slug }}/release__${{ steps.create-release.outputs.release-sequence }}/${{ inputs.helm-chart-name }}
       INPUT_NAME: ${{ inputs.app-slug }}
-      INPUT_NAMESPACE: 'default'
+      INPUT_NAMESPACE: ${{ inputs.namespace }}
       INPUT_VALUES: ${{ inputs.helm-values }}
       INPUT_RUN-PREFLIGHTS: ${{ inputs.helm-run-preflights }}
   - name: Deploy the app with KOTS
@@ -172,3 +176,5 @@ runs:
       INPUT_APP-VERSION-LABEL: release__${{ steps.create-release.outputs.release-sequence }}
       INPUT_CONFIG-VALUES: ${{ inputs.kots-config-values }}
       INPUT_WAIT-DURATION: ${{ inputs.kots-wait-duration }}
+      INPUT_NAMESPACE: ${{ inputs.namespace }}
+      INPUT_KOTS-VERSION: latest

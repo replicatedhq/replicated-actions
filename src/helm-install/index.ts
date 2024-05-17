@@ -7,7 +7,7 @@ import { downloadPreflight, runPreflight } from './preflight';
 export async function actionHelmInstall() {
   const helmPath: string = core.getInput('helm-path');
   const kubeconfig: string = core.getInput('kubeconfig');
-  const namespace: string = core.getInput('namespace');
+  const namespace: string = core.getInput('namespace') || 'default';
   const registryUsername: string = core.getInput('registry-username');
   const registryPassword: string = core.getInput('registry-password');
   const runPreflights: boolean = core.getBooleanInput('run-preflights');

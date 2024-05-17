@@ -135,7 +135,7 @@ function actionCreateCustomer() {
             const apiToken = core.getInput('api-token');
             const name = core.getInput('customer-name');
             const email = core.getInput('customer-email');
-            const licenseType = core.getInput('license-type');
+            const licenseType = core.getInput('license-type') || 'dev';
             const channelSlug = core.getInput('channel-slug');
             const apiEndpoint = core.getInput('replicated-api-endpoint');
             const expiresInDays = +(core.getInput('expires-in') || 0);
@@ -412,7 +412,7 @@ function actionHelmInstall() {
     return __awaiter(this, void 0, void 0, function* () {
         const helmPath = core.getInput('helm-path');
         const kubeconfig = core.getInput('kubeconfig');
-        const namespace = core.getInput('namespace');
+        const namespace = core.getInput('namespace') || 'default';
         const registryUsername = core.getInput('registry-username');
         const registryPassword = core.getInput('registry-password');
         const runPreflights = core.getBooleanInput('run-preflights');
@@ -636,7 +636,7 @@ function actionKotsInstall() {
                 valuesFilePath = valuesPath;
             }
         }
-        const kostPath = yield (0, kots_1.downloadKots)(core.getInput('kots-version'));
+        const kostPath = yield (0, kots_1.downloadKots)(core.getInput('kots-version') || 'latest');
         yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath);
     });
 }
@@ -742,7 +742,7 @@ function installApp(kotsPath, licenseFilePath, configFilePath) {
             const kubeconfig = core.getInput('kubeconfig');
             const slug = core.getInput('app-slug');
             const appVersionLabel = core.getInput('app-version-label');
-            const namespace = core.getInput('namespace');
+            const namespace = core.getInput('namespace') || 'default';
             const waitDuration = core.getInput('wait-duration');
             // write the kubeconfig to a temp file
             const { fd, path: kubeconfigPath, cleanup } = yield (0, tmpPromise.file)({

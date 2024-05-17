@@ -26,12 +26,12 @@ package-prepare-cluster: package-main
 
 .PHONY: package-archive-channel
 package-archive-channel:
-	rm -rf ./archive-channel/build ./archive-channel/dist ./archive-channel/node_modules
+	rm -rf ./archive-channel/build ./archive-channel/dist
 	cd ./archive-channel && npm install && npm run build && npm run package
 
 .PHONY: package-archive-customer
 package-archive-customer:
-	rm -rf ./archive-customer/build ./archive-customer/dist ./archive-customer/node_modules
+	rm -rf ./archive-customer/build ./archive-customer/dist
 	cd ./archive-customer && npm install && npm run build && npm run package
 
 .PHONY: package-create-cluster
@@ -41,17 +41,17 @@ package-create-cluster: package-main
 
 .PHONY: package-create-object-store
 package-create-object-store:
-	rm -rf ./create-object-store/build ./create-object-store/dist ./create-object-store/node_modules
+	rm -rf ./create-object-store/build ./create-object-store/dist
 	cd ./create-object-store && npm install && npm run build && npm run package
 
 .PHONY: package-create-postgres
 package-create-postgres:
-	rm -rf ./create-postgres/build ./create-postgres/dist ./create-postgres/node_modules
+	rm -rf ./create-postgres/build ./create-postgres/dist
 	cd ./create-postgres && npm install && npm run build && npm run package
 
 .PHONY: package-expose-port
 package-expose-port:
-	rm -rf ./expose-port/build ./expose-port/dist ./expose-port/node_modules
+	rm -rf ./expose-port/build ./expose-port/dist
 	cd ./expose-port && npm install && npm run build && npm run package
 
 .PHONY: package-create-customer
@@ -76,7 +76,7 @@ package-kots-install: package-main
 
 .PHONY: package-promote-release
 package-promote-release:
-	rm -rf ./promote-release/build ./promote-release/dist ./promote-release/node_modules
+	rm -rf ./promote-release/build ./promote-release/dist
 	cd ./promote-release && npm install && npm run build && npm run package
 
 .PHONY: package-remove-cluster
@@ -86,17 +86,17 @@ package-remove-cluster: package-main
 
 .PHONY: package-get-customer-instances
 package-get-customer-instances:
-	rm -rf ./get-customer-instances/build ./get-customer-instances/dist ./get-customer-instances/node_modules
+	rm -rf ./get-customer-instances/build ./get-customer-instances/dist
 	cd ./get-customer-instances && npm install && npm run build && npm run package
 
 .PHONY: package-report-compatibility-result
 package-report-compatibility-result:
-	rm -rf ./report-compatibility-result/build ./report-compatibility-result/dist ./report-compatibility-result/node_modules
+	rm -rf ./report-compatibility-result/build ./report-compatibility-result/dist
 	cd ./report-compatibility-result && npm install && npm run build && npm run package
 
 .PHONY: package-upgrade-cluster
 package-upgrade-cluster:
-	rm -rf ./upgrade-cluster/build ./upgrade-cluster/dist ./upgrade-cluster/node_modules
+	rm -rf ./upgrade-cluster/build ./upgrade-cluster/dist
 	cd ./upgrade-cluster && npm install && npm run build && npm run package
 
 .PHONY: readme-all

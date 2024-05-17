@@ -9,7 +9,7 @@ export async function actionCreateCustomer() {
     const apiToken = core.getInput('api-token')
     const name = core.getInput('customer-name');
     const email = core.getInput('customer-email');
-    const licenseType = core.getInput('license-type');
+    const licenseType = core.getInput('license-type') || 'dev';
     const channelSlug = core.getInput('channel-slug');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     const expiresInDays: number = +(core.getInput('expires-in') || 0);

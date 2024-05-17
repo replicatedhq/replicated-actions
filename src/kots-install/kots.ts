@@ -76,7 +76,7 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
       const kubeconfig = core.getInput('kubeconfig');
       const slug = core.getInput('app-slug');
       const appVersionLabel = core.getInput('app-version-label');
-      const namespace = core.getInput('namespace');
+      const namespace = core.getInput('namespace') || 'default';
       const waitDuration = core.getInput('wait-duration');
       // write the kubeconfig to a temp file
       const { fd , path: kubeconfigPath , cleanup  } = await (0, tmpPromise.file)({

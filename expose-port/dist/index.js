@@ -24,7 +24,7 @@ function run() {
             const apiToken = core.getInput("api-token");
             const clusterId = core.getInput("cluster-id");
             const port = core.getInput("port");
-            const protocols = core.getInput("protocols").split(",");
+            const protocols = core.getInput("protocols") ? core.getInput("protocols").split(",") : ["https"];
             const apiEndpoint = core.getInput("replicated-api-endpoint");
             const isWildcard = core.getBooleanInput("wildcard");
             const apiClient = new replicated_lib_1.VendorPortalApi();
