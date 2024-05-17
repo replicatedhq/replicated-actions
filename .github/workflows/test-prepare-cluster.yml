@@ -84,7 +84,7 @@ jobs:
           app-slug: replicated-actions-ci # from the Replicated QA team
           yaml-dir: ./test/kots-install/yaml
           kubernetes-distribution: kind
-          config-values: |
+          kots-config-values: |
             apiVersion: kots.io/v1beta1
             kind: ConfigValues
             metadata:
