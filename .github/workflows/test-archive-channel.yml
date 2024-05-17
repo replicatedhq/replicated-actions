@@ -36,7 +36,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          yaml-dir: ./test/kots-install
+          yaml-dir: ./test/kots-install/yaml
           promote-channel: ci-test-archive-channel-${{ github.sha }}
 
       - name: test archive-channel
