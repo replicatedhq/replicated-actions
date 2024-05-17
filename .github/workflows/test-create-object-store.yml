@@ -42,7 +42,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
-          bucket-prefix: ${{ github.head_ref }}
+          bucket-prefix: ci-test-create-object-store
           timeout-minutes: 5
 
       - name: remove cluster
