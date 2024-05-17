@@ -1,0 +1,57 @@
+name: test - archive-channel
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - archive-channel/**
+      - .github/workflows/test-archive-channel.yml
+
+concurrency:
+  group: test-archive-channel-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      WORDPRESS_CHART_VERSION: 22.2.8
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-archive-channel
+
+      - name: create-release
+        id: create-release
+        uses: replicatedhq/compatibility-actions/create-release@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          yaml-dir: ./test/kots-install
+          promote-channel: ci-test-archive-channel-${{ github.sha }}
+
+      - name: test archive-channel
+        id: archive-channel
+        uses: ./archive-channel
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          channel-slug: ${{ steps.create-release.outputs.channel-slug }}
+
+      - name: archive-channel
+        if: always()
+        uses: replicatedhq/compatibility-actions/archive-channel@v1
+        continue-on-error: true # It could be that the channel is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          channel-slug: ${{ steps.create-release.outputs.channel-slug }}

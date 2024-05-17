@@ -7,14 +7,14 @@ import { VendorPortalApi, getKubeconfig, pollForStatus, upgradeCluster } from 'r
 
 async function run() {
   try {
-    const apiToken = core.getInput('api-token')
-    const clusterId = core.getInput('cluster-id');
-    const k8sVersion = core.getInput('kubernetes-version');
-    const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
-    const apiEndpoint = core.getInput('replicated-api-endpoint')
-    let kubeconfigPath = core.getInput('kubeconfig-path');
-    const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
-    
+    const apiToken = core.getInput("api-token", { required: true });
+    const clusterId = core.getInput("cluster-id", { required: true });
+    const k8sVersion = core.getInput("kubernetes-version", { required: true });
+    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
+    let kubeconfigPath = core.getInput("kubeconfig-path");
+    const exportKubeconfig = core.getBooleanInput("export-kubeconfig");
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
 

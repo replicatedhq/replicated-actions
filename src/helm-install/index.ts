@@ -5,18 +5,18 @@ import * as fs from 'fs';
 import { downloadPreflight, runPreflight } from './preflight';
 
 export async function actionHelmInstall() {
-  const helmPath: string = core.getInput('helm-path');
-  const kubeconfig: string = core.getInput('kubeconfig');
-  const namespace: string = core.getInput('namespace') || 'default';
-  const registryUsername: string = core.getInput('registry-username');
-  const registryPassword: string = core.getInput('registry-password');
-  const runPreflights: boolean = core.getBooleanInput('run-preflights');
-  const values: string = core.getInput('values');
-  const repoName: string = core.getInput('repo-name');
-  const repoUrl: string = core.getInput('repo-url');
-  const chart: string = core.getInput('chart');
-  const version: string = core.getInput('version');
-  const name: string = core.getInput('name');
+  const helmPath: string = core.getInput("helm-path", { required: true });
+  const kubeconfig: string = core.getInput("kubeconfig", { required: true });
+  const namespace: string = core.getInput("namespace", { required: true }) || "default";
+  const registryUsername: string = core.getInput("registry-username", { required: true });
+  const registryPassword: string = core.getInput("registry-password", { required: true });
+  const runPreflights: boolean = core.getBooleanInput("run-preflights");
+  const values: string = core.getInput("values");
+  const repoName: string = core.getInput("repo-name");
+  const repoUrl: string = core.getInput("repo-url");
+  const chart: string = core.getInput("chart", { required: true });
+  const version: string = core.getInput("version");
+  const name: string = core.getInput("name", { required: true });
 
   // Write the values
   let valuesFilePath = '';

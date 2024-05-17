@@ -1,12 +1,11 @@
 import * as core from '@actions/core';
-import { VendorPortalApi, archiveChannel } from 'replicated-lib';
+import { VendorPortalApi, removeCluster } from 'replicated-lib';
 
 
 async function run() {
   try {
     const apiToken = core.getInput('api-token')
-    const appSlug = core.getInput('app-slug')
-    const channelSlug = core.getInput('channel-slug')
+    const clusterId = core.getInput('cluster-id');
     const apiEndpoint = core.getInput('replicated-api-endpoint')
     
     const apiClient = new VendorPortalApi();
@@ -15,8 +14,8 @@ async function run() {
     if (apiEndpoint) {
       apiClient.endpoint = apiEndpoint
     }
-    
-    await archiveChannel(apiClient, appSlug, channelSlug)
+
+    await removeCluster(apiClient, clusterId);
 
   } catch (error) {
     core.setFailed(error.message);

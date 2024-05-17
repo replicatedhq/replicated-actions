@@ -4,11 +4,9 @@ inputs:
   app-slug:
     description: "App Slug."
     required: true
-    default: ""
   api-token:
     description: "API Token."
     required: true
-    default: ""
   release-sequence:
     description: "The release sequence number to report compatibility result for."
     required: true

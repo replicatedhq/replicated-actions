@@ -4,11 +4,9 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-    default: ""
   cluster-id:
     description: "Cluster id to attach object store to"
     required: true
-    default: ""
   bucket-prefix:
     description: "A prefix for the bucket name to be created."
     required: true

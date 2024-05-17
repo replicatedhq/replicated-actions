@@ -21,14 +21,14 @@ const replicated_lib_1 = __nccwpck_require__(4409);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('api-token');
-            const releaseSequence = core.getInput('release-sequence');
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
-            const k8sDistribution = core.getInput('kubernetes-distribution');
-            const k8sVersion = core.getInput('kubernetes-version');
-            const success = core.getBooleanInput('success');
-            const notes = core.getInput('notes');
+            const apiToken = core.getInput("api-token", { required: true });
+            const appSlug = core.getInput("app-slug", { required: true });
+            const releaseSequence = core.getInput("release-sequence", { required: true });
+            const k8sDistribution = core.getInput("kubernetes-distribution", { required: true });
+            const k8sVersion = core.getInput("kubernetes-version", { required: true });
+            const success = core.getBooleanInput("success", { required: true });
+            const notes = core.getInput("notes");
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {

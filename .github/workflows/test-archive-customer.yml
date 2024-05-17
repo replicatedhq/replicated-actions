@@ -1,0 +1,56 @@
+name: test - archive-customer
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - archive-customer/**
+      - .github/workflows/test-archive-customer.yml
+
+concurrency:
+  group: test-archive-customer-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      WORDPRESS_CHART_VERSION: 22.2.8
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-archive-customer
+
+      - name: create-customer
+        id: create-customer
+        uses: replicatedhq/replicated-actions/create-customer@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: ${{ github.sha }}@example.com
+          license-type: test
+
+      - name: test archive-customer
+        id: archive-customer
+        uses: ./archive-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer.outputs.customer-id }}
+
+      - name: archive-customer
+        if: always()
+        uses: replicatedhq/compatibility-actions/archive-customer@v1
+        continue-on-error: true # It could be that the channel is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer.outputs.customer-id }}

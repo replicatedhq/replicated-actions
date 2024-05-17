@@ -6,7 +6,6 @@ import * as tmpPromise from 'tmp-promise';
 import * as path from 'path';
 import * as randomstring from 'randomstring';
 
-
 export async function downloadKots(version: string): Promise<string> {
   try {
       if (version === 'latest') {
@@ -55,7 +54,6 @@ export async function downloadKots(version: string): Promise<string> {
   }
 }
 
-
 async function getLatestKotsVersion() {
   try {
       const http = new httpClient.HttpClient();
@@ -71,34 +69,37 @@ async function getLatestKotsVersion() {
   }
 }
 
-export async function installApp(kotsPath: string, licenseFilePath: string, configFilePath: string) {
+export type installAppOptions = {
+    kubeconfig: string,
+    appSlug: string,
+    namespace: string,
+    sharedPassword?: string,
+    appVersionLabel?: string,
+    waitDuration?: string,
+}
+
+export async function installApp(kotsPath: string, licenseFilePath: string, configFilePath: string, opts: installAppOptions) {
   try {
-      const kubeconfig = core.getInput('kubeconfig');
-      const slug = core.getInput('app-slug');
-      const appVersionLabel = core.getInput('app-version-label');
-      const namespace = core.getInput('namespace') || 'default';
-      const waitDuration = core.getInput('wait-duration');
       // write the kubeconfig to a temp file
       const { fd , path: kubeconfigPath , cleanup  } = await (0, tmpPromise.file)({
           postfix: '.yaml'
       });
-      fs.writeFileSync(kubeconfigPath, kubeconfig);
+      fs.writeFileSync(kubeconfigPath, opts.kubeconfig);
       const installOptions : exec.ExecOptions = {};
 
       // Allow configuring the shared password
-      const sharedPassword: string = core.getInput('shared-password');
       let password: string;
-      if (sharedPassword) {
-        password = sharedPassword;
+      if (opts.sharedPassword) {
+        password = opts.sharedPassword;
       } else {
         password = randomstring.generate(12);
       }
 
       const params = [
           'install',
-          slug,
+          opts.appSlug,
           "--namespace",
-          namespace,
+          opts.namespace,
           "--shared-password",
           password,
           "--no-port-forward",
@@ -109,11 +110,11 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
       if (configFilePath !== '') {
         params.push("--config-values", configFilePath);
       }
-      if (appVersionLabel) {
-        params.push("--app-version-label", appVersionLabel);
+      if (opts.appVersionLabel) {
+        params.push("--app-version-label", opts.appVersionLabel);
       }
-      if (waitDuration) {
-        params.push("--wait-duration", waitDuration);
+      if (opts.waitDuration) {
+        params.push("--wait-duration", opts.waitDuration);
       }
       await exec.exec(kotsPath, params, installOptions);
       cleanup();

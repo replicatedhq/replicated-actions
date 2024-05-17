@@ -1,6 +1,91 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 27942:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.actionArchiveChannel = void 0;
+const core = __nccwpck_require__(42186);
+const replicated_lib_1 = __nccwpck_require__(34409);
+function actionArchiveChannel() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const apiToken = core.getInput("api-token", { required: true });
+            const appSlug = core.getInput("app-slug", { required: true });
+            const channelSlug = core.getInput("channel-slug", { required: true });
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            const apiClient = new replicated_lib_1.VendorPortalApi();
+            apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
+            yield (0, replicated_lib_1.archiveChannel)(apiClient, appSlug, channelSlug);
+            core.info(`Archived channel ${channelSlug} for app ${appSlug}`);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.actionArchiveChannel = actionArchiveChannel;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 58727:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.actionArchiveCustomer = void 0;
+const core = __nccwpck_require__(42186);
+const replicated_lib_1 = __nccwpck_require__(34409);
+function actionArchiveCustomer() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const apiToken = core.getInput("api-token", { required: true });
+            const customerId = core.getInput("customer-id", { required: true });
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            const apiClient = new replicated_lib_1.VendorPortalApi();
+            apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
+            yield (0, replicated_lib_1.archiveCustomer)(apiClient, customerId);
+            core.info(`Archived customer ${customerId}`);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.actionArchiveCustomer = actionArchiveCustomer;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ 4468:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -26,11 +111,11 @@ const yaml_1 = __nccwpck_require__(44083);
 function actionCreateCluster() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput('api-token');
-            const name = core.getInput('cluster-name');
-            const k8sDistribution = core.getInput('kubernetes-distribution');
+            const apiToken = core.getInput("api-token", { required: true });
+            const k8sDistribution = core.getInput("kubernetes-distribution", { required: true });
             const k8sVersion = core.getInput('kubernetes-version');
             const licenseId = core.getInput('license-id');
+            const name = core.getInput('cluster-name');
             const k8sTTL = core.getInput('ttl');
             const diskGib = +(core.getInput('disk'));
             const nodeCount = +(core.getInput('nodes'));
@@ -40,9 +125,9 @@ function actionCreateCluster() {
             const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
             const nodeGroups = core.getInput('node-groups');
             const tags = core.getInput('tags');
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
             let kubeconfigPath = core.getInput('kubeconfig-path');
             const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
@@ -131,15 +216,15 @@ const yaml_1 = __nccwpck_require__(44083);
 function actionCreateCustomer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('api-token');
-            const name = core.getInput('customer-name');
+            const apiToken = core.getInput("api-token", { required: true });
+            const appSlug = core.getInput("app-slug", { required: true });
+            const name = core.getInput("customer-name", { required: true });
             const email = core.getInput('customer-email');
-            const licenseType = core.getInput('license-type') || 'dev';
+            const licenseType = core.getInput("license-type") || "dev";
             const channelSlug = core.getInput('channel-slug');
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
             const expiresInDays = +(core.getInput('expires-in') || 0);
             const entitlements = core.getInput('entitlements');
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             // The default for isKotsInstallEnabled is undefined, which means it will not be set
             // As such we can not use core.getBooleanInput
             let isKotsInstallEnabled = undefined;
@@ -179,6 +264,113 @@ function processEntitlements(entitlements) {
 
 /***/ }),
 
+/***/ 79878:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.actionCreateObjectStore = void 0;
+const core = __nccwpck_require__(42186);
+const replicated_lib_1 = __nccwpck_require__(34409);
+function actionCreateObjectStore() {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e;
+        try {
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
+            const bucketPrefix = core.getInput("bucket-prefix", { required: true });
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            const apiClient = new replicated_lib_1.VendorPortalApi();
+            apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
+            let addon = yield (0, replicated_lib_1.createAddonObjectStore)(apiClient, clusterId, bucketPrefix);
+            core.info(`Created Object Store ${addon.id} - waiting for it to be ready...`);
+            core.setOutput("addon-id", addon.id);
+            addon = yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
+            core.info(`Addon ${addon.id} is ready!`);
+            core.setOutput("bucket-name", (_a = addon.object_store) === null || _a === void 0 ? void 0 : _a.bucket_name);
+            core.setOutput("bucket-prefix", (_b = addon.object_store) === null || _b === void 0 ? void 0 : _b.bucket_prefix);
+            core.setOutput("service-account-name", (_c = addon.object_store) === null || _c === void 0 ? void 0 : _c.service_account_name);
+            core.setOutput("service-account-name-read-only", (_d = addon.object_store) === null || _d === void 0 ? void 0 : _d.service_account_name_read_only);
+            core.setOutput("service-account-namespace", (_e = addon.object_store) === null || _e === void 0 ? void 0 : _e.service_account_namespace);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.actionCreateObjectStore = actionCreateObjectStore;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 78822:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.actionCreatePostgres = void 0;
+const core = __nccwpck_require__(42186);
+const replicated_lib_1 = __nccwpck_require__(34409);
+function actionCreatePostgres() {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d;
+        try {
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
+            const version = core.getInput("version");
+            const instanceType = core.getInput("instance-type");
+            const diskGib = +core.getInput("disk");
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            const apiClient = new replicated_lib_1.VendorPortalApi();
+            apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
+            let addon = yield (0, replicated_lib_1.createAddonPostgres)(apiClient, clusterId, version, instanceType, diskGib);
+            core.info(`Created Postgres ${addon.id} - waiting for it to be ready...`);
+            core.setOutput("addon-id", addon.id);
+            addon = yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
+            core.info(`Addon ${addon.id} is ready!`);
+            core.setOutput("version", (_a = addon.postgres) === null || _a === void 0 ? void 0 : _a.version);
+            core.setOutput("instance-type", (_b = addon.postgres) === null || _b === void 0 ? void 0 : _b.instance_type);
+            core.setOutput("disk", (_c = addon.postgres) === null || _c === void 0 ? void 0 : _c.disk_gib);
+            core.setOutput("uri", (_d = addon.postgres) === null || _d === void 0 ? void 0 : _d.uri);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.actionCreatePostgres = actionCreatePostgres;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ 53440:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -200,13 +392,13 @@ const replicated_lib_1 = __nccwpck_require__(34409);
 function actionCreateRelease() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('api-token');
+            const apiToken = core.getInput("api-token", { required: true });
+            const appSlug = core.getInput("app-slug", { required: true });
             const chart = core.getInput('chart');
             const yamlDir = core.getInput('yaml-dir');
             const promoteChannel = core.getInput('promote-channel');
             const releaseVersion = core.getInput('version');
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
@@ -251,6 +443,52 @@ function actionCreateRelease() {
     });
 }
 exports.actionCreateRelease = actionCreateRelease;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 20308:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.actionExposePort = void 0;
+const core = __nccwpck_require__(42186);
+const replicated_lib_1 = __nccwpck_require__(34409);
+function actionExposePort() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
+            const port = core.getInput("port");
+            const protocols = (core.getInput("protocols") || "https").split(",");
+            const isWildcard = core.getBooleanInput("wildcard");
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            const apiClient = new replicated_lib_1.VendorPortalApi();
+            apiClient.apiToken = apiToken;
+            if (apiEndpoint) {
+                apiClient.endpoint = apiEndpoint;
+            }
+            let exposedPort = yield (0, replicated_lib_1.exposeClusterPort)(apiClient, clusterId, Number(port), protocols, isWildcard);
+            core.info(`Exposed Port on ${exposedPort.hostname}`);
+            core.setOutput("hostname", exposedPort.hostname);
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+exports.actionExposePort = actionExposePort;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -410,18 +648,18 @@ const fs = __nccwpck_require__(57147);
 const preflight_1 = __nccwpck_require__(63900);
 function actionHelmInstall() {
     return __awaiter(this, void 0, void 0, function* () {
-        const helmPath = core.getInput('helm-path');
-        const kubeconfig = core.getInput('kubeconfig');
-        const namespace = core.getInput('namespace') || 'default';
-        const registryUsername = core.getInput('registry-username');
-        const registryPassword = core.getInput('registry-password');
-        const runPreflights = core.getBooleanInput('run-preflights');
-        const values = core.getInput('values');
-        const repoName = core.getInput('repo-name');
-        const repoUrl = core.getInput('repo-url');
-        const chart = core.getInput('chart');
-        const version = core.getInput('version');
-        const name = core.getInput('name');
+        const helmPath = core.getInput("helm-path", { required: true });
+        const kubeconfig = core.getInput("kubeconfig", { required: true });
+        const namespace = core.getInput("namespace", { required: true }) || "default";
+        const registryUsername = core.getInput("registry-username", { required: true });
+        const registryPassword = core.getInput("registry-password", { required: true });
+        const runPreflights = core.getBooleanInput("run-preflights");
+        const values = core.getInput("values");
+        const repoName = core.getInput("repo-name");
+        const repoUrl = core.getInput("repo-url");
+        const chart = core.getInput("chart", { required: true });
+        const version = core.getInput("version");
+        const name = core.getInput("name", { required: true });
         // Write the values
         let valuesFilePath = '';
         if (values) {
@@ -614,7 +852,15 @@ const tmp_promise_1 = __nccwpck_require__(68065);
 const fs = __nccwpck_require__(57147);
 function actionKotsInstall() {
     return __awaiter(this, void 0, void 0, function* () {
-        const licenseFileInput = core.getInput('license-file');
+        const licenseFileInput = core.getInput("license-file", { required: true });
+        const kotsVersionInput = core.getInput("kots-version", { required: true }) || "latest";
+        const configValuesInput = core.getInput("config-values");
+        const kubeconfigInput = core.getInput("kubeconfig", { required: true });
+        const appSlugInput = core.getInput("app-slug", { required: true });
+        const appVersionLabelInput = core.getInput("app-version-label");
+        const namespaceInput = core.getInput("namespace") || "default";
+        const waitDurationInput = core.getInput("wait-duration");
+        const sharedPasswordInput = core.getInput("shared-password");
         let licenseFilePath = '';
         if (fs.existsSync(licenseFileInput)) {
             licenseFilePath = licenseFileInput;
@@ -624,7 +870,6 @@ function actionKotsInstall() {
             fs.writeFileSync(licensePath, licenseFileInput);
             licenseFilePath = licensePath;
         }
-        const configValuesInput = core.getInput('config-values');
         let valuesFilePath = '';
         if (configValuesInput) {
             if (fs.existsSync(configValuesInput)) {
@@ -632,12 +877,20 @@ function actionKotsInstall() {
             }
             else {
                 const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
-                fs.writeFileSync(valuesPath, core.getInput('config-values'));
+                fs.writeFileSync(valuesPath, configValuesInput);
                 valuesFilePath = valuesPath;
             }
         }
-        const kostPath = yield (0, kots_1.downloadKots)(core.getInput('kots-version') || 'latest');
-        yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath);
+        const kostPath = yield (0, kots_1.downloadKots)(kotsVersionInput);
+        const opts = {
+            kubeconfig: kubeconfigInput,
+            appSlug: appSlugInput,
+            namespace: namespaceInput,
+            sharedPassword: sharedPasswordInput,
+            appVersionLabel: appVersionLabelInput,
+            waitDuration: waitDurationInput,
+        };
+        yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath, opts);
     });
 }
 exports.actionKotsInstall = actionKotsInstall;
@@ -736,34 +989,28 @@ function getLatestKotsVersion() {
         }
     });
 }
-function installApp(kotsPath, licenseFilePath, configFilePath) {
+function installApp(kotsPath, licenseFilePath, configFilePath, opts) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const kubeconfig = core.getInput('kubeconfig');
-            const slug = core.getInput('app-slug');
-            const appVersionLabel = core.getInput('app-version-label');
-            const namespace = core.getInput('namespace') || 'default';
-            const waitDuration = core.getInput('wait-duration');
             // write the kubeconfig to a temp file
             const { fd, path: kubeconfigPath, cleanup } = yield (0, tmpPromise.file)({
                 postfix: '.yaml'
             });
-            fs.writeFileSync(kubeconfigPath, kubeconfig);
+            fs.writeFileSync(kubeconfigPath, opts.kubeconfig);
             const installOptions = {};
             // Allow configuring the shared password
-            const sharedPassword = core.getInput('shared-password');
             let password;
-            if (sharedPassword) {
-                password = sharedPassword;
+            if (opts.sharedPassword) {
+                password = opts.sharedPassword;
             }
             else {
                 password = randomstring.generate(12);
             }
             const params = [
                 'install',
-                slug,
+                opts.appSlug,
                 "--namespace",
-                namespace,
+                opts.namespace,
                 "--shared-password",
                 password,
                 "--no-port-forward",
@@ -774,11 +1021,11 @@ function installApp(kotsPath, licenseFilePath, configFilePath) {
             if (configFilePath !== '') {
                 params.push("--config-values", configFilePath);
             }
-            if (appVersionLabel) {
-                params.push("--app-version-label", appVersionLabel);
+            if (opts.appVersionLabel) {
+                params.push("--app-version-label", opts.appVersionLabel);
             }
-            if (waitDuration) {
-                params.push("--wait-duration", waitDuration);
+            if (opts.waitDuration) {
+                params.push("--wait-duration", opts.waitDuration);
             }
             yield exec.exec(kotsPath, params, installOptions);
             cleanup();
@@ -814,15 +1061,15 @@ const replicated_lib_1 = __nccwpck_require__(34409);
 function actionRemoveCluster() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput('api-token');
-            const clusterId = core.getInput('cluster-id');
-            core.debug(`Removing cluster ${clusterId}...`);
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
+            core.debug(`Removing cluster ${clusterId}...`);
             yield (0, replicated_lib_1.removeCluster)(apiClient, clusterId);
             core.info(`Removed cluster ${clusterId}`);
         }
@@ -69792,15 +70039,25 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const archive_channel_1 = __nccwpck_require__(27942);
+const archive_customer_1 = __nccwpck_require__(58727);
 const create_cluster_1 = __nccwpck_require__(4468);
 const create_customer_1 = __nccwpck_require__(41055);
+const create_object_store_1 = __nccwpck_require__(79878);
+const create_postgres_1 = __nccwpck_require__(78822);
 const create_release_1 = __nccwpck_require__(53440);
+const expose_port_1 = __nccwpck_require__(20308);
 const helm_install_1 = __nccwpck_require__(42185);
 const kots_install_1 = __nccwpck_require__(37449);
 const remove_cluster_1 = __nccwpck_require__(22852);
+exports.actionArchiveChannel = archive_channel_1.actionArchiveChannel;
+exports.actionArchiveCustomer = archive_customer_1.actionArchiveCustomer;
 exports.actionCreateCluster = create_cluster_1.actionCreateCluster;
 exports.actionCreateCustomer = create_customer_1.actionCreateCustomer;
+exports.actionCreateObjectStore = create_object_store_1.actionCreateObjectStore;
+exports.actionCreatePostgres = create_postgres_1.actionCreatePostgres;
 exports.actionCreateRelease = create_release_1.actionCreateRelease;
+exports.actionExposePort = expose_port_1.actionExposePort;
 exports.actionHelmInstall = helm_install_1.actionHelmInstall;
 exports.actionKotsInstall = kots_install_1.actionKotsInstall;
 exports.actionRemoveCluster = remove_cluster_1.actionRemoveCluster;

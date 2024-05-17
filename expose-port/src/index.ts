@@ -3,12 +3,12 @@ import { VendorPortalApi, exposeClusterPort } from "replicated-lib";
 
 async function run() {
   try {
-    const apiToken = core.getInput("api-token");
-    const clusterId = core.getInput("cluster-id");
-    const port = core.getInput("port");
-    const protocols = core.getInput("protocols") ? core.getInput("protocols").split(",") : ["https"];
-    const apiEndpoint = core.getInput("replicated-api-endpoint");
+    const apiToken = core.getInput("api-token", { required: true });
+    const clusterId = core.getInput("cluster-id", { required: true });
+    const port = core.getInput("port", { required: true });
+    const protocols = (core.getInput("protocols") || "https").split(",");
     const isWildcard = core.getBooleanInput("wildcard");
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;

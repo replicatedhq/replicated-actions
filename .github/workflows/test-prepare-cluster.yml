@@ -11,6 +11,7 @@ on:
       - create-cluster/**
       - helm-install/**
       - kots-install/**
+      - .github/workflows/test-prepare-cluster.yml
 
 concurrency:
   group: test-prepare-cluster-${{ github.head_ref }}

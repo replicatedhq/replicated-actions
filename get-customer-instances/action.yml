@@ -4,11 +4,9 @@ inputs:
   app-slug:
     description: "App Slug."
     required: true
-    default: ""
   api-token:
     description: "API Token."
     required: true
-    default: ""
 outputs:
   matrix: # matrix to test with
     description: "Matrix to test with (json)."

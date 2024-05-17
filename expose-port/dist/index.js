@@ -21,12 +21,12 @@ const replicated_lib_1 = __nccwpck_require__(34409);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput("api-token");
-            const clusterId = core.getInput("cluster-id");
-            const port = core.getInput("port");
-            const protocols = core.getInput("protocols") ? core.getInput("protocols").split(",") : ["https"];
-            const apiEndpoint = core.getInput("replicated-api-endpoint");
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
+            const port = core.getInput("port", { required: true });
+            const protocols = (core.getInput("protocols") || "https").split(",");
             const isWildcard = core.getBooleanInput("wildcard");
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {

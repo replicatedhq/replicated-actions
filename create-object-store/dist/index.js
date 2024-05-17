@@ -22,11 +22,11 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e;
         try {
-            const apiToken = core.getInput("api-token");
-            const clusterId = core.getInput("cluster-id");
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
             const bucketPrefix = core.getInput("bucket-prefix");
             const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
-            const apiEndpoint = core.getInput("replicated-api-endpoint");
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {

@@ -21,12 +21,12 @@ const replicated_lib_1 = __nccwpck_require__(4409);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appSlug = core.getInput('app-slug');
-            const apiToken = core.getInput('api-token');
-            const channelSlug = core.getInput('channel-to');
-            const releaseSequence = core.getInput('release-sequence');
-            const releaseVersion = core.getInput('release-version');
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
+            const apiToken = core.getInput("api-token", { required: true });
+            const appSlug = core.getInput("app-slug", { required: true });
+            const channelSlug = core.getInput("channel-to", { required: true });
+            const releaseSequence = core.getInput("release-sequence", { required: true });
+            const releaseVersion = core.getInput("release-version", { required: true });
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
@@ -34,6 +34,7 @@ function run() {
             }
             const channel = yield (0, replicated_lib_1.getChannelDetails)(apiClient, appSlug, { slug: channelSlug });
             yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
+            core.info(`Release ${releaseVersion} has been promoted to channel ${channelSlug}`);
         }
         catch (error) {
             core.setFailed(error.message);

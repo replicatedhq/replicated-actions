@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - create-release/**
+      - .github/workflows/test-create-release.yml
 
 concurrency:
   group: test-create-release-${{ github.head_ref }}

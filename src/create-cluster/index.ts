@@ -8,11 +8,11 @@ import { parse } from 'yaml'
 
 export async function actionCreateCluster() {
   try {
-    const apiToken = core.getInput('api-token')
-    const name = core.getInput('cluster-name');
-    const k8sDistribution = core.getInput('kubernetes-distribution');
+    const apiToken = core.getInput("api-token", { required: true });
+    const k8sDistribution = core.getInput("kubernetes-distribution", { required: true });
     const k8sVersion = core.getInput('kubernetes-version');
     const licenseId = core.getInput('license-id');
+    const name = core.getInput('cluster-name');
     const k8sTTL = core.getInput('ttl');
     const diskGib: number = +(core.getInput('disk'));
     const nodeCount: number = +(core.getInput('nodes'));
@@ -22,9 +22,9 @@ export async function actionCreateCluster() {
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const nodeGroups = core.getInput('node-groups');
     const tags = core.getInput('tags');
-    const apiEndpoint = core.getInput('replicated-api-endpoint')
     let kubeconfigPath = core.getInput('kubeconfig-path');
     const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;

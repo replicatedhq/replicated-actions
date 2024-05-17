@@ -4,11 +4,10 @@ import { VendorPortalApi, removeCluster } from 'replicated-lib';
 
 export async function actionRemoveCluster() {
   try {
-    const apiToken = core.getInput('api-token')
-    const clusterId = core.getInput('cluster-id');
-    core.debug(`Removing cluster ${clusterId}...`);
-    const apiEndpoint = core.getInput('replicated-api-endpoint')
-    
+    const apiToken = core.getInput("api-token", { required: true });
+    const clusterId = core.getInput("cluster-id", { required: true });
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
 
@@ -16,6 +15,7 @@ export async function actionRemoveCluster() {
       apiClient.endpoint = apiEndpoint
     }
 
+    core.debug(`Removing cluster ${clusterId}...`);
     await removeCluster(apiClient, clusterId);
     core.info(`Removed cluster ${clusterId}`);
   } catch (error) {

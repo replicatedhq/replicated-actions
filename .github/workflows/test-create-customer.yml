@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - create-customer/**
+      - .github/workflows/test-create-customer.yml
 
 concurrency:
   group: test-create-customer-${{ github.head_ref }}

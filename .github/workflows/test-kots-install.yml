@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - kots-install/**
+      - .github/workflows/test-kots-install.yml
 
 concurrency:
   group: test-kots-install-${{ github.head_ref }}

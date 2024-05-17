@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - helm-install/**
+      - .github/workflows/test-helm-install.yml
 
 concurrency:
   group: test-helm-install-${{ github.head_ref }}

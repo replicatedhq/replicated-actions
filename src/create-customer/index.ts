@@ -5,17 +5,16 @@ import { parse } from 'yaml'
 
 export async function actionCreateCustomer() {
   try {
-    const appSlug = core.getInput('app-slug');
-    const apiToken = core.getInput('api-token')
-    const name = core.getInput('customer-name');
+    const apiToken = core.getInput("api-token", { required: true });
+    const appSlug = core.getInput("app-slug", { required: true });
+    const name = core.getInput("customer-name", { required: true });
     const email = core.getInput('customer-email');
-    const licenseType = core.getInput('license-type') || 'dev';
+    const licenseType = core.getInput("license-type") || "dev";
     const channelSlug = core.getInput('channel-slug');
-    const apiEndpoint = core.getInput('replicated-api-endpoint')
     const expiresInDays: number = +(core.getInput('expires-in') || 0);
     const entitlements = core.getInput('entitlements');
-    
-    
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+
     // The default for isKotsInstallEnabled is undefined, which means it will not be set
     // As such we can not use core.getBooleanInput
     let isKotsInstallEnabled: boolean | undefined = undefined;

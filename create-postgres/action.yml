@@ -4,11 +4,9 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-    default: ""
   cluster-id:
     description: "Cluster id to attach postgres to"
     required: true
-    default: ""
   version:
     description: "Postgres version to provision."
     required: false

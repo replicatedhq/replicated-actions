@@ -7,11 +7,11 @@ import {
 
 async function run() {
   try {
-    const apiToken = core.getInput("api-token");
-    const clusterId = core.getInput("cluster-id");
+    const apiToken = core.getInput("api-token", { required: true });
+    const clusterId = core.getInput("cluster-id", { required: true });
     const bucketPrefix = core.getInput("bucket-prefix");
     const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
-    const apiEndpoint = core.getInput("replicated-api-endpoint");
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
