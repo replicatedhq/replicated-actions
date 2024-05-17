@@ -43,7 +43,7 @@ jobs:
 
       - name: test create-release / kots-install
         id: create-release-kots-install
-        uses: replicatedhq/compatibility-actions/create-release@v1
+        uses: ./create-release
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
