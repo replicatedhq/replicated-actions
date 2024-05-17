@@ -4,11 +4,13 @@ inputs:
   app-slug:
     description: 'App Slug.'
     required: true
-    default: ''
   api-token:
     description: 'API Token.'
     required: true
-    default: ''
+  namespace:
+    description: 'The namespace to install the application to'
+    default: 'default'
+    required: true
   chart:
     description: 'Path to the helm chart (One of `chart` or `yaml-dir` is required).'
     required: false
@@ -24,7 +26,6 @@ inputs:
   cluster-name:
     description: 'Name of the cluster to provision'
     required: false
-    default: ''
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
@@ -104,66 +105,73 @@ outputs:
     description: 'Contains the kubeconfig to connect with the cluster.'
     value: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
 runs:
-  using: "composite"
+  using: composite
   steps:
-  - name: 'Create Release'
-    id: 'create-release'
-    uses: replicatedhq/compatibility-actions/create-release@v1
-    with:
-      app-slug: ${{ inputs.app-slug }}
-      api-token: ${{ inputs.api-token }}
-      yaml-dir: ${{ inputs.yaml-dir }}
-      chart: ${{ inputs.chart }}
-  - name: 'Create Customer'
-    id: 'create-customer'
-    uses: replicatedhq/compatibility-actions/create-customer@v1
-    with:
-      app-slug: ${{ inputs.app-slug }}
-      api-token: ${{ inputs.api-token }}
-      customer-name: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
-      customer-email: ${{ github.ref_name }}@example.com
-      license-type: "test"
-      entitlements: ${{ inputs.customer-entitlements }}
-      channel-slug: ${{ steps.create-release.outputs.channel-slug }}
+  - name: Create Release
+    id: create-release
+    shell: bash
+    run: node ${{ github.action_path }}/create-release.js
+    env:
+      INPUT_APP-SLUG: ${{ inputs.app-slug }}
+      INPUT_API-TOKEN: ${{ inputs.api-token }}
+      INPUT_YAML-DIR: ${{ inputs.yaml-dir }}
+      INPUT_CHART: ${{ inputs.chart }}
+  - name: Create Customer
+    id: create-customer
+    shell: bash
+    run: node ${{ github.action_path }}/create-customer.js
+    env:
+      INPUT_APP-SLUG: ${{ inputs.app-slug }}
+      INPUT_API-TOKEN: ${{ inputs.api-token }}
+      INPUT_CUSTOMER-NAME: ${{ github.ref_name }}-${{ inputs.kubernetes-distribution }}-${{ inputs.kubernetes-version }}
+      INPUT_CUSTOMER-EMAIL: ${{ github.ref_name }}@example.com
+      INPUT_LICENSE-TYPE: "test"
+      INPUT_ENTITLEMENTS: ${{ inputs.customer-entitlements }}
+      INPUT_CHANNEL-SLUG: ${{ steps.create-release.outputs.channel-slug }}
   - name: Create Cluster
     id: create-cluster
-    uses: replicatedhq/compatibility-actions/create-cluster@v1
-    with:
-      api-token: ${{ inputs.api-token }}
-      kubernetes-distribution: ${{ inputs.kubernetes-distribution }}
-      kubernetes-version: ${{ inputs.kubernetes-version }}
-      cluster-name: ${{ inputs.cluster-name || format('{0}-{1}-{2}', github.ref_name, inputs.kubernetes-distribution, inputs.kubernetes-version) }}
-      ttl: ${{ inputs.ttl || '' }}
-      disk: ${{ inputs.disk || '' }}
-      nodes: ${{ inputs.nodes || '' }}
-      min-nodes: ${{ inputs.min-nodes || '' }}
-      max-nodes: ${{ inputs.max-nodes || '' }}
-      instance-type: ${{ inputs.instance-type || '' }}
-      timeout-minutes: ${{ inputs.timeout-minutes || 20 }}
-      node-groups: ${{ inputs.node-groups || '' }}
-      tags: ${{ inputs.tags || '' }}
-      kubeconfig-path: ${{ inputs.kubeconfig-path || '' }}
-      export-kubeconfig: ${{ inputs.export-kubeconfig || false }}
+    shell: bash
+    run: node ${{ github.action_path }}/create-cluster.js
+    env:
+      INPUT_API-TOKEN: "${{ inputs.api-token }}"
+      INPUT_KUBERNETES-DISTRIBUTION: ${{ inputs.kubernetes-distribution }}
+      INPUT_KUBERNETES-VERSION: ${{ inputs.kubernetes-version }}
+      INPUT_CLUSTER-NAME: ${{ inputs.cluster-name || format('{0}-{1}-{2}', github.ref_name, inputs.kubernetes-distribution, inputs.kubernetes-version) }}
+      INPUT_TTL: ${{ inputs.ttl || '' }}
+      INPUT_DISK: ${{ inputs.disk || '' }}
+      INPUT_NODES: ${{ inputs.nodes || '' }}
+      INPUT_MIN-NODES: ${{ inputs.min-nodes || '' }}
+      INPUT_MAX-NODES: ${{ inputs.max-nodes || '' }}
+      INPUT_INSTANCE-TYPE: ${{ inputs.instance-type || '' }}
+      INPUT_TIMEOUT-MINUTES: ${{ inputs.timeout-minutes || 20 }}
+      INPUT_NODE-GROUPS: ${{ inputs.node-groups || '' }}
+      INPUT_TAGS: ${{ inputs.tags || '' }}
+      INPUT_KUBECONFIG-PATH: ${{ inputs.kubeconfig-path || '' }}
+      INPUT_EXPORT-KUBECONFIG: ${{ inputs.export-kubeconfig || false }}
   - name: Deploy the app with Helm
-    uses: replicatedhq/compatibility-actions/helm-install@v1
     if: ${{ inputs.chart != '' }}
-    with:
-      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
-      helm-path: "helm"
-      registry-username: ${{ github.ref_name }}@example.com
-      registry-password: ${{ steps.create-customer.outputs.license-id }}
-      chart: oci://registry.replicated.com/${{ inputs.app-slug }}/release__${{ steps.create-release.outputs.release-sequence }}/${{ inputs.helm-chart-name }}
-      name: ${{ inputs.app-slug }}
-      namespace: 'default'
-      values: ${{ inputs.helm-values }}
-      run-preflights: ${{ inputs.helm-run-preflights }}
+    shell: bash
+    run: node ${{ github.action_path }}/helm-install.js
+    env:
+      INPUT_KUBECONFIG: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+      INPUT_HELM-PATH: "helm"
+      INPUT_REGISTRY-USERNAME: ${{ github.ref_name }}@example.com
+      INPUT_REGISTRY-PASSWORD: ${{ steps.create-customer.outputs.license-id }}
+      INPUT_CHART: oci://registry.replicated.com/${{ inputs.app-slug }}/release__${{ steps.create-release.outputs.release-sequence }}/${{ inputs.helm-chart-name }}
+      INPUT_NAME: ${{ inputs.app-slug }}
+      INPUT_NAMESPACE: ${{ inputs.namespace }}
+      INPUT_VALUES: ${{ inputs.helm-values }}
+      INPUT_RUN-PREFLIGHTS: ${{ inputs.helm-run-preflights }}
   - name: Deploy the app with KOTS
     if: ${{ inputs.yaml-dir != '' }}
-    uses: replicatedhq/compatibility-actions/kots-install@v1 
-    with:
-      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
-      app-slug: ${{ inputs.app-slug }}/test-channel
-      license-file: ${{ steps.create-customer.outputs.license-file }}
-      app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
-      config-values: ${{ inputs.kots-config-values }}
-      wait-duration: ${{ inputs.kots-wait-duration }}
+    shell: bash
+    run: node ${{ github.action_path }}/kots-install.js
+    env:
+      INPUT_KUBECONFIG: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+      INPUT_APP-SLUG: ${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}
+      INPUT_LICENSE-FILE: ${{ steps.create-customer.outputs.license-file }}
+      INPUT_APP-VERSION-LABEL: release__${{ steps.create-release.outputs.release-sequence }}
+      INPUT_CONFIG-VALUES: ${{ inputs.kots-config-values }}
+      INPUT_WAIT-DURATION: ${{ inputs.kots-wait-duration }}
+      INPUT_NAMESPACE: ${{ inputs.namespace }}
+      INPUT_KOTS-VERSION: latest

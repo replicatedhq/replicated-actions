@@ -4,11 +4,9 @@ inputs:
   app-slug:
     description: "App Slug."
     required: true
-    default: ""
   api-token:
     description: "API Token."
     required: true
-    default: ""
   chart:
     description: "Path to the helm chart (One of `chart` or `yaml-dir` is required)."
     required: false
@@ -28,4 +26,4 @@ outputs:
     description: "Sequence number of the release."
 runs:
   using: "node20"
-  main: "dist/index.js"
+  main: "index.js"

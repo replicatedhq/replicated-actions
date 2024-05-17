@@ -8,6 +8,7 @@ graph LR
 prepare_cluster["Prepare Cluster"]
 app_slug["app-slug"]
 api_token["api-token"]
+namespace["namespace"]
 chart["chart"]
 yaml_dir["yaml-dir"]
 kubernetes_distribution["kubernetes-distribution"]
@@ -34,6 +35,7 @@ cluster_id["cluster-id"]
 cluster_kubeconfig["cluster-kubeconfig"]
 app_slug ---> prepare_cluster
 api_token ---> prepare_cluster
+namespace ---> prepare_cluster
 chart ---> prepare_cluster
 yaml_dir ---> prepare_cluster
 kubernetes_distribution ---> prepare_cluster
@@ -64,6 +66,7 @@ prepare_cluster ---> cluster_kubeconfig
 | --- | --- | --- | --- |
 | app-slug |  | True | App Slug. |
 | api-token |  | True | API Token. |
+| namespace | default | True | The namespace to install the application to |
 | chart |  | False | Path to the helm chart (One of `chart` or `yaml-dir` is required). |
 | yaml-dir |  | False | The directory containing multiple yamls for a Replicated release. |
 | kubernetes-distribution |  | True | Kubernetes distribution of the cluster to provision. |

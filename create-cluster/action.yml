@@ -4,7 +4,6 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-    default: ""
   kubernetes-distribution:
     description: "Kubernetes distribution of the cluster to provision."
     required: true
@@ -16,8 +15,7 @@ inputs:
     required: false
   cluster-name:
     description: "Name of the cluster to provision"
-    required: true
-    default: ""
+    required: false
   ttl:
     description: "Cluster TTL (duration, max 48h)"
     required: false
@@ -72,4 +70,4 @@ outputs:
     description: "Contains the kubeconfig to connect with the cluster."
 runs:
   using: "node20"
-  main: "dist/index.js"
+  main: "index.js"

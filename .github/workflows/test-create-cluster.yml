@@ -1,0 +1,44 @@
+name: test - create-cluster
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - create-cluster/**
+
+concurrency:
+  group: test-create-cluster-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-create-cluster
+
+      - name: test create-cluster
+        id: create-cluster
+        uses: ./create-cluster
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          kubernetes-distribution: kind
+          timeout-minutes: 5
+
+      - name: remove cluster
+        if: always()
+        uses: replicatedhq/compatibility-actions/remove-cluster@v1
+        continue-on-error: true # It could be that the cluster is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}

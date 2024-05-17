@@ -4,11 +4,9 @@ inputs:
   app-slug:
     description: "App Slug."
     required: true
-    default: ""
   api-token:
     description: "API Token."
     required: true
-    default: ""
   customer-name:
     description: "Name of the customer."
     required: true
@@ -46,4 +44,4 @@ outputs:
     description: "Contains he license file."
 runs:
   using: "node20"
-  main: "dist/index.js"
+  main: "index.js"
