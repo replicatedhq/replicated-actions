@@ -23,4 +23,4 @@ outputs:
     description: "Contains the hostname of the exposed port."
 runs:
   using: "node16"
-  main: "dist/index.js"
+  main: "index.js"

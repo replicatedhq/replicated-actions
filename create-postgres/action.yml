@@ -33,4 +33,4 @@ outputs:
     description: "Contains the URI of the postgres to connect to."
 runs:
   using: "node16"
-  main: "dist/index.js"
+  main: "index.js"

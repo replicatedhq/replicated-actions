@@ -30,4 +30,4 @@ outputs:
     description: "Contains the namespace of the service account."
 runs:
   using: "node16"
-  main: "dist/index.js"
+  main: "index.js"
