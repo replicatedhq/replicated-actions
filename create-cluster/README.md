@@ -50,7 +50,7 @@ create_cluster ---> cluster_kubeconfig
 | kubernetes-distribution |  | True | Kubernetes distribution of the cluster to provision. |
 | kubernetes-version |  | False | Kubernetes version to provision (format is distribution dependent). |
 | license-id |  | False | License ID to use for the installation (required for Embedded Cluster distribution). |
-| cluster-name |  | True | Name of the cluster to provision |
+| cluster-name |  | False | Name of the cluster to provision |
 | ttl |  | False | Cluster TTL (duration, max 48h) |
 | disk |  | False | Disk size in GiB |
 | nodes |  | False | Number of nodes to provision |
