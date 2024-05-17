@@ -33,7 +33,7 @@ jobs:
         uses: replicatedhq/compatibility-actions/create-cluster@v1
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          kubernetes-distribution: eks
+          kubernetes-distribution: kind
           timeout-minutes: 5
 
       - name: test expose-port
