@@ -31,7 +31,7 @@ package-archive-channel: package-main
 	cp -r dist archive-channel/
 
 .PHONY: package-archive-customer
-package-archive-customer:
+package-archive-customer: package-main
 	rm -rf ./archive-customer/dist
 	cp -r dist archive-customer/
 
