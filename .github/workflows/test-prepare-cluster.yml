@@ -38,8 +38,8 @@ jobs:
         run: |
           helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
 
-      - name: test prepare-cluster
-        id: prepare-cluster
+      - name: test prepare-cluster / helm
+        id: prepare-cluster-helm
         uses: ./prepare-cluster
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
@@ -47,6 +47,15 @@ jobs:
           chart: wordpress-${{ env.WORDPRESS_CHART_VERSION }}.tgz
           helm-chart-name: wordpress
           helm-run-preflights: false
+          kubernetes-distribution: kind
+
+      - name: test prepare-cluster / kots-install
+        id: prepare-cluster-kots-install
+        uses: ./prepare-cluster
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          yaml-dir: ./test/kots-install
           kubernetes-distribution: kind
 
       - name: remove cluster

@@ -33,10 +33,18 @@ jobs:
         run: |
           helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
 
-      - name: test create-release
-        id: create-release
+      - name: test create-release / helm
+        id: create-release-helm
         uses: ./create-release
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
           chart: wordpress-${{ env.WORDPRESS_CHART_VERSION }}.tgz
+
+      - name: test create-release / kots-install
+        id: create-release-kots-install
+        uses: replicatedhq/compatibility-actions/create-release@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          yaml-dir: ./test/kots-install

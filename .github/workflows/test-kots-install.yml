@@ -30,17 +30,13 @@ jobs:
       - name: build
         run: make package-kots-install
 
-      - name: pull helm chart
-        run: |
-          helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
-
       - name: create-release
         id: create-release
         uses: replicatedhq/compatibility-actions/create-release@v1
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: ${{ env.APP_SLUG }}
-          chart: wordpress-${{ env.WORDPRESS_CHART_VERSION }}.tgz
+          yaml-dir: ./test/kots-install
 
       - name: create-customer
         id: create-customer
@@ -59,19 +55,6 @@ jobs:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           kubernetes-distribution: kind
           timeout-minutes: 5
-
-      - name: helm-install
-        id: helm-install
-        uses: replicatedhq/compatibility-actions/helm-install@v1
-        with:
-          kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
-          helm-path: helm
-          registry-username: ${{ github.ref_name }}@example.com
-          registry-password: ${{ steps.create-customer.outputs.license-id }}
-          chart: oci://registry.replicated.com/${{ env.APP_SLUG }}/release__${{ steps.create-release.outputs.release-sequence }}/wordpress
-          name: wordpress
-          namespace: default
-          run-preflights: false
 
       - name: test kots-install
         id: kots-install
