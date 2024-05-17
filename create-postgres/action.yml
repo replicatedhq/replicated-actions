@@ -19,7 +19,7 @@ inputs:
   timeout-minutes:
     description: "Time to wait for the postgres to have a status of `ready`"
     required: false
-    default: "20"
+    default: "10"
 outputs:
   addon-id: # id of the addon
     description: "Contains the id of the addon."

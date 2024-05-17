@@ -37,7 +37,7 @@ create_postgres ---> uri
 | version |  | False | Postgres version to provision. |
 | instance-type |  | False | Instance type to provision |
 | disk |  | False | Disk size in GiB |
-| timeout-minutes | 20 | False | Time to wait for the postgres to have a status of `ready` |
+| timeout-minutes | 10 | False | Time to wait for the postgres to have a status of `ready` |
 
 ## Outputs
 | Name | Description |

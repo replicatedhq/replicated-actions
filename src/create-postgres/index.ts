@@ -12,7 +12,7 @@ export async function actionCreatePostgres() {
     const version = core.getInput("version");
     const instanceType = core.getInput("instance-type");
     const diskGib = +core.getInput("disk");
-    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
+    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 10);
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();

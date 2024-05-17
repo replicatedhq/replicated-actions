@@ -289,7 +289,7 @@ function actionCreateObjectStore() {
             const apiToken = core.getInput("api-token", { required: true });
             const clusterId = core.getInput("cluster-id", { required: true });
             const bucketPrefix = core.getInput("bucket-prefix", { required: true });
-            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 5);
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
@@ -344,7 +344,7 @@ function actionCreatePostgres() {
             const version = core.getInput("version");
             const instanceType = core.getInput("instance-type");
             const diskGib = +core.getInput("disk");
-            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 10);
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
@@ -473,6 +473,7 @@ function actionExposePort() {
             const port = core.getInput("port");
             const protocols = (core.getInput("protocols") || "https").split(",");
             const isWildcard = core.getBooleanInput("wildcard");
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 5);
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
@@ -480,6 +481,11 @@ function actionExposePort() {
                 apiClient.endpoint = apiEndpoint;
             }
             let exposedPort = yield (0, replicated_lib_1.exposeClusterPort)(apiClient, clusterId, Number(port), protocols, isWildcard);
+            if (exposedPort.addon_id) {
+                core.info(`Exposed port ${port} - waiting for it to be ready...`);
+                core.setOutput("addon-id", exposedPort.addon_id);
+                yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
+            }
             core.info(`Exposed Port on ${exposedPort.hostname}`);
             core.setOutput("hostname", exposedPort.hostname);
         }

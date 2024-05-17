@@ -14,7 +14,7 @@ inputs:
   timeout-minutes:
     description: "Time to wait for the object store to have a status of `ready`"
     required: false
-    default: "20"
+    default: "5"
 outputs:
   addon-id: # id of the addon
     description: "Contains the id of the addon."

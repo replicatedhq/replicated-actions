@@ -33,7 +33,7 @@ create_object_store ---> service_account_namespace
 | api-token |  | True | API Token. |
 | cluster-id |  | True | Cluster id to attach object store to |
 | bucket-prefix |  | True | A prefix for the bucket name to be created. |
-| timeout-minutes | 20 | False | Time to wait for the object store to have a status of `ready` |
+| timeout-minutes | 5 | False | Time to wait for the object store to have a status of `ready` |
 
 ## Outputs
 | Name | Description |
