@@ -4,7 +4,6 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-    default: ""
   cluster-id:
     description: "Cluster id to remove."
     required: true

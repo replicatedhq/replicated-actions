@@ -4,11 +4,9 @@ inputs:
   app-slug:
     description: 'App Slug.'
     required: true
-    default: ''
   api-token:
     description: 'API Token.'
     required: true
-    default: ''
   namespace:
     description: 'The namespace to install the application to'
     default: 'default'
@@ -28,7 +26,6 @@ inputs:
   cluster-name:
     description: 'Name of the cluster to provision'
     required: false
-    default: ''
   ttl:
     description: 'Cluster TTL (duration, max 48h)'
     required: false
