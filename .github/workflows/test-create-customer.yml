@@ -29,10 +29,6 @@ jobs:
       - name: build
         run: make package-create-customer
 
-      - name: pull helm chart
-        run: |
-          helm pull oci://registry-1.docker.io/bitnamicharts/wordpress --version ${{ env.WORDPRESS_CHART_VERSION }}
-
       - name: test create-customer
         id: create-customer
         uses: ./create-customer
