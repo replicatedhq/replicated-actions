@@ -43,7 +43,7 @@ jobs:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
           version: "16.3"
-          timeout-minutes: 5
+          timeout-minutes: 10
 
       - name: remove cluster
         if: always()

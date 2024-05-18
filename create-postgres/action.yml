@@ -32,5 +32,5 @@ outputs:
   uri: # URI of the postgres to connect to
     description: "Contains the URI of the postgres to connect to."
 runs:
-  using: "node16"
+  using: "node20"
   main: "index.js"

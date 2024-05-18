@@ -26,5 +26,5 @@ outputs:
   hostname: # hostname of the exposed port
     description: "Contains the hostname of the exposed port."
 runs:
-  using: "node16"
+  using: "node20"
   main: "index.js"
