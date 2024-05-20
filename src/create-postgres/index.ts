@@ -5,15 +5,15 @@ import {
   pollForAddonStatus,
 } from "replicated-lib";
 
-async function run() {
+export async function actionCreatePostgres() {
   try {
-    const apiToken = core.getInput("api-token");
-    const clusterId = core.getInput("cluster-id");
+    const apiToken = core.getInput("api-token", { required: true });
+    const clusterId = core.getInput("cluster-id", { required: true });
     const version = core.getInput("version");
     const instanceType = core.getInput("instance-type");
     const diskGib = +core.getInput("disk");
-    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
-    const apiEndpoint = core.getInput("replicated-api-endpoint");
+    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 10);
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -49,5 +49,3 @@ async function run() {
     core.setFailed(error.message);
   }
 }
-
-run();

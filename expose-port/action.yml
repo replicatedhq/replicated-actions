@@ -4,15 +4,12 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-    default: ""
   cluster-id:
     description: "Cluster id to expose port for"
     required: true
-    default: ""
   port:
     description: "Cluster Port to expose."
     required: true
-    default: ""
   protocols:
     description: "Protocols to expose port for. Default is `https`. Possible values are `http`, `https`, `http,https`."
     required: false
@@ -21,9 +18,13 @@ inputs:
     description: "Create a wildcard DNS entry and TLS certificate for this port (will take extra time to provision)."
     required: false
     default: "false"
+  timeout-minutes:
+    description: "Time to wait for the port to have a status of `ready`"
+    required: false
+    default: "5"
 outputs:
   hostname: # hostname of the exposed port
     description: "Contains the hostname of the exposed port."
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: "node20"
+  main: "index.js"

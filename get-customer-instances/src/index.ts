@@ -10,9 +10,9 @@ interface MatrixInstance {
 
 async function run() {
   try {
-    const appSlug = core.getInput('app-slug');
-    const apiToken = core.getInput('api-token')
-    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    const appSlug = core.getInput("app-slug", { required: true });
+    const apiToken = core.getInput("api-token", { required: true });
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;

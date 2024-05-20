@@ -5,13 +5,13 @@ import {
   pollForAddonStatus,
 } from "replicated-lib";
 
-async function run() {
+export async function actionCreateObjectStore() {
   try {
-    const apiToken = core.getInput("api-token");
-    const clusterId = core.getInput("cluster-id");
-    const bucketPrefix = core.getInput("bucket-prefix");
-    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 20);
-    const apiEndpoint = core.getInput("replicated-api-endpoint");
+    const apiToken = core.getInput("api-token", { required: true });
+    const clusterId = core.getInput("cluster-id", { required: true });
+    const bucketPrefix = core.getInput("bucket-prefix", { required: true });
+    const timeoutMinutes: number = +(core.getInput("timeout-minutes") || 5);
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -57,5 +57,3 @@ async function run() {
     core.setFailed(error.message);
   }
 }
-
-run();

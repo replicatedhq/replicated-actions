@@ -11,6 +11,7 @@ on:
       - create-cluster/**
       - helm-install/**
       - kots-install/**
+      - .github/workflows/test-prepare-cluster.yml
 
 concurrency:
   group: test-prepare-cluster-${{ github.head_ref }}
@@ -81,8 +82,27 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          yaml-dir: ./test/kots-install
+          yaml-dir: ./test/kots-install/yaml
           kubernetes-distribution: kind
+          kots-config-values: |
+            apiVersion: kots.io/v1beta1
+            kind: ConfigValues
+            metadata:
+              name: nginx
+            spec:
+              values:
+                api_token:
+                  value: r8yWQ/cUeLVprKGKZb2gpE5IcQ0Tep1iaNwn7078
+                example_default_value:
+                  default: please change this value
+                  value: testing
+                hidden_text:
+                  value: lPiIJL1RfL4v/YKzHfnx/9HyR2x4t5wnVxSLmzJlmf12HlqlyBoSfnvd0O+mftiT8h0+kumsBqc=
+                readonly_text_left:
+                  value: 8WIAQHZW_G
+                show_text_inputs:
+                  default: "0"
+                  value: "1"
 
       - name: remove cluster
         id: remove-cluster

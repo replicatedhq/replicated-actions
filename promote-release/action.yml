@@ -4,11 +4,9 @@ inputs:
   app-slug:
     description: "App Slug."
     required: true
-    default: ""
   api-token:
     description: "API Token."
     required: true
-    default: ""
   channel-to:
     description: "The slug of the Channel to promote the release sequence to."
     required: true

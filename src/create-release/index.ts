@@ -3,13 +3,13 @@ import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, cr
 
 export async function actionCreateRelease() {
   try {
-    const appSlug = core.getInput('app-slug')
-    const apiToken = core.getInput('api-token')
+    const apiToken = core.getInput("api-token", { required: true });
+    const appSlug = core.getInput("app-slug", { required: true });
     const chart = core.getInput('chart')
     const yamlDir = core.getInput('yaml-dir')
     const promoteChannel = core.getInput('promote-channel')
     const releaseVersion = core.getInput('version')
-    const apiEndpoint = core.getInput('replicated-api-endpoint')
+    const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;

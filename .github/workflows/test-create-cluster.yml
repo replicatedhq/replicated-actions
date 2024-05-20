@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - create-cluster/**
+      - .github/workflows/test-create-cluster.yml
 
 concurrency:
   group: test-create-cluster-${{ github.head_ref }}

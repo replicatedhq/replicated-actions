@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - create-release/**
+      - .github/workflows/test-create-release.yml
 
 concurrency:
   group: test-create-release-${{ github.head_ref }}
@@ -47,4 +48,4 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          yaml-dir: ./test/kots-install
+          yaml-dir: ./test/kots-install/yaml

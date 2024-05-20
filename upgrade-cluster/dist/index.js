@@ -24,13 +24,13 @@ const replicated_lib_1 = __nccwpck_require__(4409);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const apiToken = core.getInput('api-token');
-            const clusterId = core.getInput('cluster-id');
-            const k8sVersion = core.getInput('kubernetes-version');
-            const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
-            const apiEndpoint = core.getInput('replicated-api-endpoint');
-            let kubeconfigPath = core.getInput('kubeconfig-path');
-            const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
+            const apiToken = core.getInput("api-token", { required: true });
+            const clusterId = core.getInput("cluster-id", { required: true });
+            const k8sVersion = core.getInput("kubernetes-version", { required: true });
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            let kubeconfigPath = core.getInput("kubeconfig-path");
+            const exportKubeconfig = core.getBooleanInput("export-kubeconfig");
+            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {

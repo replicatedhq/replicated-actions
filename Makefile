@@ -5,14 +5,15 @@ all: package-all readme-all
 
 .PHONY: package-all
 package-all: package-all-new \
-			 package-archive-channel package-archive-customer package-create-object-store \
-			 package-create-postgres package-expose-port package-promote-release \
+			package-promote-release \
 			 package-get-customer-instances package-report-compatibility-result package-upgrade-cluster
 
 .PHONY: package-all-new
-package-all-new: package-create-customer package-create-release \
+package-all-new: package-archive-channel package-archive-customer \
+				 package-create-customer package-create-release \
 				 package-helm-install package-kots-install \
-				 package-create-cluster package-remove-cluster package-prepare-cluster
+				 package-create-cluster package-remove-cluster package-prepare-cluster \
+				 package-create-object-store package-create-postgres package-expose-port
 
 .PHONY: package-main
 package-main:
@@ -25,14 +26,14 @@ package-prepare-cluster: package-main
 	cp -r dist prepare-cluster/
 
 .PHONY: package-archive-channel
-package-archive-channel:
-	rm -rf ./archive-channel/build ./archive-channel/dist
-	cd ./archive-channel && npm install && npm run build && npm run package
+package-archive-channel: package-main
+	rm -rf ./archive-channel/dist
+	cp -r dist archive-channel/
 
 .PHONY: package-archive-customer
-package-archive-customer:
-	rm -rf ./archive-customer/build ./archive-customer/dist
-	cd ./archive-customer && npm install && npm run build && npm run package
+package-archive-customer: package-main
+	rm -rf ./archive-customer/dist
+	cp -r dist archive-customer/
 
 .PHONY: package-create-cluster
 package-create-cluster: package-main
@@ -40,19 +41,19 @@ package-create-cluster: package-main
 	cp -r dist create-cluster/
 
 .PHONY: package-create-object-store
-package-create-object-store:
-	rm -rf ./create-object-store/build ./create-object-store/dist
-	cd ./create-object-store && npm install && npm run build && npm run package
+package-create-object-store: package-main
+	rm -rf ./create-object-store/dist
+	cp -r dist create-object-store/
 
 .PHONY: package-create-postgres
-package-create-postgres:
-	rm -rf ./create-postgres/build ./create-postgres/dist
-	cd ./create-postgres && npm install && npm run build && npm run package
+package-create-postgres: package-main
+	rm -rf ./create-postgres/dist
+	cp -r dist create-postgres/
 
 .PHONY: package-expose-port
-package-expose-port:
-	rm -rf ./expose-port/build ./expose-port/dist
-	cd ./expose-port && npm install && npm run build && npm run package
+package-expose-port: package-main
+	rm -rf ./expose-port/dist
+	cp -r dist expose-port/
 
 .PHONY: package-create-customer
 package-create-customer: package-main

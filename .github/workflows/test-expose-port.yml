@@ -1,0 +1,56 @@
+name: test - expose-port
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - expose-port/**
+      - .github/workflows/test-expose-port.yml
+
+concurrency:
+  group: test-expose-port-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-expose-port
+
+      - name: create-cluster
+        id: create-cluster
+        uses: replicatedhq/compatibility-actions/create-cluster@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          kubernetes-distribution: kind
+          timeout-minutes: 5
+
+      - name: test expose-port
+        id: expose-port
+        uses: ./expose-port
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
+          port: "30000"
+          protocols: http,https
+          wildcard: "true"
+          timeout-minutes: 5
+
+      - name: remove cluster
+        if: always()
+        uses: replicatedhq/compatibility-actions/remove-cluster@v1
+        continue-on-error: true # It could be that the cluster is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}

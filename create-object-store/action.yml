@@ -4,11 +4,9 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-    default: ""
   cluster-id:
     description: "Cluster id to attach object store to"
     required: true
-    default: ""
   bucket-prefix:
     description: "A prefix for the bucket name to be created."
     required: true
@@ -16,7 +14,7 @@ inputs:
   timeout-minutes:
     description: "Time to wait for the object store to have a status of `ready`"
     required: false
-    default: "20"
+    default: "5"
 outputs:
   addon-id: # id of the addon
     description: "Contains the id of the addon."
@@ -31,5 +29,5 @@ outputs:
   service-account-namespace: # namespace of the service account
     description: "Contains the namespace of the service account."
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: "node20"
+  main: "index.js"
