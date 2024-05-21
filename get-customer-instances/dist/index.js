@@ -30402,6 +30402,8 @@ async function getApplicationDetails(vendorPortalApi, appSlug) {
     const listAppsUri = `${vendorPortalApi.endpoint}/apps`;
     const listAppsRes = await http.get(listAppsUri);
     if (listAppsRes.message.statusCode != 200) {
+        // discard the response body
+        await listAppsRes.readBody();
         throw new Error(`Failed to list apps: Server responded with ${listAppsRes.message.statusCode}`);
     }
     const listAppsBody = JSON.parse(await listAppsRes.readBody());
@@ -30449,6 +30451,8 @@ async function createChannel(vendorPortalApi, appSlug, channelName) {
     const createChannelUri = `${vendorPortalApi.endpoint}/app/${app.id}/channel`;
     const createChannelRes = await http.post(createChannelUri, JSON.stringify(reqBody));
     if (createChannelRes.message.statusCode != 201) {
+        // discard the response body
+        await createChannelRes.readBody();
         throw new Error(`Failed to create channel: Server responded with ${createChannelRes.message.statusCode}`);
     }
     const createChannelBody = JSON.parse(await createChannelRes.readBody());
@@ -30473,6 +30477,8 @@ async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name })
     const listChannelsUri = `${vendorPortalApi.endpoint}/app/${appid}/channels?excludeDetail=true`;
     const listChannelsRes = await http.get(listChannelsUri);
     if (listChannelsRes.message.statusCode != 200) {
+        // discard the response body
+        await listChannelsRes.readBody();
         throw new Error(`Failed to list channels: Server responded with ${listChannelsRes.message.statusCode}`);
     }
     const listChannelsBody = JSON.parse(await listChannelsRes.readBody());
@@ -30490,6 +30496,8 @@ async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
     const archiveChannelUri = `${vendorPortalApi.endpoint}/app/${app.id}/channel/${channel.id}`;
     const archiveChannelRes = await http.del(archiveChannelUri);
     if (archiveChannelRes.message.statusCode != 200) {
+        // discard the response body
+        await archiveChannelRes.readBody();
         throw new Error(`Failed to archive channel: Server responded with ${archiveChannelRes.message.statusCode}`);
     }
     // discard the response body
@@ -30546,11 +30554,11 @@ class StatusError extends Error {
     }
 }
 exports.StatusError = StatusError;
-async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
-    return await createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, "", clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags);
+async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily) {
+    return await createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, "", clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily);
 }
 exports.createCluster = createCluster;
-async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, licenseId, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags) {
+async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, licenseId, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         name: clusterName,
@@ -30581,6 +30589,9 @@ async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistrib
     }
     if (tags) {
         reqBody["tags"] = tags;
+    }
+    if (ipFamily) {
+        reqBody["ip_family"] = ipFamily;
     }
     const uri = `${vendorPortalApi.endpoint}/cluster`;
     const res = await http.post(uri, JSON.stringify(reqBody));
@@ -30646,6 +30657,8 @@ async function getClusterDetails(vendorPortalApi, clusterId) {
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
         throw new StatusError(`Failed to get cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
     const body = JSON.parse(await res.readBody());
@@ -30660,6 +30673,8 @@ async function getKubeconfig(vendorPortalApi, clusterId) {
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/kubeconfig`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
         throw new StatusError(`Failed to get kubeconfig: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
     const body = JSON.parse(await res.readBody());
@@ -30670,11 +30685,11 @@ async function removeCluster(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
     const res = await http.del(uri);
+    // discard the response body
+    await res.readBody();
     if (res.message.statusCode != 200) {
         throw new StatusError(`Failed to remove cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
-    // discard the response body
-    await res.readBody();
 }
 exports.removeCluster = removeCluster;
 async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
@@ -30684,12 +30699,10 @@ async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     };
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/upgrade`;
     const res = await http.post(uri, JSON.stringify(reqBody));
+    // discard the response body
+    await res.readBody();
     if (res.message.statusCode != 200) {
         throw new StatusError(`Failed to upgrade cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
-    }
-    else {
-        // discard the response body
-        await res.readBody();
     }
     return getClusterDetails(vendorPortalApi, clusterId);
 }
@@ -30699,6 +30712,8 @@ async function getClusterVersions(vendorPortalApi) {
     const uri = `${vendorPortalApi.endpoint}/cluster/versions`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
         throw new StatusError(`Failed to get cluster versions: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
     const body = JSON.parse(await res.readBody());
@@ -30827,6 +30842,8 @@ async function getAddonDetails(vendorPortalApi, clusterId, addonId) {
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
         throw new StatusError(`Failed to get add-on: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
     const body = JSON.parse(await res.readBody());
@@ -31010,6 +31027,8 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         const downloadLicenseRes = await http.get(downloadLicenseUri);
         // If response is 403, ignore as we could be using a trial license (on builders plan)
         if (downloadLicenseRes.message.statusCode != 200 && downloadLicenseRes.message.statusCode != 403) {
+            // discard the response body
+            await downloadLicenseRes.readBody();
             throw new Error(`Failed to download created license: Server responded with ${downloadLicenseRes.message.statusCode}`);
         }
         let downloadLicenseBody = "";
@@ -31034,11 +31053,11 @@ async function archiveCustomer(vendorPortalApi, customerId) {
     console.log(`Archive Customer ...`);
     const archiveCustomerUri = `${vendorPortalApi.endpoint}/customer/${customerId}/archive`;
     const archiveCustomerRes = await http.post(archiveCustomerUri, undefined);
+    // discard the response body
+    await archiveCustomerRes.readBody();
     if (archiveCustomerRes.message.statusCode != 204) {
         throw new Error(`Failed to archive customer: Server responded with ${archiveCustomerRes.message.statusCode}`);
     }
-    // discard the response body
-    await archiveCustomerRes.readBody();
 }
 exports.archiveCustomer = archiveCustomer;
 async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
@@ -31049,6 +31068,8 @@ async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     const getClusterUsageUri = `${vendorPortalApi.endpoint}/app/${app.id}/cluster-usage`;
     const getClusterUsageRes = await http.get(getClusterUsageUri);
     if (getClusterUsageRes.message.statusCode != 200) {
+        // discard the response body
+        await getClusterUsageRes.readBody();
         throw new Error(`Failed to get Cluster Usage: Server responded with ${getClusterUsageRes.message.statusCode}`);
     }
     const getClusterUsageBody = JSON.parse(await getClusterUsageRes.readBody());
@@ -31154,6 +31175,8 @@ async function createRelease(vendorPortalApi, appSlug, yamlDir) {
     const createReleaseUri = `${vendorPortalApi.endpoint}/app/${app.id}/release`;
     const createReleaseRes = await http.post(createReleaseUri, JSON.stringify(reqBody));
     if (createReleaseRes.message.statusCode != 201) {
+        // discard the response body
+        await createReleaseRes.readBody();
         throw new Error(`Failed to create release: Server responded with ${createReleaseRes.message.statusCode}`);
     }
     const createReleaseBody = JSON.parse(await createReleaseRes.readBody());
@@ -31182,6 +31205,8 @@ async function createReleaseFromChart(vendorPortalApi, appSlug, chart) {
     const createReleaseUri = `${vendorPortalApi.endpoint}/app/${app.id}/release`;
     const createReleaseRes = await http.post(createReleaseUri, JSON.stringify(reqBody));
     if (createReleaseRes.message.statusCode != 201) {
+        // discard the response body
+        await createReleaseRes.readBody();
         throw new Error(`Failed to create release: Server responded with ${createReleaseRes.message.statusCode}`);
     }
     const createReleaseBody = JSON.parse(await createReleaseRes.readBody());
@@ -31299,7 +31324,6 @@ async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseS
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}/promote`;
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 200) {
-        // If res has a body, read it and add it to the error message
         let body = "";
         try {
             body = await res.readBody();
@@ -31357,6 +31381,8 @@ async function getReleaseByAppId(vendorPortalApi, appId, releaseSequence) {
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}`;
     const res = await http.get(uri);
     if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
         throw new Error(`Failed to get release: Server responded with ${res.message.statusCode}`);
     }
     const body = JSON.parse(await res.readBody());
@@ -31365,7 +31391,7 @@ async function getReleaseByAppId(vendorPortalApi, appId, releaseSequence) {
 async function reportCompatibilityResult(vendorPortalApi, appSlug, releaseSequence, compatibilityResult) {
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
-    // 2. promote the release
+    // 2. report the compatibility result
     await reportCompatibilityResultByAppId(vendorPortalApi, app.id, releaseSequence, compatibilityResult);
 }
 exports.reportCompatibilityResult = reportCompatibilityResult;
@@ -31388,7 +31414,6 @@ async function reportCompatibilityResultByAppId(vendorPortalApi, appId, releaseS
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}/compatibility`;
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 201) {
-        // If res has a body, read it and add it to the error message
         let body = "";
         try {
             body = await res.readBody();

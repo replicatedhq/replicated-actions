@@ -22,6 +22,7 @@ export async function actionCreateCluster() {
     const timeoutMinutes: number = +(core.getInput('timeout-minutes') || 20);
     const nodeGroups = core.getInput('node-groups');
     const tags = core.getInput('tags');
+    const ipFamily = core.getInput('ip-family');
     let kubeconfigPath = core.getInput('kubeconfig-path');
     const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
@@ -39,7 +40,7 @@ export async function actionCreateCluster() {
     let cluster = await createClusterWithLicense(
         apiClient, name, k8sDistribution, k8sVersion, licenseId,
         k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount,
-        instanceType, nodeGroupsArray, tagsArray,
+        instanceType, nodeGroupsArray, tagsArray, ipFamily
     );
     core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
     core.setOutput('cluster-id', cluster.id);
