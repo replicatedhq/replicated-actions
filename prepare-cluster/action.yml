@@ -152,7 +152,7 @@ runs:
       INPUT_TIMEOUT-MINUTES: ${{ inputs.timeout-minutes || 20 }}
       INPUT_NODE-GROUPS: ${{ inputs.node-groups || '' }}
       INPUT_TAGS: ${{ inputs.tags || '' }}
-      INPUT_LICENSE-ID: ${{ input.license-id || '' }}
+      INPUT_LICENSE-ID: ${{ inputs.license-id || '' }}
       INPUT_IP-FAMILY: ${{ inputs.ip-family || '' }}
       INPUT_KUBECONFIG-PATH: ${{ inputs.kubeconfig-path || '' }}
       INPUT_EXPORT-KUBECONFIG: ${{ inputs.export-kubeconfig || false }}
