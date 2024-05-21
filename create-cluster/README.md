@@ -20,6 +20,7 @@ instance_type["instance-type"]
 timeout_minutes["timeout-minutes"]
 node_groups["node-groups"]
 tags["tags"]
+ip_family["ip-family"]
 kubeconfig_path["kubeconfig-path"]
 export_kubeconfig["export-kubeconfig"]
 cluster_id["cluster-id"]
@@ -38,6 +39,7 @@ instance_type ---> create_cluster
 timeout_minutes ---> create_cluster
 node_groups ---> create_cluster
 tags ---> create_cluster
+ip_family ---> create_cluster
 kubeconfig_path ---> create_cluster
 export_kubeconfig ---> create_cluster
 create_cluster ---> cluster_id
@@ -60,6 +62,7 @@ create_cluster ---> cluster_kubeconfig
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
 | node-groups |  | False | Node groups to provision.<br>Example:<br><pre>node-groups: \|<br>  - name: "worker"<br>    instance-type: "t3.medium"<br>    disk: 100<br>    nodes: 3</pre><br> |
 | tags |  | False | Tags to assign to the cluster.<br>Example:<br><pre>tags: \|<br>  - key: "department"<br>    value: "engineering"</pre><br> |
+| ip-family |  | False | IP Family to use for the cluster (ipv4|ipv6|dual) |
 | kubeconfig-path |  | False | If specified, the kubeconfig will be written to this path |
 | export-kubeconfig | false | False | Export the KUBECONFIG variable (true/false) |
 
