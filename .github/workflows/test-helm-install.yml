@@ -61,8 +61,8 @@ jobs:
           kubernetes-distribution: kind
           timeout-minutes: 5
 
-      - name: test helm-install
-        id: helm-install
+      - name: test helm-install / registry login
+        id: helm-install-registry-login
         uses: ./helm-install
         with:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
@@ -71,7 +71,19 @@ jobs:
           registry-password: ${{ steps.create-customer.outputs.license-id }}
           chart: oci://registry.replicated.com/${{ env.APP_SLUG }}/release__${{ steps.create-release.outputs.release-sequence }}/wordpress
           name: wordpress
-          namespace: default
+          namespace: registry-login
+          run-preflights: false
+
+      - name: test helm-install / no registry login
+        id: helm-install-no-registry-login
+        uses: ./helm-install
+        with:
+          kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+          helm-path: helm
+          chart: oci://registry-1.docker.io/bitnamicharts/wordpress
+          version: ${{ env.WORDPRESS_CHART_VERSION }}
+          name: wordpress
+          namespace: no-registry-login
           run-preflights: false
 
       - name: remove cluster

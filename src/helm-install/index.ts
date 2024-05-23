@@ -8,8 +8,8 @@ export async function actionHelmInstall() {
   const helmPath: string = core.getInput("helm-path", { required: true });
   const kubeconfig: string = core.getInput("kubeconfig", { required: true });
   const namespace: string = core.getInput("namespace", { required: true }) || "default";
-  const registryUsername: string = core.getInput("registry-username", { required: true });
-  const registryPassword: string = core.getInput("registry-password", { required: true });
+  const registryUsername: string = core.getInput("registry-username");
+  const registryPassword: string = core.getInput("registry-password");
   const runPreflights: boolean = core.getBooleanInput("run-preflights");
   const values: string = core.getInput("values");
   const repoName: string = core.getInput("repo-name");

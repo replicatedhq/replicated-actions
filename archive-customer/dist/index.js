@@ -658,8 +658,8 @@ function actionHelmInstall() {
         const helmPath = core.getInput("helm-path", { required: true });
         const kubeconfig = core.getInput("kubeconfig", { required: true });
         const namespace = core.getInput("namespace", { required: true }) || "default";
-        const registryUsername = core.getInput("registry-username", { required: true });
-        const registryPassword = core.getInput("registry-password", { required: true });
+        const registryUsername = core.getInput("registry-username");
+        const registryPassword = core.getInput("registry-password");
         const runPreflights = core.getBooleanInput("run-preflights");
         const values = core.getInput("values");
         const repoName = core.getInput("repo-name");
