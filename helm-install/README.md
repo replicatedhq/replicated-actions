@@ -36,8 +36,8 @@ run_preflights ---> install_a_helm_chart_to_a_cluster
 | --- | --- | --- | --- |
 | helm-path |  | True | The path to the helm binary to use |
 | kubeconfig |  | True | A valid kubeconfig to connect to |
-| registry-username |  | True | The registry username to log in with |
-| registry-password |  | True | The registry password to use |
+| registry-username |  | False | The registry username to log in with |
+| registry-password |  | False | The registry password to use |
 | repo-name |  | False | The repo name to use (when not installing from local or oci) |
 | repo-url |  | False | The repo url to use (when not installing from local or oci) |
 | chart |  | True | The chart to use |

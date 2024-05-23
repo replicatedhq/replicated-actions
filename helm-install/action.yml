@@ -9,10 +9,10 @@ inputs:
     required: true
   registry-username:
     description: "The registry username to log in with"
-    required: true
+    required: false
   registry-password:
     description: "The registry password to use"
-    required: true
+    required: false
   repo-name:
     description: "The repo name to use (when not installing from local or oci)"
     required: false
