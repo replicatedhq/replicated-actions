@@ -37,7 +37,7 @@ jobs:
 
       - name: create-release
         id: create-release
-        uses: replicatedhq/compatibility-actions/create-release@v1
+        uses: replicatedhq/replicated-actions/create-release@v1
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: ${{ env.APP_SLUG }}
@@ -45,7 +45,7 @@ jobs:
 
       - name: create-customer
         id: create-customer
-        uses: replicatedhq/compatibility-actions/create-customer@v1
+        uses: replicatedhq/replicated-actions/create-customer@v1
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
@@ -55,7 +55,7 @@ jobs:
 
       - name: create-cluster
         id: create-cluster
-        uses: replicatedhq/compatibility-actions/create-cluster@v1
+        uses: replicatedhq/replicated-actions/create-cluster@v1
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           kubernetes-distribution: kind
@@ -89,7 +89,7 @@ jobs:
       - name: remove cluster
         id: remove-cluster
         if: always()
-        uses: replicatedhq/compatibility-actions/remove-cluster@v1
+        uses: replicatedhq/replicated-actions/remove-cluster@v1
         continue-on-error: true # It could be that the cluster is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
