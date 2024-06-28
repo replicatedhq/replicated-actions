@@ -49,7 +49,7 @@ jobs:
 
       - name: archive-customer
         if: always()
-        uses: replicatedhq/compatibility-actions/archive-customer@v1
+        uses: replicatedhq/replicated-actions/archive-customer@v1
         continue-on-error: true # It could be that the customer is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}

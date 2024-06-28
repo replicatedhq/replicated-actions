@@ -32,7 +32,7 @@ jobs:
 
       - name: create-release
         id: create-release
-        uses: replicatedhq/compatibility-actions/create-release@v1
+        uses: replicatedhq/replicated-actions/create-release@v1
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
@@ -49,7 +49,7 @@ jobs:
 
       - name: archive-channel
         if: always()
-        uses: replicatedhq/compatibility-actions/archive-channel@v1
+        uses: replicatedhq/replicated-actions/archive-channel@v1
         continue-on-error: true # It could be that the channel is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
