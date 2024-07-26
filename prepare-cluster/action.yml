@@ -103,6 +103,19 @@ inputs:
         - name: "number-of-users"
           value: "10"</pre>
     required: false
+  helm-extra-repos:
+    description: |
+      Extra helm repos to add.
+      Example:
+      <pre>helm-extra-repos: \|
+        - repo_name: "cnpg"
+          url: "https://cloudnative-pg.github.io/charts"
+          namespace: "cnpg-system"
+          chart_name: "cloudnative-pg"
+        - repo_name: "minio-operator"
+          url: "https://operator.min.io"
+          namespace: "minio-operator"
+          chart_name: "operator"</pre>
 outputs:
   cluster-id: # id of the cluster
     description: 'Contains the cluster id.'
@@ -156,6 +169,27 @@ runs:
       INPUT_IP-FAMILY: ${{ inputs.ip-family || '' }}
       INPUT_KUBECONFIG-PATH: ${{ inputs.kubeconfig-path || '' }}
       INPUT_EXPORT-KUBECONFIG: ${{ inputs.export-kubeconfig || false }}
+  - uses: azure/k8s-set-context@v4
+    with:
+      method: kubeconfig
+      kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
+  - name: helm add extra helm-repos
+    if: ${{ inputs.helm-extra-repos != '' }}
+    shell: bash
+    run: |
+      repos='${{ inputs.helm-extra-repos }}'
+      echo "$repos" | yq -o=json | jq -c '.[]' | while read repo; do
+        name=$(echo $repo | jq -r '.repo_name')
+        url=$(echo $repo | jq -r '.url')
+        namespace=$(echo $repo | jq -r '.namespace')
+        chart=$(echo $repo | jq -r '.chart_name')
+        echo "Adding repository $name with URL $url"
+        helm repo add $name $url
+        helm upgrade --install $name \
+          --namespace $namespace \
+          --create-namespace \
+          $name/$chart
+      done 
   - name: Deploy the app with Helm
     if: ${{ inputs.chart != '' }}
     shell: bash

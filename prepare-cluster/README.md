@@ -95,6 +95,7 @@ prepare_cluster ---> cluster_kubeconfig
 | kots-config-values |  | False | The KOTS config values to use |
 | kots-wait-duration |  | False | Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m") |
 | customer-entitlements |  | False | Entitlements to assign to the customer.<br>Example:<br><pre>customer-entitlements: \|<br>  - name: "number-of-users"<br>    value: "10"</pre><br> |
+| helm-extra-repos |  | False | Extra helm repos to add.<br>Example:<br><pre>helm-extra-repos: \|<br>  - repo_name: "cnpg"<br>    url: "https://cloudnative-pg.github.io/charts"<br>    namespace: "cnpg-system"<br>    chart_name: "cloudnative-pg"<br>  - repo_name: "minio-operator"<br>    url: "https://operator.min.io"<br>    namespace: "minio-operator"<br>    chart_name: "operator"</pre><br> |
 
 ## Outputs
 | Name | Description |
