@@ -170,6 +170,7 @@ runs:
       INPUT_KUBECONFIG-PATH: ${{ inputs.kubeconfig-path || '' }}
       INPUT_EXPORT-KUBECONFIG: ${{ inputs.export-kubeconfig || false }}
   - uses: azure/k8s-set-context@v4
+    if: ${{ inputs.helm-extra-repos != '' }}
     with:
       method: kubeconfig
       kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
