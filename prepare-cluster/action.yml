@@ -92,6 +92,10 @@ inputs:
   kots-config-values:
     description: 'The KOTS config values to use'
     required: false
+  kots-version:
+    description: 'The version of KOTS to use'
+    required: false
+    default: 'v1.112.4'
   kots-wait-duration:
     description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
     required: false
@@ -217,4 +221,4 @@ runs:
       INPUT_CONFIG-VALUES: ${{ inputs.kots-config-values }}
       INPUT_WAIT-DURATION: ${{ inputs.kots-wait-duration }}
       INPUT_NAMESPACE: ${{ inputs.namespace }}
-      INPUT_KOTS-VERSION: latest
+      INPUT_KOTS-VERSION: ${{ inputs.kots-version }}
