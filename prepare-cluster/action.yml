@@ -95,7 +95,7 @@ inputs:
   kots-version:
     description: 'The version of KOTS to use'
     required: false
-    default: 'v1.112.4'
+    default: 'latest'
   kots-wait-duration:
     description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
     required: false
@@ -215,7 +215,7 @@ runs:
     run: node ${{ github.action_path }}/kots-install.js
     env:
       INPUT_KUBECONFIG: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
-      INPUT_APP-SLUG: ${{ inputs.app-slug }}/${{ steps.create-release.outputs.channel-slug }}
+      INPUT_APP-SLUG: ${{ inputs.app-slug }}/test-channel
       INPUT_LICENSE-FILE: ${{ steps.create-customer.outputs.license-file }}
       INPUT_APP-VERSION-LABEL: release__${{ steps.create-release.outputs.release-sequence }}
       INPUT_CONFIG-VALUES: ${{ inputs.kots-config-values }}
