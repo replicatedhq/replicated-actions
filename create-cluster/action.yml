@@ -32,7 +32,7 @@ inputs:
     description: "Maximum number of nodes to provision"
     required: false
   instance-type:
-    description: "Instance type to provision"
+    description: "Instance type to provision (ignored if you specify node-groups)"
     required: false
   timeout-minutes:
     description: "Time to wait for the cluster to have a status of `running`"
