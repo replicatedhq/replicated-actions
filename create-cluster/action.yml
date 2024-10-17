@@ -57,7 +57,7 @@ inputs:
           value: "engineering"</pre>
     required: false
   ip-family:
-    description: "IP Family to use for the cluster (ipv4, ipv6 or dual)"
+    description: "IP Family to use for the cluster (ipv4 or dual (kind clusters only))"
     required: false
   kubeconfig-path:
     description: "If specified, the kubeconfig will be written to this path"
