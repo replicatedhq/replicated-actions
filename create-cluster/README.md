@@ -58,7 +58,7 @@ create_cluster ---> cluster_kubeconfig
 | nodes |  | False | Number of nodes to provision |
 | min-nodes |  | False | Minimum number of nodes to provision |
 | max-nodes |  | False | Maximum number of nodes to provision |
-| instance-type |  | False | Instance type to provision |
+| instance-type |  | False | Instance type to provision (ignored if you specify node-groups) |
 | timeout-minutes | 20 | False | Time to wait for the cluster to have a status of `running` |
 | node-groups |  | False | Node groups to provision.<br>Example:<br><pre>node-groups: \|<br>  - name: "worker"<br>    instance-type: "t3.medium"<br>    disk: 100<br>    nodes: 3</pre><br> |
 | tags |  | False | Tags to assign to the cluster.<br>Example:<br><pre>tags: \|<br>  - key: "department"<br>    value: "engineering"</pre><br> |
