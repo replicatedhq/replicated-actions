@@ -13,7 +13,7 @@ package-all-new: package-archive-channel package-archive-customer \
 				 package-create-customer package-create-release \
 				 package-helm-install package-kots-install \
 				 package-create-cluster package-remove-cluster package-prepare-cluster \
-				 package-create-object-store package-create-postgres package-expose-port
+				 package-create-object-store package-expose-port
 
 .PHONY: package-main
 package-main:
@@ -44,11 +44,6 @@ package-create-cluster: package-main
 package-create-object-store: package-main
 	rm -rf ./create-object-store/dist
 	cp -r dist create-object-store/
-
-.PHONY: package-create-postgres
-package-create-postgres: package-main
-	rm -rf ./create-postgres/dist
-	cp -r dist create-postgres/
 
 .PHONY: package-expose-port
 package-expose-port: package-main
@@ -102,7 +97,7 @@ package-upgrade-cluster:
 
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
-			 readme-create-postgres readme-expose-port readme-create-customer readme-create-release readme-helm-install \
+			 readme-expose-port readme-create-customer readme-create-release readme-helm-install \
 			 readme-kots-install readme-promote-release readme-remove-cluster readme-prepare-cluster \
 			 readme-get-customer-instances readme-report-compatibility-result \
 			 readme-upgrade-cluster
@@ -126,10 +121,6 @@ readme-create-cluster: pip-install
 .PHONY: readme-create-object-store
 readme-create-object-store: pip-install
 	python docs/generate-readme/action-to-mermaid.py ./create-object-store/action.yml > ./create-object-store/README.md
-
-.PHONY: readme-create-postgres
-readme-create-postgres: pip-install
-	python docs/generate-readme/action-to-mermaid.py ./create-postgres/action.yml > ./create-postgres/README.md
 
 .PHONY: readme-expose-port
 readme-expose-port: pip-install

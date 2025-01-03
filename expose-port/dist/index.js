@@ -323,60 +323,6 @@ exports.actionCreateObjectStore = actionCreateObjectStore;
 
 /***/ }),
 
-/***/ 78822:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.actionCreatePostgres = void 0;
-const core = __nccwpck_require__(42186);
-const replicated_lib_1 = __nccwpck_require__(34409);
-function actionCreatePostgres() {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d;
-        try {
-            const apiToken = core.getInput("api-token", { required: true });
-            const clusterId = core.getInput("cluster-id", { required: true });
-            const version = core.getInput("version");
-            const instanceType = core.getInput("instance-type");
-            const diskGib = +core.getInput("disk");
-            const timeoutMinutes = +(core.getInput("timeout-minutes") || 10);
-            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-            const apiClient = new replicated_lib_1.VendorPortalApi();
-            apiClient.apiToken = apiToken;
-            if (apiEndpoint) {
-                apiClient.endpoint = apiEndpoint;
-            }
-            let addon = yield (0, replicated_lib_1.createAddonPostgres)(apiClient, clusterId, version, instanceType, diskGib);
-            core.info(`Created Postgres ${addon.id} - waiting for it to be ready...`);
-            core.setOutput("addon-id", addon.id);
-            addon = yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
-            core.info(`Addon ${addon.id} is ready!`);
-            core.setOutput("version", (_a = addon.postgres) === null || _a === void 0 ? void 0 : _a.version);
-            core.setOutput("instance-type", (_b = addon.postgres) === null || _b === void 0 ? void 0 : _b.instance_type);
-            core.setOutput("disk", (_c = addon.postgres) === null || _c === void 0 ? void 0 : _c.disk_gib);
-            core.setOutput("uri", (_d = addon.postgres) === null || _d === void 0 ? void 0 : _d.uri);
-        }
-        catch (error) {
-            core.setFailed(error.message);
-        }
-    });
-}
-exports.actionCreatePostgres = actionCreatePostgres;
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
 /***/ 53440:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -70084,7 +70030,6 @@ const archive_customer_1 = __nccwpck_require__(58727);
 const create_cluster_1 = __nccwpck_require__(4468);
 const create_customer_1 = __nccwpck_require__(41055);
 const create_object_store_1 = __nccwpck_require__(79878);
-const create_postgres_1 = __nccwpck_require__(78822);
 const create_release_1 = __nccwpck_require__(53440);
 const expose_port_1 = __nccwpck_require__(20308);
 const helm_install_1 = __nccwpck_require__(42185);
@@ -70095,7 +70040,6 @@ exports.actionArchiveCustomer = archive_customer_1.actionArchiveCustomer;
 exports.actionCreateCluster = create_cluster_1.actionCreateCluster;
 exports.actionCreateCustomer = create_customer_1.actionCreateCustomer;
 exports.actionCreateObjectStore = create_object_store_1.actionCreateObjectStore;
-exports.actionCreatePostgres = create_postgres_1.actionCreatePostgres;
 exports.actionCreateRelease = create_release_1.actionCreateRelease;
 exports.actionExposePort = expose_port_1.actionExposePort;
 exports.actionHelmInstall = helm_install_1.actionHelmInstall;
