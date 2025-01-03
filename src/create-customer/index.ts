@@ -22,6 +22,12 @@ export async function actionCreateCustomer() {
       isKotsInstallEnabled =
         core.getInput("is-kots-install-enabled") === "true";
     }
+
+    let isDevModeEnabled: boolean | undefined = undefined;
+    if (core.getInput("is-dev-mode-enabled") !== "") {
+      isDevModeEnabled =
+        core.getInput("is-dev-mode-enabled") === "true";
+    }
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -31,7 +37,7 @@ export async function actionCreateCustomer() {
     }
 
     const entitlementsArray = processEntitlements(entitlements)
-    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled);
+    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled, isDevModeEnabled);
 
     core.setOutput('customer-id', customer.customerId);
     core.setOutput('license-id', customer.licenseId);

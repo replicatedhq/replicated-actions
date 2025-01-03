@@ -37,6 +37,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: ${{ env.APP_SLUG }}
+          promote-channel: test-channel
           yaml-dir: ./test/kots-install/yaml
 
       - name: create-customer
@@ -48,6 +49,7 @@ jobs:
           customer-name: "CI Test Customer - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: ${{ github.sha }}@example.com
           license-type: test
+          channel-slug: ${{ steps.create-release.outputs.channel-slug }}
 
       - name: create-cluster
         id: create-cluster

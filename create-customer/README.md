@@ -15,6 +15,7 @@ channel_slug["channel-slug"]
 expires_in["expires-in"]
 entitlements["entitlements"]
 is_kots_install_enabled["is-kots-install-enabled"]
+is_dev_mode_enabled["is-dev-mode-enabled"]
 customer_id["customer-id"]
 license_id["license-id"]
 license_file["license-file"]
@@ -27,6 +28,7 @@ channel_slug ---> create_customer
 expires_in ---> create_customer
 entitlements ---> create_customer
 is_kots_install_enabled ---> create_customer
+is_dev_mode_enabled ---> create_customer
 create_customer ---> customer_id
 create_customer ---> license_id
 create_customer ---> license_file
@@ -43,6 +45,7 @@ create_customer ---> license_file
 | expires-in | 0 | False | Expiration of the license in days. (default: 0 - never expires)) |
 | entitlements |  | False | Entitlements to assign to the customer.<br>Example:<br><pre>entitlements: \|<br>  - name: "number-of-users"<br>    value: "10"</pre><br> |
 | is-kots-install-enabled |  | False | If KOTS install should be enabled for the customer. |
+| is-dev-mode-enabled |  | False | If Dev Mode should be enabled for the customer. Can only be enabled for dev licenses. |
 
 ## Outputs
 | Name | Description |
