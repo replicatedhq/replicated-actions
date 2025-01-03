@@ -30948,7 +30948,7 @@ exports.Customer = Customer;
 class KubernetesDistribution {
 }
 exports.KubernetesDistribution = KubernetesDistribution;
-async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled) {
+async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled, isDevModeEnabled) {
     try {
         const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
         console.log("Creating customer on appId " + app.id);
@@ -30976,6 +30976,9 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         }
         if (entitlementValues) {
             createCustomerReqBody["entitlementValues"] = entitlementValues;
+        }
+        if (isDevModeEnabled !== undefined) {
+            createCustomerReqBody["is_dev_mode_enabled"] = isDevModeEnabled;
         }
         const createCustomerRes = await http.post(createCustomerUri, JSON.stringify(createCustomerReqBody));
         if (createCustomerRes.message.statusCode != 201) {
