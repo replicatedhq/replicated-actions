@@ -30492,7 +30492,7 @@ async function findChannelDetailsInOutput(channels, { slug, name }) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonPostgres = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
+exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -30728,43 +30728,6 @@ async function createAddonObjectStore(vendorPortalApi, clusterId, bucketName) {
     return addon;
 }
 exports.createAddonObjectStore = createAddonObjectStore;
-async function createAddonPostgres(vendorPortalApi, clusterId, version, instanceType, diskGib) {
-    const http = await vendorPortalApi.client();
-    const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons/postgres`;
-    const reqBody = {};
-    if (version) {
-        reqBody["version"] = version;
-    }
-    if (instanceType) {
-        reqBody["instance_type"] = instanceType;
-    }
-    if (diskGib) {
-        reqBody["disk_gib"] = diskGib;
-    }
-    const res = await http.post(uri, JSON.stringify(reqBody));
-    if (res.message.statusCode != 201) {
-        let body = "";
-        try {
-            body = await res.readBody();
-        }
-        catch (err) {
-            // ignore
-        }
-        throw new Error(`Failed to queue add-on create: Server responded with ${res.message.statusCode}: ${body}`);
-    }
-    const body = JSON.parse(await res.readBody());
-    var addon = { id: body.addon.id, status: body.addon.status };
-    if (body.addon.postgres) {
-        addon.postgres = {
-            uri: body.addon.postgres.uri,
-            version: body.addon.postgres.version,
-            instance_type: body.addon.postgres.instance_type,
-            disk_gib: body.addon.postgres.disk_gib
-        };
-    }
-    return addon;
-}
-exports.createAddonPostgres = createAddonPostgres;
 async function pollForAddonStatus(vendorPortalApi, clusterId, addonId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
     // get add-ons from the api, look for the status of the id to be ${status}
     // if it's not ${status}, sleep for 5 seconds and try again
@@ -31073,7 +31036,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonPostgres = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(4995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(3770);
@@ -31093,7 +31056,6 @@ Object.defineProperty(exports, "removeCluster", ({ enumerable: true, get: functi
 Object.defineProperty(exports, "upgradeCluster", ({ enumerable: true, get: function () { return clusters_1.upgradeCluster; } }));
 Object.defineProperty(exports, "getClusterVersions", ({ enumerable: true, get: function () { return clusters_1.getClusterVersions; } }));
 Object.defineProperty(exports, "createAddonObjectStore", ({ enumerable: true, get: function () { return clusters_1.createAddonObjectStore; } }));
-Object.defineProperty(exports, "createAddonPostgres", ({ enumerable: true, get: function () { return clusters_1.createAddonPostgres; } }));
 Object.defineProperty(exports, "pollForAddonStatus", ({ enumerable: true, get: function () { return clusters_1.pollForAddonStatus; } }));
 Object.defineProperty(exports, "exposeClusterPort", ({ enumerable: true, get: function () { return clusters_1.exposeClusterPort; } }));
 var customers_1 = __nccwpck_require__(8958);
@@ -31278,19 +31240,22 @@ function isSupportedExt(ext) {
     const supportedExts = [".tgz", ".gz", ".yaml", ".yml", ".css", ".woff", ".woff2", ".ttf", ".otf", ".eot", ".svg"];
     return supportedExts.includes(ext);
 }
-async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequence, version) {
+async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequence, version, releaseNotes) {
     // 1. get the app id from the app slug
     const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     // 2. promote the release
-    await promoteReleaseByAppId(vendorPortalApi, app.id, channelId, releaseSequence, version);
+    await promoteReleaseByAppId(vendorPortalApi, app.id, channelId, releaseSequence, version, releaseNotes);
 }
 exports.promoteRelease = promoteRelease;
-async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version) {
+async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version, releaseNotes) {
     const http = await vendorPortalApi.client();
     const reqBody = {
         versionLabel: version,
         channelIds: [channelId]
     };
+    if (releaseNotes) {
+        reqBody["releaseNotesGzip"] = (0, exports.gzipData)(releaseNotes);
+    }
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/release/${releaseSequence}/promote`;
     const res = await http.post(uri, JSON.stringify(reqBody));
     if (res.message.statusCode != 200) {
@@ -32417,10 +32382,10 @@ module.exports = require("util");
 /***/ 2640:
 /***/ ((module) => {
 
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-  return arr2;
+function _arrayLikeToArray(r, a) {
+  (null == a || a > r.length) && (a = r.length);
+  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+  return n;
 }
 module.exports = _arrayLikeToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32429,11 +32394,9 @@ module.exports = _arrayLikeToArray, module.exports.__esModule = true, module.exp
 /***/ 5492:
 /***/ ((module) => {
 
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self;
+function _assertThisInitialized(e) {
+  if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  return e;
 }
 module.exports = _assertThisInitialized, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32442,10 +32405,8 @@ module.exports = _assertThisInitialized, module.exports.__esModule = true, modul
 /***/ 6383:
 /***/ ((module) => {
 
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+function _classCallCheck(a, n) {
+  if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
 }
 module.exports = _classCallCheck, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32455,22 +32416,16 @@ module.exports = _classCallCheck, module.exports.__esModule = true, module.expor
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var toPropertyKey = __nccwpck_require__(2319);
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, toPropertyKey(descriptor.key), descriptor);
+function _defineProperties(e, r) {
+  for (var t = 0; t < r.length; t++) {
+    var o = r[t];
+    o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, toPropertyKey(o.key), o);
   }
 }
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  Object.defineProperty(Constructor, "prototype", {
-    writable: false
-  });
-  return Constructor;
+function _createClass(e, r, t) {
+  return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
+    writable: !1
+  }), e;
 }
 module.exports = _createClass, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32480,53 +32435,50 @@ module.exports = _createClass, module.exports.__esModule = true, module.exports[
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var unsupportedIterableToArray = __nccwpck_require__(7361);
-function _createForOfIteratorHelper(o, allowArrayLike) {
-  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
-  if (!it) {
-    if (Array.isArray(o) || (it = unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
-      if (it) o = it;
-      var i = 0;
-      var F = function F() {};
+function _createForOfIteratorHelper(r, e) {
+  var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+  if (!t) {
+    if (Array.isArray(r) || (t = unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
+      t && (r = t);
+      var _n = 0,
+        F = function F() {};
       return {
         s: F,
         n: function n() {
-          if (i >= o.length) return {
-            done: true
-          };
-          return {
-            done: false,
-            value: o[i++]
+          return _n >= r.length ? {
+            done: !0
+          } : {
+            done: !1,
+            value: r[_n++]
           };
         },
-        e: function e(_e) {
-          throw _e;
+        e: function e(r) {
+          throw r;
         },
         f: F
       };
     }
     throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
-  var normalCompletion = true,
-    didErr = false,
-    err;
+  var o,
+    a = !0,
+    u = !1;
   return {
     s: function s() {
-      it = it.call(o);
+      t = t.call(r);
     },
     n: function n() {
-      var step = it.next();
-      normalCompletion = step.done;
-      return step;
+      var r = t.next();
+      return a = r.done, r;
     },
-    e: function e(_e2) {
-      didErr = true;
-      err = _e2;
+    e: function e(r) {
+      u = !0, o = r;
     },
     f: function f() {
       try {
-        if (!normalCompletion && it["return"] != null) it["return"]();
+        a || null == t["return"] || t["return"]();
       } finally {
-        if (didErr) throw err;
+        if (u) throw o;
       }
     }
   };
@@ -32541,18 +32493,16 @@ module.exports = _createForOfIteratorHelper, module.exports.__esModule = true, m
 var getPrototypeOf = __nccwpck_require__(2369);
 var isNativeReflectConstruct = __nccwpck_require__(1735);
 var possibleConstructorReturn = __nccwpck_require__(6066);
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = isNativeReflectConstruct();
-  return function _createSuperInternal() {
-    var Super = getPrototypeOf(Derived),
-      result;
-    if (hasNativeReflectConstruct) {
-      var NewTarget = getPrototypeOf(this).constructor;
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-    return possibleConstructorReturn(this, result);
+function _createSuper(t) {
+  var r = isNativeReflectConstruct();
+  return function () {
+    var e,
+      o = getPrototypeOf(t);
+    if (r) {
+      var s = getPrototypeOf(this).constructor;
+      e = Reflect.construct(o, arguments, s);
+    } else e = o.apply(this, arguments);
+    return possibleConstructorReturn(this, e);
   };
 }
 module.exports = _createSuper, module.exports.__esModule = true, module.exports["default"] = module.exports;
@@ -32563,19 +32513,13 @@ module.exports = _createSuper, module.exports.__esModule = true, module.exports[
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var toPropertyKey = __nccwpck_require__(2319);
-function _defineProperty(obj, key, value) {
-  key = toPropertyKey(key);
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
+function _defineProperty(e, r, t) {
+  return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+    value: t,
+    enumerable: !0,
+    configurable: !0,
+    writable: !0
+  }) : e[r] = t, e;
 }
 module.exports = _defineProperty, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32584,11 +32528,10 @@ module.exports = _defineProperty, module.exports.__esModule = true, module.expor
 /***/ 2369:
 /***/ ((module) => {
 
-function _getPrototypeOf(o) {
-  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports;
-  return _getPrototypeOf(o);
+function _getPrototypeOf(t) {
+  return module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function (t) {
+    return t.__proto__ || Object.getPrototypeOf(t);
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _getPrototypeOf(t);
 }
 module.exports = _getPrototypeOf, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32598,21 +32541,17 @@ module.exports = _getPrototypeOf, module.exports.__esModule = true, module.expor
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var setPrototypeOf = __nccwpck_require__(9269);
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
+function _inherits(t, e) {
+  if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function");
+  t.prototype = Object.create(e && e.prototype, {
     constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
+      value: t,
+      writable: !0,
+      configurable: !0
     }
-  });
-  Object.defineProperty(subClass, "prototype", {
-    writable: false
-  });
-  if (superClass) setPrototypeOf(subClass, superClass);
+  }), Object.defineProperty(t, "prototype", {
+    writable: !1
+  }), e && setPrototypeOf(t, e);
 }
 module.exports = _inherits, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32621,9 +32560,9 @@ module.exports = _inherits, module.exports.__esModule = true, module.exports["de
 /***/ 3286:
 /***/ ((module) => {
 
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    "default": obj
+function _interopRequireDefault(e) {
+  return e && e.__esModule ? e : {
+    "default": e
   };
 }
 module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
@@ -32634,15 +32573,12 @@ module.exports = _interopRequireDefault, module.exports.__esModule = true, modul
 /***/ ((module) => {
 
 function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
   try {
-    Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
+    var t = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+  } catch (t) {}
+  return (module.exports = _isNativeReflectConstruct = function _isNativeReflectConstruct() {
+    return !!t;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports)();
 }
 module.exports = _isNativeReflectConstruct, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32653,13 +32589,10 @@ module.exports = _isNativeReflectConstruct, module.exports.__esModule = true, mo
 
 var _typeof = (__nccwpck_require__(5605)["default"]);
 var assertThisInitialized = __nccwpck_require__(5492);
-function _possibleConstructorReturn(self, call) {
-  if (call && (_typeof(call) === "object" || typeof call === "function")) {
-    return call;
-  } else if (call !== void 0) {
-    throw new TypeError("Derived constructors may only return object or undefined");
-  }
-  return assertThisInitialized(self);
+function _possibleConstructorReturn(t, e) {
+  if (e && ("object" == _typeof(e) || "function" == typeof e)) return e;
+  if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
+  return assertThisInitialized(t);
 }
 module.exports = _possibleConstructorReturn, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32668,12 +32601,10 @@ module.exports = _possibleConstructorReturn, module.exports.__esModule = true, m
 /***/ 9269:
 /***/ ((module) => {
 
-function _setPrototypeOf(o, p) {
-  module.exports = _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports;
-  return _setPrototypeOf(o, p);
+function _setPrototypeOf(t, e) {
+  return module.exports = _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function (t, e) {
+    return t.__proto__ = e, t;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _setPrototypeOf(t, e);
 }
 module.exports = _setPrototypeOf, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32683,17 +32614,17 @@ module.exports = _setPrototypeOf, module.exports.__esModule = true, module.expor
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var _typeof = (__nccwpck_require__(5605)["default"]);
-function _toPrimitive(input, hint) {
-  if (_typeof(input) !== "object" || input === null) return input;
-  var prim = input[Symbol.toPrimitive];
-  if (prim !== undefined) {
-    var res = prim.call(input, hint || "default");
-    if (_typeof(res) !== "object") return res;
+function toPrimitive(t, r) {
+  if ("object" != _typeof(t) || !t) return t;
+  var e = t[Symbol.toPrimitive];
+  if (void 0 !== e) {
+    var i = e.call(t, r || "default");
+    if ("object" != _typeof(i)) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
-  return (hint === "string" ? String : Number)(input);
+  return ("string" === r ? String : Number)(t);
 }
-module.exports = _toPrimitive, module.exports.__esModule = true, module.exports["default"] = module.exports;
+module.exports = toPrimitive, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
@@ -32702,11 +32633,11 @@ module.exports = _toPrimitive, module.exports.__esModule = true, module.exports[
 
 var _typeof = (__nccwpck_require__(5605)["default"]);
 var toPrimitive = __nccwpck_require__(7655);
-function _toPropertyKey(arg) {
-  var key = toPrimitive(arg, "string");
-  return _typeof(key) === "symbol" ? key : String(key);
+function toPropertyKey(t) {
+  var i = toPrimitive(t, "string");
+  return "symbol" == _typeof(i) ? i : i + "";
 }
-module.exports = _toPropertyKey, module.exports.__esModule = true, module.exports["default"] = module.exports;
+module.exports = toPropertyKey, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
 /***/ }),
 
@@ -32716,11 +32647,11 @@ module.exports = _toPropertyKey, module.exports.__esModule = true, module.export
 function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+  return module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
     return typeof o;
   } : function (o) {
     return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _typeof(o);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32730,13 +32661,12 @@ module.exports = _typeof, module.exports.__esModule = true, module.exports["defa
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var arrayLikeToArray = __nccwpck_require__(2640);
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
+function _unsupportedIterableToArray(r, a) {
+  if (r) {
+    if ("string" == typeof r) return arrayLikeToArray(r, a);
+    var t = {}.toString.call(r).slice(8, -1);
+    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? arrayLikeToArray(r, a) : void 0;
+  }
 }
 module.exports = _unsupportedIterableToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
 
@@ -32848,7 +32778,7 @@ var patterns = {
   timezone: /([Z+-].*)$/,
   timezoneZ: /^(Z)$/,
   timezoneHH: /^([+-]\d{2})$/,
-  timezoneHHMM: /^([+-]\d{2}):?(\d{2})$/
+  timezoneHHMM: /^([+-])(\d{2}):?(\d{2})$/
 }; // Parse various time zone offset formats to an offset in milliseconds
 
 function tzParseTimezone(timezoneString, date, isUtcDate) {
@@ -32884,15 +32814,15 @@ function tzParseTimezone(timezoneString, date, isUtcDate) {
   token = patterns.timezoneHHMM.exec(timezoneString);
 
   if (token) {
-    hours = parseInt(token[1], 10);
-    var minutes = parseInt(token[2], 10);
+    hours = parseInt(token[2], 10);
+    var minutes = parseInt(token[3], 10);
 
     if (!validateTimezone(hours, minutes)) {
       return NaN;
     }
 
     absoluteOffset = Math.abs(hours) * MILLISECONDS_IN_HOUR + minutes * MILLISECONDS_IN_MINUTE;
-    return hours > 0 ? -absoluteOffset : absoluteOffset;
+    return token[1] === '+' ? -absoluteOffset : absoluteOffset;
   } // IANA time zone
 
 
@@ -33041,7 +32971,7 @@ function partsOffset(dtf, date) {
 }
 
 function hackyOffset(dtf, date) {
-  var formatted = dtf.format(date).replace(/\u200E/g, '');
+  var formatted = dtf.format(date);
   var parsed = /(\d+)\/(\d+)\/(\d+),? (\d+):(\d+):(\d+)/.exec(formatted); // var [, fMonth, fDay, fYear, fHour, fMinute, fSecond] = parsed
   // return [fYear, fMonth, fDay, fHour, fMinute, fSecond]
 
@@ -33057,10 +32987,10 @@ function getDateTimeFormat(timeZone) {
   if (!dtfCache[timeZone]) {
     // New browsers use `hourCycle`, IE and Chrome <73 does not support it and uses `hour12`
     var testDateFormatted = new Intl.DateTimeFormat('en-US', {
-      hour12: false,
+      hourCycle: 'h23',
       timeZone: 'America/New_York',
       year: 'numeric',
-      month: 'numeric',
+      month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
@@ -33068,7 +32998,7 @@ function getDateTimeFormat(timeZone) {
     }).format(new Date('2014-06-25T04:00:00.123Z'));
     var hourCycleSupported = testDateFormatted === '06/25/2014, 00:00:00' || testDateFormatted === '‎06‎/‎25‎/‎2014‎ ‎00‎:‎00‎:‎00';
     dtfCache[timeZone] = hourCycleSupported ? new Intl.DateTimeFormat('en-US', {
-      hour12: false,
+      hourCycle: 'h23',
       timeZone: timeZone,
       year: 'numeric',
       month: 'numeric',
@@ -33077,7 +33007,7 @@ function getDateTimeFormat(timeZone) {
       minute: '2-digit',
       second: '2-digit'
     }) : new Intl.DateTimeFormat('en-US', {
-      hourCycle: 'h23',
+      hour12: false,
       timeZone: timeZone,
       year: 'numeric',
       month: 'numeric',
@@ -33116,7 +33046,7 @@ var MILLISECONDS_IN_MINUTE = 60 * 1000;
 var formatters = {
   // Timezone (ISO-8601. If offset is 0, output is always `'Z'`)
   X: function (date, token, localize, options) {
-    var timezoneOffset = getTimeZoneOffset(options.timeZone, options._originalDate || date);
+    var timezoneOffset = getTimeZoneOffset(options.timeZone, date);
 
     if (timezoneOffset === 0) {
       return 'Z';
@@ -33147,7 +33077,7 @@ var formatters = {
   },
   // Timezone (ISO-8601. If offset is 0, output is `'+00:00'` or equivalent)
   x: function (date, token, localize, options) {
-    var timezoneOffset = getTimeZoneOffset(options.timeZone, options._originalDate || date);
+    var timezoneOffset = getTimeZoneOffset(options.timeZone, date);
 
     switch (token) {
       // Hours and optional minutes
@@ -33174,7 +33104,7 @@ var formatters = {
   },
   // Timezone (GMT)
   O: function (date, token, localize, options) {
-    var timezoneOffset = getTimeZoneOffset(options.timeZone, options._originalDate || date);
+    var timezoneOffset = getTimeZoneOffset(options.timeZone, date);
 
     switch (token) {
       // Short
@@ -33191,19 +33121,17 @@ var formatters = {
   },
   // Timezone (specific non-location)
   z: function (date, token, localize, options) {
-    var originalDate = options._originalDate || date;
-
     switch (token) {
       // Short
       case 'z':
       case 'zz':
       case 'zzz':
-        return (0, _index.default)('short', originalDate, options);
+        return (0, _index.default)('short', date, options);
       // Long
 
       case 'zzzz':
       default:
-        return (0, _index.default)('long', originalDate, options);
+        return (0, _index.default)('long', date, options);
     }
   }
 };
@@ -33247,7 +33175,7 @@ function formatTimezoneWithOptionalMinutes(offset, dirtyDelimeter) {
   return formatTimezone(offset, dirtyDelimeter);
 }
 
-function formatTimezoneShort(offset, dirtyDelimeter) {
+function formatTimezoneShort(offset, dirtyDelimiter) {
   var sign = offset > 0 ? '-' : '+';
   var absOffset = Math.abs(offset);
   var hours = Math.floor(absOffset / 60);
@@ -33257,8 +33185,8 @@ function formatTimezoneShort(offset, dirtyDelimeter) {
     return sign + String(hours);
   }
 
-  var delimeter = dirtyDelimeter || '';
-  return sign + String(hours) + delimeter + addLeadingZeros(minutes, 2);
+  var delimiter = dirtyDelimiter || '';
+  return sign + String(hours) + delimiter + addLeadingZeros(minutes, 2);
 }
 
 var _default = formatters;
@@ -33569,6 +33497,8 @@ var tzFormattingTokensRegExp = /([xXOz]+)|''|'(''|[^'])+('|$)/g;
  *   - Some of the local week-numbering year tokens (`YY`, `YYYY`) that are confused with the calendar year tokens
  *   (`yy`, `yyyy`). See: https://git.io/fxCyr
  * @param {String} [options.timeZone=''] - used to specify the IANA time zone offset of a date String.
+ * @param {Date|Number} [options.originalDate] - can be used to pass the original unmodified date to `format` to
+ *   improve correctness of the replaced timezone token close to the DST threshold.
  * @returns {String} the formatted date string
  * @throws {TypeError} 2 arguments required
  * @throws {RangeError} `options.additionalDigits` must be 0, 1 or 2
@@ -33604,7 +33534,7 @@ function format(dirtyDate, dirtyFormatStr, dirtyOptions) {
   var matches = formatStr.match(tzFormattingTokensRegExp);
 
   if (matches) {
-    var date = (0, _index3.default)(dirtyDate, options); // Work through each match and replace the tz token in the format string with the quoted
+    var date = (0, _index3.default)(options.originalDate || dirtyDate, options); // Work through each match and replace the tz token in the format string with the quoted
     // formatted time zone so the remaining tokens can be filled in by date-fns#format.
 
     formatStr = matches.reduce(function (result, token) {
@@ -33672,6 +33602,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function formatInTimeZone(date, timeZone, formatStr, options) {
   var extendedOptions = (0, _index.default)(options);
   extendedOptions.timeZone = timeZone;
+  extendedOptions.originalDate = date;
   return (0, _index2.default)((0, _index3.default)(date, timeZone), formatStr, extendedOptions);
 }
 

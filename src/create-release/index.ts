@@ -9,6 +9,7 @@ export async function actionCreateRelease() {
     const yamlDir = core.getInput('yaml-dir')
     const promoteChannel = core.getInput('promote-channel')
     const releaseVersion = core.getInput('version')
+    const releaseNotes = core.getInput('release-notes')
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
     
     const apiClient = new VendorPortalApi();
@@ -50,7 +51,7 @@ export async function actionCreateRelease() {
         resolvedChannel = await createChannel(apiClient, appSlug, promoteChannel)
       }
 
-      await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion)
+      await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
       core.setOutput('channel-slug', resolvedChannel.slug);
     }
     core.setOutput('release-sequence', release.sequence);
