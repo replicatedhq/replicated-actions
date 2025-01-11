@@ -14,10 +14,13 @@ inputs:
     description: "The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required)."
     required: false
   promote-channel:
-    description: "Channel name or id to promote this release to."
+    description: "Channel name or id to promote this release to. If not specified, the release will not be promoted."
     required: false
   version:
-    description: "Release version"
+    description: "Release version. This will be ignored if `promote-channel` is not specified."
+    required: false
+  release-notes:
+    description: "Release notes. This will be ignored if `promote-channel` is not specified."
     required: false
 outputs:
   channel-slug: # slug of the channel

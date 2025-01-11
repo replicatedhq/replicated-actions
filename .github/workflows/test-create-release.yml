@@ -49,3 +49,6 @@ jobs:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
           yaml-dir: ./test/kots-install/yaml
+          promote-channel: test-channel
+          version: 1.0.0-kots
+          release-notes: release notes for 1.0.0-kots
