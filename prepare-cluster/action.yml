@@ -99,6 +99,9 @@ inputs:
   kots-wait-duration:
     description: 'Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
     required: false
+  kots-storage-class:
+    description: "Sets the storage class to use for the KOTS Admin Console components. Default: unset, which means the default storage class will be used."
+    required: false
   customer-entitlements:
     description: |
       Entitlements to assign to the customer.
@@ -222,3 +225,4 @@ runs:
       INPUT_WAIT-DURATION: ${{ inputs.kots-wait-duration }}
       INPUT_NAMESPACE: ${{ inputs.namespace }}
       INPUT_KOTS-VERSION: ${{ inputs.kots-version }}
+      INPUT_STORAGE-CLASS: ${{ inputs.kots-storage-class }}

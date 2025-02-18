@@ -810,6 +810,7 @@ function actionKotsInstall() {
         const namespaceInput = core.getInput("namespace") || "default";
         const waitDurationInput = core.getInput("wait-duration");
         const sharedPasswordInput = core.getInput("shared-password");
+        const storageClassInput = core.getInput("storage-class");
         let licenseFilePath = '';
         if (fs.existsSync(licenseFileInput)) {
             licenseFilePath = licenseFileInput;
@@ -838,6 +839,7 @@ function actionKotsInstall() {
             sharedPassword: sharedPasswordInput,
             appVersionLabel: appVersionLabelInput,
             waitDuration: waitDurationInput,
+            storageClass: storageClassInput,
         };
         yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath, opts);
     });
@@ -974,6 +976,9 @@ function installApp(kotsPath, licenseFilePath, configFilePath, opts) {
             }
             if (opts.waitDuration) {
                 params.push("--wait-duration", opts.waitDuration);
+            }
+            if (opts.storageClass) {
+                params.push("--storage-class", opts.storageClass);
             }
             yield exec.exec(kotsPath, params, installOptions);
             cleanup();

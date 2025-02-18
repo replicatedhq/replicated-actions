@@ -15,6 +15,7 @@ license_file["license-file"]
 config_values["config-values"]
 namespace["namespace"]
 wait_duration["wait-duration"]
+storage_class["storage-class"]
 kubeconfig ---> kots_install
 kots_version ---> kots_install
 app_slug ---> kots_install
@@ -24,6 +25,7 @@ license_file ---> kots_install
 config_values ---> kots_install
 namespace ---> kots_install
 wait_duration ---> kots_install
+storage_class ---> kots_install
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -37,6 +39,7 @@ wait_duration ---> kots_install
 | config-values |  | False | The config values to use. This can be a path to a file or the contents of the file. |
 | namespace | default | False | The namespace to install the application to |
 | wait-duration |  | False | Timeout to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m") |
+| storage-class |  | False | Sets the storage class to use for the KOTS Admin Console components. Default: unset, which means the default storage class will be used. |
 
 ## Outputs
 | Name | Description |

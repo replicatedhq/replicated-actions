@@ -33,6 +33,7 @@ helm_run_preflights["helm-run-preflights"]
 kots_config_values["kots-config-values"]
 kots_version["kots-version"]
 kots_wait_duration["kots-wait-duration"]
+kots_storage_class["kots-storage-class"]
 customer_entitlements["customer-entitlements"]
 helm_extra_repos["helm-extra-repos"]
 cluster_id["cluster-id"]
@@ -64,6 +65,7 @@ helm_run_preflights ---> prepare_cluster
 kots_config_values ---> prepare_cluster
 kots_version ---> prepare_cluster
 kots_wait_duration ---> prepare_cluster
+kots_storage_class ---> prepare_cluster
 customer_entitlements ---> prepare_cluster
 helm_extra_repos ---> prepare_cluster
 prepare_cluster ---> cluster_id
@@ -99,6 +101,7 @@ prepare_cluster ---> cluster_kubeconfig
 | kots-config-values |  | False | The KOTS config values to use |
 | kots-version | latest | False | The version of KOTS to use |
 | kots-wait-duration |  | False | Timeout for KOTS to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m") |
+| kots-storage-class |  | False | Sets the storage class to use for the KOTS Admin Console components. Default: unset, which means the default storage class will be used. |
 | customer-entitlements |  | False | Entitlements to assign to the customer.<br>Example:<br><pre>customer-entitlements: \|<br>  - name: "number-of-users"<br>    value: "10"</pre><br> |
 | helm-extra-repos |  | True | Extra helm repos to add.<br>Example:<br><pre>helm-extra-repos: \|<br>  - repo_name: "cnpg"<br>    url: "https://cloudnative-pg.github.io/charts"<br>    namespace: "cnpg-system"<br>    chart_name: "cloudnative-pg"<br>  - repo_name: "minio-operator"<br>    url: "https://operator.min.io"<br>    namespace: "minio-operator"<br>    chart_name: "operator"</pre><br> |
 

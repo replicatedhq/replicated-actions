@@ -13,6 +13,7 @@ export async function actionKotsInstall() {
   const namespaceInput = core.getInput("namespace") || "default";
   const waitDurationInput = core.getInput("wait-duration");
   const sharedPasswordInput: string = core.getInput("shared-password");
+  const storageClassInput = core.getInput("storage-class");
 
   let licenseFilePath = '';
   if (fs.existsSync(licenseFileInput)) {
@@ -43,6 +44,7 @@ export async function actionKotsInstall() {
     sharedPassword: sharedPasswordInput,
     appVersionLabel: appVersionLabelInput,
     waitDuration: waitDurationInput,
+    storageClass: storageClassInput,
   };
   await installApp(kostPath, licenseFilePath, valuesFilePath, opts);
 }
