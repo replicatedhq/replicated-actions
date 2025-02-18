@@ -76,6 +76,7 @@ export type installAppOptions = {
     sharedPassword?: string,
     appVersionLabel?: string,
     waitDuration?: string,
+    storageClass?: string,
 }
 
 export async function installApp(kotsPath: string, licenseFilePath: string, configFilePath: string, opts: installAppOptions) {
@@ -115,6 +116,9 @@ export async function installApp(kotsPath: string, licenseFilePath: string, conf
       }
       if (opts.waitDuration) {
         params.push("--wait-duration", opts.waitDuration);
+      }
+      if (opts.storageClass) {
+        params.push("--storage-class", opts.storageClass);
       }
       await exec.exec(kotsPath, params, installOptions);
       cleanup();

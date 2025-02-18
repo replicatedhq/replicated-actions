@@ -30,6 +30,9 @@ inputs:
   wait-duration:
     description: 'Timeout to be used while waiting for individual components to be ready. must be in Go duration format (eg: 10s, 2m) (default "2m")'
     required: false
+  storage-class:
+    description: "Sets the storage class to use for the KOTS Admin Console components. Default: unset, which means the default storage class will be used."
+    required: false
 runs:
   using: "node20"
   main: "index.js"
