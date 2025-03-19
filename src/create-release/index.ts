@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease  } from 'replicated-lib';
+import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease, pollForAirgapReleaseStatus, getDownloadUrlAirgapBuildRelease } from 'replicated-lib';
 
 export async function actionCreateRelease() {
   try {
@@ -11,6 +11,12 @@ export async function actionCreateRelease() {
     const releaseVersion = core.getInput('version')
     const releaseNotes = core.getInput('release-notes')
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+    const parsedTimeout = parseInt(core.getInput('timeout-minutes') || '20');
+    if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
+      core.setFailed('timeout-minutes must be a positive number');
+      return;
+    }
+    const timeoutMinutes = parsedTimeout;
     
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -52,6 +58,23 @@ export async function actionCreateRelease() {
       }
 
       await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+
+      if (resolvedChannel.buildAirgapAutomatically) {
+        try {
+          const status = await pollForAirgapReleaseStatus(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
+          if (status === "built") {
+            const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+            core.setOutput('airgap-build-status', 'built');
+            core.setOutput('download-url', downloadUrl);
+          } else {
+            core.setOutput('airgap-build-status', status);
+          }
+        } catch (error) {
+          core.setOutput('airgap-build-status', 'failed');
+          console.warn('Failed to get airgap build status or download URL:', error.message);
+        }
+      }
+
       core.setOutput('channel-slug', resolvedChannel.slug);
     }
     core.setOutput('release-sequence', release.sequence);
