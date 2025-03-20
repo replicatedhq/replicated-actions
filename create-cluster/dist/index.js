@@ -347,7 +347,7 @@ function actionCreateRelease() {
             const releaseVersion = core.getInput('version');
             const releaseNotes = core.getInput('release-notes');
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-            const waitForAirgapBuild = core.getInput('wait-for-airgap-build') || "false";
+            const waitForAirgapBuild = core.getBooleanInput('wait-for-airgap-build', { required: false }) || false;
             const parsedTimeout = parseInt(core.getInput('timeout-minutes') || '20');
             if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
                 core.setFailed('timeout-minutes must be a positive number');
@@ -388,7 +388,7 @@ function actionCreateRelease() {
                     resolvedChannel = yield (0, replicated_lib_1.createChannel)(apiClient, appSlug, promoteChannel);
                 }
                 yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
-                if (waitForAirgapBuild == "true") {
+                if (waitForAirgapBuild) {
                     if (resolvedChannel.buildAirgapAutomatically) {
                         try {
                             const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
