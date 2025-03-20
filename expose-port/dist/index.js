@@ -347,6 +347,13 @@ function actionCreateRelease() {
             const releaseVersion = core.getInput('version');
             const releaseNotes = core.getInput('release-notes');
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            const waitForAirgapBuild = core.getInput('wait-for-airgap-build') || "false";
+            const parsedTimeout = parseInt(core.getInput('timeout-minutes') || '20');
+            if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
+                core.setFailed('timeout-minutes must be a positive number');
+                return;
+            }
+            const timeoutMinutes = parsedTimeout;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
@@ -381,6 +388,28 @@ function actionCreateRelease() {
                     resolvedChannel = yield (0, replicated_lib_1.createChannel)(apiClient, appSlug, promoteChannel);
                 }
                 yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+                if (waitForAirgapBuild == "true") {
+                    if (resolvedChannel.buildAirgapAutomatically) {
+                        try {
+                            const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
+                            if (status === "built") {
+                                const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+                                core.setOutput('airgap-status', status);
+                                core.setOutput('airgap-url', downloadUrl);
+                            }
+                            else {
+                                core.setOutput('airgap-status', status);
+                            }
+                        }
+                        catch (error) {
+                            core.setOutput('airgap-status', 'failed');
+                            console.warn('Failed to get airgap build status or download URL:', error.message);
+                        }
+                    }
+                    else {
+                        core.setOutput('airgap-status', 'promoted-channel-not-airgap-enabled');
+                    }
+                }
                 core.setOutput('channel-slug', resolvedChannel.slug);
             }
             core.setOutput('release-sequence', release.sequence);
@@ -32830,11 +32859,18 @@ async function findApplicationDetailsInOutput(apps, appSlug) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.exportedForTesting = exports.Channel = void 0;
+exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.exportedForTesting = exports.StatusError = exports.Channel = void 0;
 const applications_1 = __nccwpck_require__(23770);
 class Channel {
 }
 exports.Channel = Channel;
+class StatusError extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+    }
+}
+exports.StatusError = StatusError;
 exports.exportedForTesting = {
     getChannelByApplicationId,
     findChannelDetailsInOutput
@@ -32907,13 +32943,83 @@ exports.archiveChannel = archiveChannel;
 async function findChannelDetailsInOutput(channels, { slug, name }) {
     for (const channel of channels) {
         if (slug && channel.channelSlug == slug) {
-            return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence };
+            return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence, buildAirgapAutomatically: channel.buildAirgapAutomatically };
         }
         if (name && channel.name == name) {
-            return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence };
+            return { name: channel.name, id: channel.id, slug: channel.channelSlug, releaseSequence: channel.releaseSequence, buildAirgapAutomatically: channel.buildAirgapAutomatically };
         }
     }
     return Promise.reject({ channel: null, reason: `Could not find channel with slug ${slug} or name ${name}` });
+}
+async function pollForAirgapReleaseStatus(vendorPortalApi, appId, channelId, releaseSequence, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
+    // get airgapped build release from the api, look for the status of the id to be ${status}
+    // if it's not ${status}, sleep for 5 seconds and try again
+    // if it is ${status}, return the release with that status
+    // iterate for timeout/sleeptime times
+    const iterations = (timeout * 1000) / sleeptimeMs;
+    for (let i = 0; i < iterations; i++) {
+        try {
+            const release = await getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence);
+            if (release.airgapBuildStatus === expectedStatus) {
+                return release.airgapBuildStatus;
+            }
+            if (release.airgapBuildStatus === "failed") {
+                console.debug(`Airgapped build release ${releaseSequence} failed`);
+                return "failed";
+            }
+            console.debug(`Airgapped build release ${releaseSequence} is not ready, sleeping for ${sleeptimeMs / 1000} seconds`);
+            await new Promise(f => setTimeout(f, sleeptimeMs));
+        }
+        catch (err) {
+            if (err instanceof StatusError) {
+                if (err.statusCode >= 500) {
+                    // 5xx errors are likely transient, so we should retry
+                    console.debug(`Got HTTP error with status ${err.statusCode}, sleeping for ${sleeptimeMs / 1000} seconds`);
+                    await new Promise(f => setTimeout(f, sleeptimeMs));
+                }
+                else {
+                    console.debug(`Got HTTP error with status ${err.statusCode}, exiting`);
+                    throw err;
+                }
+            }
+            else {
+                throw err;
+            }
+        }
+    }
+    throw new Error(`Airgapped build release ${releaseSequence} did not reach status ${expectedStatus} in ${timeout} seconds`);
+}
+exports.pollForAirgapReleaseStatus = pollForAirgapReleaseStatus;
+async function getDownloadUrlAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence) {
+    const release = await getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence);
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/airgap/download-url?channelSequence=${release.channelSequence}`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
+        throw new Error(`Failed to get airgap build release: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    return body.url;
+}
+exports.getDownloadUrlAirgapBuildRelease = getDownloadUrlAirgapBuildRelease;
+async function getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence) {
+    const http = await vendorPortalApi.client();
+    const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/releases`;
+    const res = await http.get(uri);
+    if (res.message.statusCode != 200) {
+        // discard the response body
+        await res.readBody();
+        throw new Error(`Failed to get airgap build release: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    const release = body.releases.find((r) => r.sequence === releaseSequence);
+    return {
+        sequence: release.sequence,
+        channelSequence: release.channelSequence,
+        airgapBuildStatus: release.airgapBuildStatus
+    };
 }
 
 
@@ -33469,7 +33575,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(44995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(23770);
@@ -33479,6 +33585,8 @@ Object.defineProperty(exports, "Channel", ({ enumerable: true, get: function () 
 Object.defineProperty(exports, "createChannel", ({ enumerable: true, get: function () { return channels_1.createChannel; } }));
 Object.defineProperty(exports, "getChannelDetails", ({ enumerable: true, get: function () { return channels_1.getChannelDetails; } }));
 Object.defineProperty(exports, "archiveChannel", ({ enumerable: true, get: function () { return channels_1.archiveChannel; } }));
+Object.defineProperty(exports, "pollForAirgapReleaseStatus", ({ enumerable: true, get: function () { return channels_1.pollForAirgapReleaseStatus; } }));
+Object.defineProperty(exports, "getDownloadUrlAirgapBuildRelease", ({ enumerable: true, get: function () { return channels_1.getDownloadUrlAirgapBuildRelease; } }));
 var clusters_1 = __nccwpck_require__(85230);
 Object.defineProperty(exports, "ClusterVersion", ({ enumerable: true, get: function () { return clusters_1.ClusterVersion; } }));
 Object.defineProperty(exports, "createCluster", ({ enumerable: true, get: function () { return clusters_1.createCluster; } }));
