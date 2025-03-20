@@ -11,6 +11,7 @@ export async function actionCreateRelease() {
     const releaseVersion = core.getInput('version')
     const releaseNotes = core.getInput('release-notes')
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+    const waitForAirgapBuild = core.getBooleanInput('wait-for-airgap-build') || false;
     const parsedTimeout = parseInt(core.getInput('timeout-minutes') || '20');
     if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
       core.setFailed('timeout-minutes must be a positive number');
@@ -59,21 +60,26 @@ export async function actionCreateRelease() {
 
       await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
 
-      if (resolvedChannel.buildAirgapAutomatically) {
-        try {
-          const status = await pollForAirgapReleaseStatus(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
-          if (status === "built") {
-            const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
-            core.setOutput('airgap-status', status);
-            core.setOutput('airgap-url', downloadUrl);
-          } else {
-            core.setOutput('airgap-status', status);
+      if (waitForAirgapBuild) {
+        if (resolvedChannel.buildAirgapAutomatically) {
+          try {
+            const status = await pollForAirgapReleaseStatus(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
+            if (status === "built") {
+              const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+              core.setOutput('airgap-status', status);
+              core.setOutput('airgap-url', downloadUrl);
+            } else {
+              core.setOutput('airgap-status', status);
+            }
+          } catch (error) {
+            core.setOutput('airgap-status', 'failed');
+            console.warn('Failed to get airgap build status or download URL:', error.message);
           }
-        } catch (error) {
-          core.setOutput('airgap-status', 'failed');
-          console.warn('Failed to get airgap build status or download URL:', error.message);
+        } else {
+          core.setOutput('airgap-status', 'promoted-channel-not-airgap-enabled');
         }
       }
+      
 
       core.setOutput('channel-slug', resolvedChannel.slug);
     }

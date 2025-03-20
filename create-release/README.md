@@ -23,6 +23,7 @@ promote_channel ---> replicated_create_release
 version ---> replicated_create_release
 release_notes ---> replicated_create_release
 timeout_minutes ---> replicated_create_release
+wait_for_airgap_build ---> replicated_create_release
 replicated_create_release ---> channel_slug
 replicated_create_release ---> release_sequence
 ```
@@ -36,6 +37,7 @@ replicated_create_release ---> release_sequence
 | promote-channel |  | False | Channel name or id to promote this release to. If not specified, the release will not be promoted. |
 | version |  | False | Release version. This will be ignored if `promote-channel` is not specified. |
 | release-notes |  | False | Release notes. This will be ignored if `promote-channel` is not specified. |
+| wait-for-airgap-build | false | False | Wait for the airgap build status or not. |
 | timeout-minutes | 20 | False | Maximum time (in minutes) to wait for the airgap build to complete. |
 ## Outputs
 | Name | Description |

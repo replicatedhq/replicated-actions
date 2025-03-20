@@ -22,6 +22,9 @@ inputs:
   release-notes:
     description: "Release notes. This will be ignored if `promote-channel` is not specified."
     required: false
+  wait-for-airgap-build:
+    description: "Wait for the airgap build status or not. Defaults to false."
+    required: false
   timeout-minutes:
     description: "Maximum time (in minutes) to wait for the airgap build to complete. Defaults to 20 minutes."
     required: false
