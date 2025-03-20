@@ -22,6 +22,7 @@ yaml_dir ---> replicated_create_release
 promote_channel ---> replicated_create_release
 version ---> replicated_create_release
 release_notes ---> replicated_create_release
+timeout_minutes ---> replicated_create_release
 replicated_create_release ---> channel_slug
 replicated_create_release ---> release_sequence
 ```
@@ -35,10 +36,12 @@ replicated_create_release ---> release_sequence
 | promote-channel |  | False | Channel name or id to promote this release to. If not specified, the release will not be promoted. |
 | version |  | False | Release version. This will be ignored if `promote-channel` is not specified. |
 | release-notes |  | False | Release notes. This will be ignored if `promote-channel` is not specified. |
-
+| timeout-minutes | 20 | False | Maximum time (in minutes) to wait for the airgap build to complete. |
 ## Outputs
 | Name | Description |
 | --- | --- |
 | channel-slug | Contains the channel slug. |
 | release-sequence | Sequence number of the release. |
+| airgap-url | Contains the download url of the airgap build, if promote-channel is enabled auto airgap builds. |
+| airgap-status | Current build status of the airgap bundle, if promote-channel is enabled auto airgap builds. |
 

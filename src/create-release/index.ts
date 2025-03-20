@@ -64,13 +64,13 @@ export async function actionCreateRelease() {
           const status = await pollForAirgapReleaseStatus(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
           if (status === "built") {
             const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
-            core.setOutput('airgap-build-status', 'built');
-            core.setOutput('download-url', downloadUrl);
+            core.setOutput('airgap-status', status);
+            core.setOutput('airgap-url', downloadUrl);
           } else {
-            core.setOutput('airgap-build-status', status);
+            core.setOutput('airgap-status', status);
           }
         } catch (error) {
-          core.setOutput('airgap-build-status', 'failed');
+          core.setOutput('airgap-status', 'failed');
           console.warn('Failed to get airgap build status or download URL:', error.message);
         }
       }
