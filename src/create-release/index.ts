@@ -11,7 +11,7 @@ export async function actionCreateRelease() {
     const releaseVersion = core.getInput('version')
     const releaseNotes = core.getInput('release-notes')
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-    const waitForAirgapBuild = core.getBooleanInput('wait-for-airgap-build') || false;
+    const waitForAirgapBuild = core.getBooleanInput('wait-for-airgap-build', {required: false}) || false;
     const parsedTimeout = parseInt(core.getInput('timeout-minutes') || '20');
     if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
       core.setFailed('timeout-minutes must be a positive number');
