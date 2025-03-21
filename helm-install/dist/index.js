@@ -393,21 +393,24 @@ function actionCreateRelease() {
                         try {
                             // Wait 5 seconds for the airgap build to start
                             console.log("Waiting for airgap build to start");
-                            setTimeout(() => {
+                            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
                                 console.log("Airgap build started");
                                 console.log("app slug: ", appSlug);
                                 console.log("channel id: ", resolvedChannel === null || resolvedChannel === void 0 ? void 0 : resolvedChannel.id);
                                 console.log("release sequence: ", release.sequence);
-                            }, 30000);
-                            const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
-                            if (status === "built") {
-                                const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence);
-                                core.setOutput('airgap-status', status);
-                                core.setOutput('airgap-url', downloadUrl);
-                            }
-                            else {
-                                core.setOutput('airgap-status', status);
-                            }
+                                if (!resolvedChannel) {
+                                    throw new Error('Channel is undefined');
+                                }
+                                const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
+                                if (status === "built") {
+                                    const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+                                    core.setOutput('airgap-status', status);
+                                    core.setOutput('airgap-url', downloadUrl);
+                                }
+                                else {
+                                    core.setOutput('airgap-status', status);
+                                }
+                            }), 10000);
                         }
                         catch (error) {
                             core.setOutput('airgap-status', 'failed');
