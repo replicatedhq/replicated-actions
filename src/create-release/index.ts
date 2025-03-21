@@ -66,7 +66,7 @@ export async function actionCreateRelease() {
             const app = await getApplicationDetails(apiClient, appSlug);
             const status = await pollForAirgapReleaseStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes*60);
             if (status === "built") {
-              const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+              const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, app.id, resolvedChannel.id, +release.sequence);
               core.setOutput('airgap-status', status);
               core.setOutput('airgap-url', downloadUrl);
             } else {

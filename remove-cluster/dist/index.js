@@ -394,7 +394,7 @@ function actionCreateRelease() {
                             const app = yield (0, replicated_lib_1.getApplicationDetails)(apiClient, appSlug);
                             const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
                             if (status === "built") {
-                                const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+                                const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, app.id, resolvedChannel.id, +release.sequence);
                                 core.setOutput('airgap-status', status);
                                 core.setOutput('airgap-url', downloadUrl);
                             }
