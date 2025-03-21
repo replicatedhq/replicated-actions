@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease, pollForAirgapReleaseStatus, getDownloadUrlAirgapBuildRelease } from 'replicated-lib';
+import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease, pollForAirgapReleaseStatus, getDownloadUrlAirgapBuildRelease, getApplicationDetails } from 'replicated-lib';
 
 export async function actionCreateRelease() {
   try {
@@ -59,30 +59,19 @@ export async function actionCreateRelease() {
       }
 
       await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+
       if (waitForAirgapBuild == "true") {
         if (resolvedChannel.buildAirgapAutomatically) {
           try {
-            // Wait 5 seconds for the airgap build to start
-            console.log("Waiting for airgap build to start");
-            setTimeout(async () => {
-              console.log("Airgap build started");
-              console.log("app slug: ", appSlug);
-              console.log("channel id: ", resolvedChannel?.id);
-              console.log("release sequence: ", release.sequence);
-
-              if (!resolvedChannel) {
-                throw new Error('Channel is undefined');
-              }
-
-              const status = await pollForAirgapReleaseStatus(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
-              if (status === "built") {
-                const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
-                core.setOutput('airgap-status', status);
-                core.setOutput('airgap-url', downloadUrl);
-              } else {
-                core.setOutput('airgap-status', status);
-              }
-            }, 10000);
+            const app = await getApplicationDetails(apiClient, appSlug);
+            const status = await pollForAirgapReleaseStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
+            if (status === "built") {
+              const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
+              core.setOutput('airgap-status', status);
+              core.setOutput('airgap-url', downloadUrl);
+            } else {
+              core.setOutput('airgap-status', status);
+            }
           } catch (error) {
             core.setOutput('airgap-status', 'failed');
             console.warn('Failed to get airgap build status or download URL:', error.message);
