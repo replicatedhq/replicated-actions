@@ -391,6 +391,8 @@ function actionCreateRelease() {
                 if (waitForAirgapBuild == "true") {
                     if (resolvedChannel.buildAirgapAutomatically) {
                         try {
+                            // Wait for the airgap build to start
+                            yield new Promise(resolve => setTimeout(resolve, 5000));
                             const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
                             if (status === "built") {
                                 const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence);

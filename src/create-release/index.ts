@@ -63,6 +63,8 @@ export async function actionCreateRelease() {
       if (waitForAirgapBuild == "true") {
         if (resolvedChannel.buildAirgapAutomatically) {
           try {
+            // Wait 5 seconds for the airgap build to start
+            await new Promise(resolve => setTimeout(resolve, 5000));
             const status = await pollForAirgapReleaseStatus(apiClient, appSlug, resolvedChannel.id, +release.sequence, "built", timeoutMinutes);
             if (status === "built") {
               const downloadUrl = await getDownloadUrlAirgapBuildRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence);
