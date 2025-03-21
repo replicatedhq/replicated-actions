@@ -388,14 +388,13 @@ function actionCreateRelease() {
                     resolvedChannel = yield (0, replicated_lib_1.createChannel)(apiClient, appSlug, promoteChannel);
                 }
                 yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
-                yield new Promise(resolve => setTimeout(resolve, 5000));
-                console.log("Promoted release");
                 if (waitForAirgapBuild == "true") {
                     if (resolvedChannel.buildAirgapAutomatically) {
                         try {
                             // Wait 5 seconds for the airgap build to start
-                            yield new Promise(resolve => setTimeout(resolve, 5000));
                             console.log("Waiting for airgap build to start");
+                            new Promise(resolve => setTimeout(resolve, 10000));
+                            console.log("Airgap build started");
                             console.log("app slug: ", appSlug);
                             console.log("channel id: ", resolvedChannel.id);
                             console.log("release sequence: ", release.sequence);
