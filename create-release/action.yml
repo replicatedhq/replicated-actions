@@ -22,11 +22,21 @@ inputs:
   release-notes:
     description: "Release notes. This will be ignored if `promote-channel` is not specified."
     required: false
+  wait-for-airgap-build:
+    description: "Wait for the airgap build status or not. Defaults to false."
+    required: false
+  timeout-minutes:
+    description: "Maximum time (in minutes) to wait for the airgap build to complete. Defaults to 20 minutes."
+    required: false
 outputs:
   channel-slug: # slug of the channel
     description: "Contains the channel slug."
   release-sequence: # sequence number of the release
     description: "Sequence number of the release."
+  airgap-url:
+    description: "Contains the download url of the airgap build, if promote-channel is enabled auto airgap builds."
+  airgap-status:
+    description: "Current build status of the airgap bundle, if promote-channel is enabled auto airgap builds."
 runs:
   using: "node20"
   main: "index.js"
