@@ -1,0 +1,52 @@
+name: test - promote-release
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - promote-release/**
+      - .github/workflows/test-promote-release.yml
+
+concurrency:
+  group: test-promote-release-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      WORDPRESS_CHART_VERSION: 22.2.8
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-promote-release
+
+      - name: create-release (not promoted)
+        id: create-release
+        uses: replicatedhq/replicated-actions/create-release@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          yaml-dir: ./test/kots-install/yaml
+          version: 1.0.0-promote-test
+
+      - name: test promote-release
+        id: promote-release
+        uses: ./promote-release
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          channel-to: test-channel
+          release-sequence: ${{ steps.create-release.outputs.release-sequence }}
+          release-version: 1.0.0-promote-test
+
+
