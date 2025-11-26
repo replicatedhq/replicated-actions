@@ -51,7 +51,7 @@ jobs:
           app-slug: ${{ env.APP_SLUG }}
           release-sequence: ${{ steps.create-release.outputs.release-sequence }}
           kubernetes-distribution: kind
-          kubernetes-version: v1.25.3
+          kubernetes-version: "1.34.0"
           success: true
           notes: "CI test - compatibility verified successfully"
 
