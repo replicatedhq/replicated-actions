@@ -45,7 +45,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          channel-to: test-channel
+          channel-to: test-channel-1
           release-sequence: ${{ steps.create-release.outputs.release-sequence }}
           release-version: 1.0.0-promote-test
 
