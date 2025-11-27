@@ -1,0 +1,67 @@
+name: test - get-customer-instances
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - get-customer-instances/**
+      - .github/workflows/test-get-customer-instances.yml
+
+concurrency:
+  group: test-get-customer-instances-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-get-customer-instances
+
+      - name: test get-customer-instances
+        id: get-customer-instances
+        uses: ./get-customer-instances
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+
+      - name: verify output
+        env:
+          MATRIX: ${{ steps.get-customer-instances.outputs.matrix }}
+        run: |
+          if [ -z "$MATRIX" ]; then
+            echo "Error: matrix output is empty"
+            exit 1
+          fi
+          
+          # Verify it's valid JSON using node
+          node -e "
+            try {
+              const matrix = JSON.parse(process.env.MATRIX);
+              if (!Array.isArray(matrix)) {
+                console.error('Error: matrix is not an array');
+                process.exit(1);
+              }
+              console.log('✓ Matrix output is valid JSON array');
+              console.log('Matrix contains', matrix.length, 'items');
+              if (matrix.length > 0) {
+                console.log('Sample item:', JSON.stringify(matrix[0], null, 2));
+              }
+            } catch (e) {
+              console.error('Error: matrix output is not valid JSON:', e.message);
+              process.exit(1);
+            }
+          "
+          
+          echo "Matrix output: $MATRIX"
+

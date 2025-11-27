@@ -37,6 +37,52 @@ See the [example workflow](example-workflows/release.yaml) for more details.
 
 https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394238d5f872c1b8c65/example-workflows/release.yaml#L1-L151
 
+## Local Development
+
+Before committing changes, you can validate your work locally to ensure everything builds correctly.
+
+### Build and Package Validation
+
+Run the same validation checks that CI performs:
+
+```bash
+make
+```
+
+or explicitly:
+
+```bash
+make all
+```
+
+This command will:
+- Build all TypeScript source files
+- Package all actions into their `dist/` directories
+- Generate all README files from action definitions
+
+The CI workflow runs `make` and fails if any files changed, ensuring that all generated files are committed. Running `make` locally before committing helps catch build issues early.
+
+### Individual Action Builds
+
+You can also build specific actions individually:
+
+```bash
+make package-create-cluster
+make package-archive-channel
+make package-prepare-cluster
+# etc.
+```
+
+### Unit Tests
+
+Unit tests can be run with:
+
+```bash
+npm test
+```
+
+Note: Currently, there are no unit test files in the repository. The test workflows in `.github/workflows/` are integration tests that require the `REPLICATED_API_TOKEN` secret and run against the Replicated API.
+
 ## Secrets and Pull Requests in GitHub Actions
 
 Because these actions require use of the Replicated API token--commonly provided in a repository secret--it is important to understand some of the intrinsic details of how GitHub Actions treats secrets in certain scenarios.
