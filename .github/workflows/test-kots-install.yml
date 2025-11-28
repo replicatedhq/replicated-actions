@@ -39,6 +39,7 @@ jobs:
           app-slug: ${{ env.APP_SLUG }}
           promote-channel: test-channel
           yaml-dir: ./test/kots-install/yaml
+          version: 1.0.0-kots-install-test
 
       - name: create-customer
         id: create-customer
@@ -66,7 +67,7 @@ jobs:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           app-slug: ${{ env.APP_SLUG }}/${{ steps.create-release.outputs.channel-slug }}
           license-file: ${{ steps.create-customer.outputs.license-file }}
-          app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
+          app-version-label: 1.0.0-kots-install-test
           namespace: config-string
           config-values: |
             apiVersion: kots.io/v1beta1
@@ -95,7 +96,7 @@ jobs:
           kubeconfig: ${{ steps.create-cluster.outputs.cluster-kubeconfig }}
           app-slug: ${{ env.APP_SLUG }}/${{ steps.create-release.outputs.channel-slug }}
           license-file: ${{ steps.create-customer.outputs.license-file }}
-          app-version-label: release__${{ steps.create-release.outputs.release-sequence }}
+          app-version-label: 1.0.0-kots-install-test
           namespace: config-file
           config-values: ./test/kots-install/config.yaml
 
