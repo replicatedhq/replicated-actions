@@ -40,17 +40,43 @@ jobs:
           customer-email: ${{ github.sha }}@example.com
           license-type: test
 
-      - name: test archive-customer
-        id: archive-customer
+      - name: test archive-customer with customer-id
+        id: archive-customer-id
         uses: ./archive-customer
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci
           customer-id: ${{ steps.create-customer.outputs.customer-id }}
 
-      - name: archive-customer
+      - name: create-customer for name test
+        id: create-customer-name
+        uses: replicatedhq/replicated-actions/create-customer@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer Name - ${{ github.ref_name }} - ${{ github.sha }}"
+          license-type: test
+
+      - name: test archive-customer with customer-name
+        id: archive-customer-name
+        uses: ./archive-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci
+          customer-name: "CI Test Customer Name - ${{ github.ref_name }} - ${{ github.sha }}"
+
+      - name: archive-customer cleanup
         if: always()
         uses: replicatedhq/replicated-actions/archive-customer@v1
         continue-on-error: true # It could be that the customer is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id: ${{ steps.create-customer.outputs.customer-id }}
+
+      - name: archive-customer-name cleanup
+        if: always()
+        uses: replicatedhq/replicated-actions/archive-customer@v1
+        continue-on-error: true # It could be that the customer is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer-name.outputs.customer-id }}

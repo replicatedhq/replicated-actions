@@ -65,15 +65,42 @@ function actionArchiveCustomer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const apiToken = core.getInput("api-token", { required: true });
-            const customerId = core.getInput("customer-id", { required: true });
+            const appSlug = core.getInput("app-slug", { required: true });
+            const customerId = core.getInput("customer-id");
+            const customerName = core.getInput("customer-name");
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+            // Validate that at least one identifier is provided
+            if (!customerId && !customerName) {
+                throw new Error("Either customer-id or customer-name must be provided");
+            }
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
             if (apiEndpoint) {
                 apiClient.endpoint = apiEndpoint;
             }
-            yield (0, replicated_lib_1.archiveCustomer)(apiClient, customerId);
-            core.info(`Archived customer ${customerId}`);
+            let resolvedCustomerId;
+            if (customerId) {
+                // Use provided customer ID directly
+                resolvedCustomerId = customerId;
+            }
+            else if (customerName) {
+                // Look up customer by name
+                const customers = yield (0, replicated_lib_1.listCustomersByName)(apiClient, appSlug, customerName);
+                if (customers.length === 0) {
+                    throw new Error(`No customer found with name "${customerName}"`);
+                }
+                if (customers.length > 1) {
+                    throw new Error(`Multiple customers found with name "${customerName}". Please use customer-id instead. Found ${customers.length} customers.`);
+                }
+                resolvedCustomerId = customers[0].customerId;
+                core.info(`Resolved customer name "${customerName}" to customer ID ${resolvedCustomerId}`);
+            }
+            else {
+                // This should never happen due to the check above, but TypeScript needs this
+                throw new Error("Either customer-id or customer-name must be provided");
+            }
+            yield (0, replicated_lib_1.archiveCustomer)(apiClient, resolvedCustomerId);
+            core.info(`Archived customer ${resolvedCustomerId}`);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -32821,7 +32848,8 @@ exports.generate = function(options, cb) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getApplicationDetails = exports.Application = void 0;
+exports.Application = void 0;
+exports.getApplicationDetails = getApplicationDetails;
 class Application {
 }
 exports.Application = Application;
@@ -32841,7 +32869,6 @@ async function getApplicationDetails(vendorPortalApi, appSlug) {
     console.log(`Found app id ${app.id} for app slug ${app.slug}`);
     return app;
 }
-exports.getApplicationDetails = getApplicationDetails;
 async function findApplicationDetailsInOutput(apps, appSlug) {
     for (const app of apps) {
         if (app.slug === appSlug) {
@@ -32860,7 +32887,12 @@ async function findApplicationDetailsInOutput(apps, appSlug) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.exportedForTesting = exports.StatusError = exports.Channel = void 0;
+exports.exportedForTesting = exports.StatusError = exports.Channel = void 0;
+exports.createChannel = createChannel;
+exports.getChannelDetails = getChannelDetails;
+exports.archiveChannel = archiveChannel;
+exports.pollForAirgapReleaseStatus = pollForAirgapReleaseStatus;
+exports.getDownloadUrlAirgapBuildRelease = getDownloadUrlAirgapBuildRelease;
 const applications_1 = __nccwpck_require__(23770);
 class Channel {
 }
@@ -32896,7 +32928,6 @@ async function createChannel(vendorPortalApi, appSlug, channelName) {
     console.log(`Created channel with id ${createChannelBody.channel.id}`);
     return { name: createChannelBody.channel.name, id: createChannelBody.channel.id, slug: createChannelBody.channel.channelSlug };
 }
-exports.createChannel = createChannel;
 async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
     const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
@@ -32907,7 +32938,6 @@ async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
     // 2. get the channel id from the channel slug
     return await getChannelByApplicationId(vendorPortalApi, app.id, { slug, name });
 }
-exports.getChannelDetails = getChannelDetails;
 async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name }) {
     const http = await vendorPortalApi.client();
     console.log(`Getting channel id from channel slug ${slug} or name ${name}...`);
@@ -32940,7 +32970,6 @@ async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
     // discard the response body
     await archiveChannelRes.readBody();
 }
-exports.archiveChannel = archiveChannel;
 async function findChannelDetailsInOutput(channels, { slug, name }) {
     for (const channel of channels) {
         if (slug && channel.channelSlug == slug) {
@@ -32990,7 +33019,6 @@ async function pollForAirgapReleaseStatus(vendorPortalApi, appId, channelId, rel
     }
     throw new Error(`Airgapped build release ${releaseSequence} did not reach status ${expectedStatus} in ${timeout} seconds`);
 }
-exports.pollForAirgapReleaseStatus = pollForAirgapReleaseStatus;
 async function getDownloadUrlAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence) {
     const release = await getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence);
     const http = await vendorPortalApi.client();
@@ -33004,7 +33032,6 @@ async function getDownloadUrlAirgapBuildRelease(vendorPortalApi, appId, channelI
     const body = JSON.parse(await res.readBody());
     return body.url;
 }
-exports.getDownloadUrlAirgapBuildRelease = getDownloadUrlAirgapBuildRelease;
 async function getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/releases`;
@@ -33032,7 +33059,17 @@ async function getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseS
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
+exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
+exports.createCluster = createCluster;
+exports.createClusterWithLicense = createClusterWithLicense;
+exports.pollForStatus = pollForStatus;
+exports.getKubeconfig = getKubeconfig;
+exports.removeCluster = removeCluster;
+exports.upgradeCluster = upgradeCluster;
+exports.getClusterVersions = getClusterVersions;
+exports.createAddonObjectStore = createAddonObjectStore;
+exports.pollForAddonStatus = pollForAddonStatus;
+exports.exposeClusterPort = exposeClusterPort;
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -33064,7 +33101,6 @@ exports.StatusError = StatusError;
 async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily) {
     return await createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, "", clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily);
 }
-exports.createCluster = createCluster;
 async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, licenseId, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33119,7 +33155,6 @@ async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistrib
         status: body.cluster.status
     };
 }
-exports.createClusterWithLicense = createClusterWithLicense;
 async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
     // get clusters from the api, look for the status of the id to be ${status}
     // if it's not ${status}, sleep for 5 seconds and try again
@@ -33158,7 +33193,6 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
     }
     throw new Error(`Cluster did not reach state ${expectedStatus} within ${timeout} seconds`);
 }
-exports.pollForStatus = pollForStatus;
 async function getClusterDetails(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
@@ -33187,7 +33221,6 @@ async function getKubeconfig(vendorPortalApi, clusterId) {
     const body = JSON.parse(await res.readBody());
     return atob(body.kubeconfig);
 }
-exports.getKubeconfig = getKubeconfig;
 async function removeCluster(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
@@ -33198,7 +33231,6 @@ async function removeCluster(vendorPortalApi, clusterId) {
         throw new StatusError(`Failed to remove cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
 }
-exports.removeCluster = removeCluster;
 async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33213,7 +33245,6 @@ async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     }
     return getClusterDetails(vendorPortalApi, clusterId);
 }
-exports.upgradeCluster = upgradeCluster;
 async function getClusterVersions(vendorPortalApi) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/versions`;
@@ -33236,7 +33267,6 @@ async function getClusterVersions(vendorPortalApi) {
     }
     return clusterVersions;
 }
-exports.getClusterVersions = getClusterVersions;
 async function createAddonObjectStore(vendorPortalApi, clusterId, bucketName) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons/objectstore`;
@@ -33267,7 +33297,6 @@ async function createAddonObjectStore(vendorPortalApi, clusterId, bucketName) {
     }
     return addon;
 }
-exports.createAddonObjectStore = createAddonObjectStore;
 async function pollForAddonStatus(vendorPortalApi, clusterId, addonId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
     // get add-ons from the api, look for the status of the id to be ${status}
     // if it's not ${status}, sleep for 5 seconds and try again
@@ -33306,7 +33335,6 @@ async function pollForAddonStatus(vendorPortalApi, clusterId, addonId, expectedS
     }
     throw new Error(`Add-on did not reach state ${expectedStatus} within ${timeout} seconds`);
 }
-exports.pollForAddonStatus = pollForAddonStatus;
 async function getAddonDetails(vendorPortalApi, clusterId, addonId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons`;
@@ -33379,20 +33407,52 @@ async function exposeClusterPort(vendorPortalApi, clusterId, port, protocols, is
     };
     return portObj;
 }
-exports.exposeClusterPort = exposeClusterPort;
 
 
 /***/ }),
 
 /***/ 44995:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VendorPortalApi = void 0;
 // Replicated Library Configuration
-const httpClient = __nccwpck_require__(96255);
+const httpClient = __importStar(__nccwpck_require__(96255));
 class VendorPortalApi {
     constructor() {
         this.endpoint = "https://api.replicated.com/vendor/v3";
@@ -33440,7 +33500,11 @@ exports.VendorPortalApi = VendorPortalApi;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getUsedKubernetesDistributions = exports.archiveCustomer = exports.createCustomer = exports.KubernetesDistribution = exports.Customer = void 0;
+exports.KubernetesDistribution = exports.CustomerSummary = exports.Customer = void 0;
+exports.createCustomer = createCustomer;
+exports.archiveCustomer = archiveCustomer;
+exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
+exports.listCustomersByName = listCustomersByName;
 const channels_1 = __nccwpck_require__(67491);
 const applications_1 = __nccwpck_require__(23770);
 const date_fns_1 = __nccwpck_require__(73314);
@@ -33448,6 +33512,9 @@ const date_fns_tz_1 = __nccwpck_require__(14960);
 class Customer {
 }
 exports.Customer = Customer;
+class CustomerSummary {
+}
+exports.CustomerSummary = CustomerSummary;
 class KubernetesDistribution {
 }
 exports.KubernetesDistribution = KubernetesDistribution;
@@ -33519,7 +33586,6 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         throw error;
     }
 }
-exports.createCustomer = createCustomer;
 async function archiveCustomer(vendorPortalApi, customerId) {
     const http = await vendorPortalApi.client();
     // 2. Archive a customer
@@ -33532,7 +33598,6 @@ async function archiveCustomer(vendorPortalApi, customerId) {
         throw new Error(`Failed to archive customer: Server responded with ${archiveCustomerRes.message.statusCode}`);
     }
 }
-exports.archiveCustomer = archiveCustomer;
 async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     const http = await vendorPortalApi.client();
     // 1. get the app
@@ -33565,7 +33630,61 @@ async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     }
     return kubernetesDistributions;
 }
-exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
+async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
+    const http = await vendorPortalApi.client();
+    // Get the app ID from the app slug to filter results
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    // Use the searchTeamCustomers endpoint to search for customers by name and app
+    const searchCustomersUri = `${vendorPortalApi.endpoint}/customers/search`;
+    let allCustomers = [];
+    let offset = 0; // offset is the number of pages to skip
+    const pageSize = 100;
+    let hasMorePages = true;
+    while (hasMorePages) {
+        const requestBody = {
+            include_paid: true,
+            include_inactive: true,
+            include_dev: true,
+            include_community: true,
+            include_archived: false,
+            include_active: true,
+            include_test: true,
+            include_trial: true,
+            query: `name:${customerName}`,
+            app_id: app.id,
+            offset: offset,
+            page_size: pageSize
+        };
+        const searchCustomersRes = await http.post(searchCustomersUri, JSON.stringify(requestBody));
+        if (searchCustomersRes.message.statusCode != 200) {
+            let body = "";
+            try {
+                body = await searchCustomersRes.readBody();
+            }
+            catch (err) {
+                // ignore
+            }
+            throw new Error(`Failed to list customers: Server responded with ${searchCustomersRes.message.statusCode}: ${body}`);
+        }
+        const searchCustomersBody = JSON.parse(await searchCustomersRes.readBody());
+        // Convert response body into CustomerSummary array
+        if (searchCustomersBody.data && Array.isArray(searchCustomersBody.data)) {
+            for (const customer of searchCustomersBody.data) {
+                allCustomers.push({
+                    name: customer.name,
+                    customerId: customer.id
+                });
+            }
+        }
+        // Check if there are more pages to fetch
+        const totalCount = searchCustomersBody.total_count || 0;
+        const currentPageSize = searchCustomersBody.data ? searchCustomersBody.data.length : 0;
+        const totalPages = Math.ceil(totalCount / pageSize);
+        hasMorePages = currentPageSize > 0 && offset + 1 < totalPages;
+        offset++; // Increment offset by 1 (one more page to skip)
+    }
+    return allCustomers;
+}
 
 
 /***/ }),
@@ -33576,7 +33695,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.listCustomersByName = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.CustomerSummary = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(44995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(23770);
@@ -33602,9 +33721,11 @@ Object.defineProperty(exports, "pollForAddonStatus", ({ enumerable: true, get: f
 Object.defineProperty(exports, "exposeClusterPort", ({ enumerable: true, get: function () { return clusters_1.exposeClusterPort; } }));
 var customers_1 = __nccwpck_require__(88958);
 Object.defineProperty(exports, "KubernetesDistribution", ({ enumerable: true, get: function () { return customers_1.KubernetesDistribution; } }));
+Object.defineProperty(exports, "CustomerSummary", ({ enumerable: true, get: function () { return customers_1.CustomerSummary; } }));
 Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
 Object.defineProperty(exports, "getUsedKubernetesDistributions", ({ enumerable: true, get: function () { return customers_1.getUsedKubernetesDistributions; } }));
+Object.defineProperty(exports, "listCustomersByName", ({ enumerable: true, get: function () { return customers_1.listCustomersByName; } }));
 var releases_1 = __nccwpck_require__(74873);
 Object.defineProperty(exports, "createRelease", ({ enumerable: true, get: function () { return releases_1.createRelease; } }));
 Object.defineProperty(exports, "createReleaseFromChart", ({ enumerable: true, get: function () { return releases_1.createReleaseFromChart; } }));
@@ -33615,18 +33736,55 @@ Object.defineProperty(exports, "reportCompatibilityResult", ({ enumerable: true,
 /***/ }),
 
 /***/ 74873:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.gzipData = exports.createReleaseFromChart = exports.createRelease = exports.exportedForTesting = void 0;
+exports.gzipData = exports.exportedForTesting = void 0;
+exports.createRelease = createRelease;
+exports.createReleaseFromChart = createReleaseFromChart;
+exports.promoteRelease = promoteRelease;
+exports.reportCompatibilityResult = reportCompatibilityResult;
 const applications_1 = __nccwpck_require__(23770);
 const pako_1 = __nccwpck_require__(31726);
-const path = __nccwpck_require__(71017);
-const fs = __nccwpck_require__(57147);
-const util = __nccwpck_require__(73837);
-const base64 = __nccwpck_require__(26463);
+const path = __importStar(__nccwpck_require__(71017));
+const fs = __importStar(__nccwpck_require__(57147));
+const util = __importStar(__nccwpck_require__(73837));
+const base64 = __importStar(__nccwpck_require__(26463));
 const date_fns_tz_1 = __nccwpck_require__(14960);
 exports.exportedForTesting = {
     areReleaseChartsPushed,
@@ -33665,7 +33823,6 @@ async function createRelease(vendorPortalApi, appSlug, yamlDir) {
     }
     return { sequence: createReleaseBody.release.sequence, charts: createReleaseBody.release.charts };
 }
-exports.createRelease = createRelease;
 async function createReleaseFromChart(vendorPortalApi, appSlug, chart) {
     var _a;
     const http = await vendorPortalApi.client();
@@ -33695,7 +33852,6 @@ async function createReleaseFromChart(vendorPortalApi, appSlug, chart) {
     }
     return { sequence: createReleaseBody.release.sequence, charts: createReleaseBody.release.charts };
 }
-exports.createReleaseFromChart = createReleaseFromChart;
 const gzipData = (data) => {
     return Buffer.from((0, pako_1.gzip)(JSON.stringify(data))).toString("base64");
 };
@@ -33788,7 +33944,6 @@ async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequen
     // 2. promote the release
     await promoteReleaseByAppId(vendorPortalApi, app.id, channelId, releaseSequence, version, releaseNotes);
 }
-exports.promoteRelease = promoteRelease;
 async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version, releaseNotes) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33871,7 +34026,6 @@ async function reportCompatibilityResult(vendorPortalApi, appSlug, releaseSequen
     // 2. report the compatibility result
     await reportCompatibilityResultByAppId(vendorPortalApi, app.id, releaseSequence, compatibilityResult);
 }
-exports.reportCompatibilityResult = reportCompatibilityResult;
 async function reportCompatibilityResultByAppId(vendorPortalApi, appId, releaseSequence, compatibilityResult) {
     const http = await vendorPortalApi.client();
     const reqBody = {
