@@ -32821,7 +32821,8 @@ exports.generate = function(options, cb) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getApplicationDetails = exports.Application = void 0;
+exports.Application = void 0;
+exports.getApplicationDetails = getApplicationDetails;
 class Application {
 }
 exports.Application = Application;
@@ -32841,7 +32842,6 @@ async function getApplicationDetails(vendorPortalApi, appSlug) {
     console.log(`Found app id ${app.id} for app slug ${app.slug}`);
     return app;
 }
-exports.getApplicationDetails = getApplicationDetails;
 async function findApplicationDetailsInOutput(apps, appSlug) {
     for (const app of apps) {
         if (app.slug === appSlug) {
@@ -32860,7 +32860,12 @@ async function findApplicationDetailsInOutput(apps, appSlug) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.exportedForTesting = exports.StatusError = exports.Channel = void 0;
+exports.exportedForTesting = exports.StatusError = exports.Channel = void 0;
+exports.createChannel = createChannel;
+exports.getChannelDetails = getChannelDetails;
+exports.archiveChannel = archiveChannel;
+exports.pollForAirgapReleaseStatus = pollForAirgapReleaseStatus;
+exports.getDownloadUrlAirgapBuildRelease = getDownloadUrlAirgapBuildRelease;
 const applications_1 = __nccwpck_require__(23770);
 class Channel {
 }
@@ -32896,7 +32901,6 @@ async function createChannel(vendorPortalApi, appSlug, channelName) {
     console.log(`Created channel with id ${createChannelBody.channel.id}`);
     return { name: createChannelBody.channel.name, id: createChannelBody.channel.id, slug: createChannelBody.channel.channelSlug };
 }
-exports.createChannel = createChannel;
 async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
     const http = await vendorPortalApi.client();
     // 1. get the app id from the app slug
@@ -32907,7 +32911,6 @@ async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
     // 2. get the channel id from the channel slug
     return await getChannelByApplicationId(vendorPortalApi, app.id, { slug, name });
 }
-exports.getChannelDetails = getChannelDetails;
 async function getChannelByApplicationId(vendorPortalApi, appid, { slug, name }) {
     const http = await vendorPortalApi.client();
     console.log(`Getting channel id from channel slug ${slug} or name ${name}...`);
@@ -32940,7 +32943,6 @@ async function archiveChannel(vendorPortalApi, appSlug, channelSlug) {
     // discard the response body
     await archiveChannelRes.readBody();
 }
-exports.archiveChannel = archiveChannel;
 async function findChannelDetailsInOutput(channels, { slug, name }) {
     for (const channel of channels) {
         if (slug && channel.channelSlug == slug) {
@@ -32990,7 +32992,6 @@ async function pollForAirgapReleaseStatus(vendorPortalApi, appId, channelId, rel
     }
     throw new Error(`Airgapped build release ${releaseSequence} did not reach status ${expectedStatus} in ${timeout} seconds`);
 }
-exports.pollForAirgapReleaseStatus = pollForAirgapReleaseStatus;
 async function getDownloadUrlAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence) {
     const release = await getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence);
     const http = await vendorPortalApi.client();
@@ -33004,7 +33005,6 @@ async function getDownloadUrlAirgapBuildRelease(vendorPortalApi, appId, channelI
     const body = JSON.parse(await res.readBody());
     return body.url;
 }
-exports.getDownloadUrlAirgapBuildRelease = getDownloadUrlAirgapBuildRelease;
 async function getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseSequence) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/releases`;
@@ -33032,7 +33032,17 @@ async function getAirgapBuildRelease(vendorPortalApi, appId, channelId, releaseS
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
+exports.StatusError = exports.ClusterExposedPort = exports.ClusterPort = exports.Postgres = exports.ObjectStore = exports.Addon = exports.ClusterVersion = exports.Cluster = void 0;
+exports.createCluster = createCluster;
+exports.createClusterWithLicense = createClusterWithLicense;
+exports.pollForStatus = pollForStatus;
+exports.getKubeconfig = getKubeconfig;
+exports.removeCluster = removeCluster;
+exports.upgradeCluster = upgradeCluster;
+exports.getClusterVersions = getClusterVersions;
+exports.createAddonObjectStore = createAddonObjectStore;
+exports.pollForAddonStatus = pollForAddonStatus;
+exports.exposeClusterPort = exposeClusterPort;
 class Cluster {
 }
 exports.Cluster = Cluster;
@@ -33064,7 +33074,6 @@ exports.StatusError = StatusError;
 async function createCluster(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily) {
     return await createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, "", clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily);
 }
-exports.createCluster = createCluster;
 async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistribution, k8sVersion, licenseId, clusterTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroups, tags, ipFamily) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33119,7 +33128,6 @@ async function createClusterWithLicense(vendorPortalApi, clusterName, k8sDistrib
         status: body.cluster.status
     };
 }
-exports.createClusterWithLicense = createClusterWithLicense;
 async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
     // get clusters from the api, look for the status of the id to be ${status}
     // if it's not ${status}, sleep for 5 seconds and try again
@@ -33158,7 +33166,6 @@ async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout
     }
     throw new Error(`Cluster did not reach state ${expectedStatus} within ${timeout} seconds`);
 }
-exports.pollForStatus = pollForStatus;
 async function getClusterDetails(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
@@ -33187,7 +33194,6 @@ async function getKubeconfig(vendorPortalApi, clusterId) {
     const body = JSON.parse(await res.readBody());
     return atob(body.kubeconfig);
 }
-exports.getKubeconfig = getKubeconfig;
 async function removeCluster(vendorPortalApi, clusterId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}`;
@@ -33198,7 +33204,6 @@ async function removeCluster(vendorPortalApi, clusterId) {
         throw new StatusError(`Failed to remove cluster: Server responded with ${res.message.statusCode}`, res.message.statusCode);
     }
 }
-exports.removeCluster = removeCluster;
 async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33213,7 +33218,6 @@ async function upgradeCluster(vendorPortalApi, clusterId, k8sVersion) {
     }
     return getClusterDetails(vendorPortalApi, clusterId);
 }
-exports.upgradeCluster = upgradeCluster;
 async function getClusterVersions(vendorPortalApi) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/versions`;
@@ -33236,7 +33240,6 @@ async function getClusterVersions(vendorPortalApi) {
     }
     return clusterVersions;
 }
-exports.getClusterVersions = getClusterVersions;
 async function createAddonObjectStore(vendorPortalApi, clusterId, bucketName) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons/objectstore`;
@@ -33267,7 +33270,6 @@ async function createAddonObjectStore(vendorPortalApi, clusterId, bucketName) {
     }
     return addon;
 }
-exports.createAddonObjectStore = createAddonObjectStore;
 async function pollForAddonStatus(vendorPortalApi, clusterId, addonId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
     // get add-ons from the api, look for the status of the id to be ${status}
     // if it's not ${status}, sleep for 5 seconds and try again
@@ -33306,7 +33308,6 @@ async function pollForAddonStatus(vendorPortalApi, clusterId, addonId, expectedS
     }
     throw new Error(`Add-on did not reach state ${expectedStatus} within ${timeout} seconds`);
 }
-exports.pollForAddonStatus = pollForAddonStatus;
 async function getAddonDetails(vendorPortalApi, clusterId, addonId) {
     const http = await vendorPortalApi.client();
     const uri = `${vendorPortalApi.endpoint}/cluster/${clusterId}/addons`;
@@ -33379,20 +33380,52 @@ async function exposeClusterPort(vendorPortalApi, clusterId, port, protocols, is
     };
     return portObj;
 }
-exports.exposeClusterPort = exposeClusterPort;
 
 
 /***/ }),
 
 /***/ 44995:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VendorPortalApi = void 0;
 // Replicated Library Configuration
-const httpClient = __nccwpck_require__(96255);
+const httpClient = __importStar(__nccwpck_require__(96255));
 class VendorPortalApi {
     constructor() {
         this.endpoint = "https://api.replicated.com/vendor/v3";
@@ -33440,7 +33473,11 @@ exports.VendorPortalApi = VendorPortalApi;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getUsedKubernetesDistributions = exports.archiveCustomer = exports.createCustomer = exports.KubernetesDistribution = exports.Customer = void 0;
+exports.KubernetesDistribution = exports.CustomerSummary = exports.Customer = void 0;
+exports.createCustomer = createCustomer;
+exports.archiveCustomer = archiveCustomer;
+exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
+exports.listCustomersByName = listCustomersByName;
 const channels_1 = __nccwpck_require__(67491);
 const applications_1 = __nccwpck_require__(23770);
 const date_fns_1 = __nccwpck_require__(73314);
@@ -33448,6 +33485,9 @@ const date_fns_tz_1 = __nccwpck_require__(14960);
 class Customer {
 }
 exports.Customer = Customer;
+class CustomerSummary {
+}
+exports.CustomerSummary = CustomerSummary;
 class KubernetesDistribution {
 }
 exports.KubernetesDistribution = KubernetesDistribution;
@@ -33519,7 +33559,6 @@ async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType
         throw error;
     }
 }
-exports.createCustomer = createCustomer;
 async function archiveCustomer(vendorPortalApi, customerId) {
     const http = await vendorPortalApi.client();
     // 2. Archive a customer
@@ -33532,7 +33571,6 @@ async function archiveCustomer(vendorPortalApi, customerId) {
         throw new Error(`Failed to archive customer: Server responded with ${archiveCustomerRes.message.statusCode}`);
     }
 }
-exports.archiveCustomer = archiveCustomer;
 async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     const http = await vendorPortalApi.client();
     // 1. get the app
@@ -33565,7 +33603,61 @@ async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     }
     return kubernetesDistributions;
 }
-exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
+async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
+    const http = await vendorPortalApi.client();
+    // Get the app ID from the app slug to filter results
+    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
+    // Use the searchTeamCustomers endpoint to search for customers by name and app
+    const searchCustomersUri = `${vendorPortalApi.endpoint}/customers/search`;
+    let allCustomers = [];
+    let offset = 0; // offset is the number of pages to skip
+    const pageSize = 100;
+    let hasMorePages = true;
+    while (hasMorePages) {
+        const requestBody = {
+            include_paid: true,
+            include_inactive: true,
+            include_dev: true,
+            include_community: true,
+            include_archived: false,
+            include_active: true,
+            include_test: true,
+            include_trial: true,
+            query: `name:${customerName}`,
+            app_id: app.id,
+            offset: offset,
+            page_size: pageSize
+        };
+        const searchCustomersRes = await http.post(searchCustomersUri, JSON.stringify(requestBody));
+        if (searchCustomersRes.message.statusCode != 200) {
+            let body = "";
+            try {
+                body = await searchCustomersRes.readBody();
+            }
+            catch (err) {
+                // ignore
+            }
+            throw new Error(`Failed to list customers: Server responded with ${searchCustomersRes.message.statusCode}: ${body}`);
+        }
+        const searchCustomersBody = JSON.parse(await searchCustomersRes.readBody());
+        // Convert response body into CustomerSummary array
+        if (searchCustomersBody.data && Array.isArray(searchCustomersBody.data)) {
+            for (const customer of searchCustomersBody.data) {
+                allCustomers.push({
+                    name: customer.name,
+                    customerId: customer.id
+                });
+            }
+        }
+        // Check if there are more pages to fetch
+        const totalCount = searchCustomersBody.total_count || 0;
+        const currentPageSize = searchCustomersBody.data ? searchCustomersBody.data.length : 0;
+        const totalPages = Math.ceil(totalCount / pageSize);
+        hasMorePages = currentPageSize > 0 && offset + 1 < totalPages;
+        offset++; // Increment offset by 1 (one more page to skip)
+    }
+    return allCustomers;
+}
 
 
 /***/ }),
@@ -33576,7 +33668,7 @@ exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.listCustomersByName = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.CustomerSummary = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(44995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(23770);
@@ -33602,9 +33694,11 @@ Object.defineProperty(exports, "pollForAddonStatus", ({ enumerable: true, get: f
 Object.defineProperty(exports, "exposeClusterPort", ({ enumerable: true, get: function () { return clusters_1.exposeClusterPort; } }));
 var customers_1 = __nccwpck_require__(88958);
 Object.defineProperty(exports, "KubernetesDistribution", ({ enumerable: true, get: function () { return customers_1.KubernetesDistribution; } }));
+Object.defineProperty(exports, "CustomerSummary", ({ enumerable: true, get: function () { return customers_1.CustomerSummary; } }));
 Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: function () { return customers_1.archiveCustomer; } }));
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
 Object.defineProperty(exports, "getUsedKubernetesDistributions", ({ enumerable: true, get: function () { return customers_1.getUsedKubernetesDistributions; } }));
+Object.defineProperty(exports, "listCustomersByName", ({ enumerable: true, get: function () { return customers_1.listCustomersByName; } }));
 var releases_1 = __nccwpck_require__(74873);
 Object.defineProperty(exports, "createRelease", ({ enumerable: true, get: function () { return releases_1.createRelease; } }));
 Object.defineProperty(exports, "createReleaseFromChart", ({ enumerable: true, get: function () { return releases_1.createReleaseFromChart; } }));
@@ -33615,18 +33709,55 @@ Object.defineProperty(exports, "reportCompatibilityResult", ({ enumerable: true,
 /***/ }),
 
 /***/ 74873:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.gzipData = exports.createReleaseFromChart = exports.createRelease = exports.exportedForTesting = void 0;
+exports.gzipData = exports.exportedForTesting = void 0;
+exports.createRelease = createRelease;
+exports.createReleaseFromChart = createReleaseFromChart;
+exports.promoteRelease = promoteRelease;
+exports.reportCompatibilityResult = reportCompatibilityResult;
 const applications_1 = __nccwpck_require__(23770);
 const pako_1 = __nccwpck_require__(31726);
-const path = __nccwpck_require__(71017);
-const fs = __nccwpck_require__(57147);
-const util = __nccwpck_require__(73837);
-const base64 = __nccwpck_require__(26463);
+const path = __importStar(__nccwpck_require__(71017));
+const fs = __importStar(__nccwpck_require__(57147));
+const util = __importStar(__nccwpck_require__(73837));
+const base64 = __importStar(__nccwpck_require__(26463));
 const date_fns_tz_1 = __nccwpck_require__(14960);
 exports.exportedForTesting = {
     areReleaseChartsPushed,
@@ -33665,7 +33796,6 @@ async function createRelease(vendorPortalApi, appSlug, yamlDir) {
     }
     return { sequence: createReleaseBody.release.sequence, charts: createReleaseBody.release.charts };
 }
-exports.createRelease = createRelease;
 async function createReleaseFromChart(vendorPortalApi, appSlug, chart) {
     var _a;
     const http = await vendorPortalApi.client();
@@ -33695,7 +33825,6 @@ async function createReleaseFromChart(vendorPortalApi, appSlug, chart) {
     }
     return { sequence: createReleaseBody.release.sequence, charts: createReleaseBody.release.charts };
 }
-exports.createReleaseFromChart = createReleaseFromChart;
 const gzipData = (data) => {
     return Buffer.from((0, pako_1.gzip)(JSON.stringify(data))).toString("base64");
 };
@@ -33788,7 +33917,6 @@ async function promoteRelease(vendorPortalApi, appSlug, channelId, releaseSequen
     // 2. promote the release
     await promoteReleaseByAppId(vendorPortalApi, app.id, channelId, releaseSequence, version, releaseNotes);
 }
-exports.promoteRelease = promoteRelease;
 async function promoteReleaseByAppId(vendorPortalApi, appId, channelId, releaseSequence, version, releaseNotes) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33871,7 +33999,6 @@ async function reportCompatibilityResult(vendorPortalApi, appSlug, releaseSequen
     // 2. report the compatibility result
     await reportCompatibilityResultByAppId(vendorPortalApi, app.id, releaseSequence, compatibilityResult);
 }
-exports.reportCompatibilityResult = reportCompatibilityResult;
 async function reportCompatibilityResultByAppId(vendorPortalApi, appId, releaseSequence, compatibilityResult) {
     const http = await vendorPortalApi.client();
     const reqBody = {
@@ -33988,24 +34115,34 @@ const _c = { fs: fs.constants, os: os.constants };
 /*
  * The working inner variables.
  */
-const // the random characters to choose from
+const
+  // the random characters to choose from
   RANDOM_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+
   TEMPLATE_PATTERN = /XXXXXX/,
+
   DEFAULT_TRIES = 3,
+
   CREATE_FLAGS = (_c.O_CREAT || _c.fs.O_CREAT) | (_c.O_EXCL || _c.fs.O_EXCL) | (_c.O_RDWR || _c.fs.O_RDWR),
+
   // constants are off on the windows platform and will not match the actual errno codes
   IS_WIN32 = os.platform() === 'win32',
   EBADF = _c.EBADF || _c.os.errno.EBADF,
   ENOENT = _c.ENOENT || _c.os.errno.ENOENT,
+
   DIR_MODE = 0o700 /* 448 */,
   FILE_MODE = 0o600 /* 384 */,
+
   EXIT = 'exit',
+
   // this will hold the objects need to be removed on exit
   _removeObjects = [],
+
   // API change in fs.rmdirSync leads to error when passing in a second parameter, e.g. the callback
   FN_RMDIR_SYNC = fs.rmdirSync.bind(fs);
 
-let _gracefulCleanup = false;
+let
+  _gracefulCleanup = false;
 
 /**
  * Recursively remove a directory and its contents.
@@ -34035,35 +34172,38 @@ function FN_RIMRAF_SYNC(dirPath) {
  * @param {?tmpNameCallback} callback the callback function
  */
 function tmpName(options, callback) {
-  const args = _parseArguments(options, callback),
+  const
+    args = _parseArguments(options, callback),
     opts = args[0],
     cb = args[1];
 
-  _assertAndSanitizeOptions(opts, function (err, sanitizedOptions) {
-    if (err) return cb(err);
+  try {
+    _assertAndSanitizeOptions(opts);
+  } catch (err) {
+    return cb(err);
+  }
 
-    let tries = sanitizedOptions.tries;
-    (function _getUniqueName() {
-      try {
-        const name = _generateTmpName(sanitizedOptions);
+  let tries = opts.tries;
+  (function _getUniqueName() {
+    try {
+      const name = _generateTmpName(opts);
 
-        // check whether the path exists then retry if needed
-        fs.stat(name, function (err) {
+      // check whether the path exists then retry if needed
+      fs.stat(name, function (err) {
+        /* istanbul ignore else */
+        if (!err) {
           /* istanbul ignore else */
-          if (!err) {
-            /* istanbul ignore else */
-            if (tries-- > 0) return _getUniqueName();
+          if (tries-- > 0) return _getUniqueName();
 
-            return cb(new Error('Could not get a unique tmp filename, max tries reached ' + name));
-          }
+          return cb(new Error('Could not get a unique tmp filename, max tries reached ' + name));
+        }
 
-          cb(null, name);
-        });
-      } catch (err) {
-        cb(err);
-      }
-    })();
-  });
+        cb(null, name);
+      });
+    } catch (err) {
+      cb(err);
+    }
+  }());
 }
 
 /**
@@ -34074,14 +34214,15 @@ function tmpName(options, callback) {
  * @throws {Error} if the options are invalid or could not generate a filename
  */
 function tmpNameSync(options) {
-  const args = _parseArguments(options),
+  const
+    args = _parseArguments(options),
     opts = args[0];
 
-  const sanitizedOptions = _assertAndSanitizeOptionsSync(opts);
+  _assertAndSanitizeOptions(opts);
 
-  let tries = sanitizedOptions.tries;
+  let tries = opts.tries;
   do {
-    const name = _generateTmpName(sanitizedOptions);
+    const name = _generateTmpName(opts);
     try {
       fs.statSync(name);
     } catch (e) {
@@ -34099,7 +34240,8 @@ function tmpNameSync(options) {
  * @param {?fileCallback} callback
  */
 function file(options, callback) {
-  const args = _parseArguments(options, callback),
+  const
+    args = _parseArguments(options, callback),
     opts = args[0],
     cb = args[1];
 
@@ -34136,12 +34278,13 @@ function file(options, callback) {
  * @throws {Error} if cannot create a file
  */
 function fileSync(options) {
-  const args = _parseArguments(options),
+  const
+    args = _parseArguments(options),
     opts = args[0];
 
   const discardOrDetachDescriptor = opts.discardDescriptor || opts.detachDescriptor;
   const name = tmpNameSync(opts);
-  let fd = fs.openSync(name, CREATE_FLAGS, opts.mode || FILE_MODE);
+  var fd = fs.openSync(name, CREATE_FLAGS, opts.mode || FILE_MODE);
   /* istanbul ignore else */
   if (opts.discardDescriptor) {
     fs.closeSync(fd);
@@ -34162,7 +34305,8 @@ function fileSync(options) {
  * @param {?dirCallback} callback
  */
 function dir(options, callback) {
-  const args = _parseArguments(options, callback),
+  const
+    args = _parseArguments(options, callback),
     opts = args[0],
     cb = args[1];
 
@@ -34189,7 +34333,8 @@ function dir(options, callback) {
  * @throws {Error} if it cannot create a directory
  */
 function dirSync(options) {
-  const args = _parseArguments(options),
+  const
+    args = _parseArguments(options),
     opts = args[0];
 
   const name = tmpNameSync(opts);
@@ -34240,7 +34385,8 @@ function _removeFileSync(fdPath) {
   } finally {
     try {
       fs.unlinkSync(fdPath[1]);
-    } catch (e) {
+    }
+    catch (e) {
       // reraise any unanticipated error
       if (!_isENOENT(e)) rethrownException = e;
     }
@@ -34312,6 +34458,7 @@ function _prepareRemoveCallback(removeFunction, fileOrDirName, sync, cleanupCall
 
   // if sync is true, the next parameter will be ignored
   return function _cleanupCallback(next) {
+
     /* istanbul ignore else */
     if (!called) {
       // remove cleanupCallback from cache
@@ -34324,7 +34471,7 @@ function _prepareRemoveCallback(removeFunction, fileOrDirName, sync, cleanupCall
       if (sync || removeFunction === FN_RMDIR_SYNC || removeFunction === FN_RIMRAF_SYNC) {
         return removeFunction(fileOrDirName);
       } else {
-        return removeFunction(fileOrDirName, next || function () {});
+        return removeFunction(fileOrDirName, next || function() {});
       }
     }
   };
@@ -34359,7 +34506,8 @@ function _garbageCollector() {
  * @private
  */
 function _randomChars(howMany) {
-  let value = [],
+  let
+    value = [],
     rnd = null;
 
   // make sure that we do not fail because we ran out of entropy
@@ -34369,11 +34517,22 @@ function _randomChars(howMany) {
     rnd = crypto.pseudoRandomBytes(howMany);
   }
 
-  for (let i = 0; i < howMany; i++) {
+  for (var i = 0; i < howMany; i++) {
     value.push(RANDOM_CHARS[rnd[i] % RANDOM_CHARS.length]);
   }
 
   return value.join('');
+}
+
+/**
+ * Helper which determines whether a string s is blank, that is undefined, or empty or null.
+ *
+ * @private
+ * @param {string} s
+ * @returns {Boolean} true whether the string s is blank, false otherwise
+ */
+function _isBlank(s) {
+  return s === null || _isUndefined(s) || !s.trim();
 }
 
 /**
@@ -34418,51 +34577,6 @@ function _parseArguments(options, callback) {
 }
 
 /**
- * Resolve the specified path name in respect to tmpDir.
- *
- * The specified name might include relative path components, e.g. ../
- * so we need to resolve in order to be sure that is is located inside tmpDir
- *
- * @private
- */
-function _resolvePath(name, tmpDir, cb) {
-  const pathToResolve = path.isAbsolute(name) ? name : path.join(tmpDir, name);
-
-  fs.stat(pathToResolve, function (err) {
-    if (err) {
-      fs.realpath(path.dirname(pathToResolve), function (err, parentDir) {
-        if (err) return cb(err);
-
-        cb(null, path.join(parentDir, path.basename(pathToResolve)));
-      });
-    } else {
-      fs.realpath(pathToResolve, cb);
-    }
-  });
-}
-
-/**
- * Resolve the specified path name in respect to tmpDir.
- *
- * The specified name might include relative path components, e.g. ../
- * so we need to resolve in order to be sure that is is located inside tmpDir
- *
- * @private
- */
-function _resolvePathSync(name, tmpDir) {
-  const pathToResolve = path.isAbsolute(name) ? name : path.join(tmpDir, name);
-
-  try {
-    fs.statSync(pathToResolve);
-    return fs.realpathSync(pathToResolve);
-  } catch (_err) {
-    const parentDir = fs.realpathSync(path.dirname(pathToResolve));
-
-    return path.join(parentDir, path.basename(pathToResolve));
-  }
-}
-
-/**
  * Generates a new temporary name.
  *
  * @param {Object} opts
@@ -34470,17 +34584,16 @@ function _resolvePathSync(name, tmpDir) {
  * @private
  */
 function _generateTmpName(opts) {
+
   const tmpDir = opts.tmpdir;
 
   /* istanbul ignore else */
-  if (!_isUndefined(opts.name)) {
+  if (!_isUndefined(opts.name))
     return path.join(tmpDir, opts.dir, opts.name);
-  }
 
   /* istanbul ignore else */
-  if (!_isUndefined(opts.template)) {
+  if (!_isUndefined(opts.template))
     return path.join(tmpDir, opts.dir, opts.template).replace(TEMPLATE_PATTERN, _randomChars(6));
-  }
 
   // prefix and postfix
   const name = [
@@ -34496,32 +34609,33 @@ function _generateTmpName(opts) {
 }
 
 /**
- * Asserts and sanitizes the basic options.
+ * Asserts whether the specified options are valid, also sanitizes options and provides sane defaults for missing
+ * options.
  *
+ * @param {Options} options
  * @private
  */
-function _assertOptionsBase(options) {
-  if (!_isUndefined(options.name)) {
-    const name = options.name;
+function _assertAndSanitizeOptions(options) {
 
-    // assert that name is not absolute and does not contain a path
-    if (path.isAbsolute(name)) throw new Error(`name option must not contain an absolute path, found "${name}".`);
+  options.tmpdir = _getTmpDir(options);
 
-    // must not fail on valid .<name> or ..<name> or similar such constructs
-    const basename = path.basename(name);
-    if (basename === '..' || basename === '.' || basename !== name)
-      throw new Error(`name option must not contain a path, found "${name}".`);
-  }
+  const tmpDir = options.tmpdir;
 
   /* istanbul ignore else */
-  if (!_isUndefined(options.template) && !options.template.match(TEMPLATE_PATTERN)) {
-    throw new Error(`Invalid template, found "${options.template}".`);
-  }
-
+  if (!_isUndefined(options.name))
+    _assertIsRelative(options.name, 'name', tmpDir);
   /* istanbul ignore else */
-  if ((!_isUndefined(options.tries) && isNaN(options.tries)) || options.tries < 0) {
+  if (!_isUndefined(options.dir))
+    _assertIsRelative(options.dir, 'dir', tmpDir);
+  /* istanbul ignore else */
+  if (!_isUndefined(options.template)) {
+    _assertIsRelative(options.template, 'template', tmpDir);
+    if (!options.template.match(TEMPLATE_PATTERN))
+      throw new Error(`Invalid template, found "${options.template}".`);
+  }
+  /* istanbul ignore else */
+  if (!_isUndefined(options.tries) && isNaN(options.tries) || options.tries < 0)
     throw new Error(`Invalid tries, found "${options.tries}".`);
-  }
 
   // if a name was specified we will try once
   options.tries = _isUndefined(options.name) ? options.tries || DEFAULT_TRIES : 1;
@@ -34530,103 +34644,65 @@ function _assertOptionsBase(options) {
   options.discardDescriptor = !!options.discardDescriptor;
   options.unsafeCleanup = !!options.unsafeCleanup;
 
+  // sanitize dir, also keep (multiple) blanks if the user, purportedly sane, requests us to
+  options.dir = _isUndefined(options.dir) ? '' : path.relative(tmpDir, _resolvePath(options.dir, tmpDir));
+  options.template = _isUndefined(options.template) ? undefined : path.relative(tmpDir, _resolvePath(options.template, tmpDir));
+  // sanitize further if template is relative to options.dir
+  options.template = _isBlank(options.template) ? undefined : path.relative(options.dir, options.template);
+
   // for completeness' sake only, also keep (multiple) blanks if the user, purportedly sane, requests us to
+  options.name = _isUndefined(options.name) ? undefined : options.name;
   options.prefix = _isUndefined(options.prefix) ? '' : options.prefix;
   options.postfix = _isUndefined(options.postfix) ? '' : options.postfix;
 }
 
 /**
- * Gets the relative directory to tmpDir.
+ * Resolve the specified path name in respect to tmpDir.
  *
+ * The specified name might include relative path components, e.g. ../
+ * so we need to resolve in order to be sure that is is located inside tmpDir
+ *
+ * @param name
+ * @param tmpDir
+ * @returns {string}
  * @private
  */
-function _getRelativePath(option, name, tmpDir, cb) {
-  if (_isUndefined(name)) return cb(null);
-
-  _resolvePath(name, tmpDir, function (err, resolvedPath) {
-    if (err) return cb(err);
-
-    const relativePath = path.relative(tmpDir, resolvedPath);
-
-    if (!resolvedPath.startsWith(tmpDir)) {
-      return cb(new Error(`${option} option must be relative to "${tmpDir}", found "${relativePath}".`));
-    }
-
-    cb(null, relativePath);
-  });
-}
-
-/**
- * Gets the relative path to tmpDir.
- *
- * @private
- */
-function _getRelativePathSync(option, name, tmpDir) {
-  if (_isUndefined(name)) return;
-
-  const resolvedPath = _resolvePathSync(name, tmpDir);
-  const relativePath = path.relative(tmpDir, resolvedPath);
-
-  if (!resolvedPath.startsWith(tmpDir)) {
-    throw new Error(`${option} option must be relative to "${tmpDir}", found "${relativePath}".`);
+function _resolvePath(name, tmpDir) {
+  if (name.startsWith(tmpDir)) {
+    return path.resolve(name);
+  } else {
+    return path.resolve(path.join(tmpDir, name));
   }
-
-  return relativePath;
 }
 
 /**
- * Asserts whether the specified options are valid, also sanitizes options and provides sane defaults for missing
- * options.
+ * Asserts whether specified name is relative to the specified tmpDir.
  *
+ * @param {string} name
+ * @param {string} option
+ * @param {string} tmpDir
+ * @throws {Error}
  * @private
  */
-function _assertAndSanitizeOptions(options, cb) {
-  _getTmpDir(options, function (err, tmpDir) {
-    if (err) return cb(err);
-
-    options.tmpdir = tmpDir;
-
-    try {
-      _assertOptionsBase(options, tmpDir);
-    } catch (err) {
-      return cb(err);
+function _assertIsRelative(name, option, tmpDir) {
+  if (option === 'name') {
+    // assert that name is not absolute and does not contain a path
+    if (path.isAbsolute(name))
+      throw new Error(`${option} option must not contain an absolute path, found "${name}".`);
+    // must not fail on valid .<name> or ..<name> or similar such constructs
+    let basename = path.basename(name);
+    if (basename === '..' || basename === '.' || basename !== name)
+      throw new Error(`${option} option must not contain a path, found "${name}".`);
+  }
+  else { // if (option === 'dir' || option === 'template') {
+    // assert that dir or template are relative to tmpDir
+    if (path.isAbsolute(name) && !name.startsWith(tmpDir)) {
+      throw new Error(`${option} option must be relative to "${tmpDir}", found "${name}".`);
     }
-
-    // sanitize dir, also keep (multiple) blanks if the user, purportedly sane, requests us to
-    _getRelativePath('dir', options.dir, tmpDir, function (err, dir) {
-      if (err) return cb(err);
-
-      options.dir = _isUndefined(dir) ? '' : dir;
-
-      // sanitize further if template is relative to options.dir
-      _getRelativePath('template', options.template, tmpDir, function (err, template) {
-        if (err) return cb(err);
-
-        options.template = template;
-
-        cb(null, options);
-      });
-    });
-  });
-}
-
-/**
- * Asserts whether the specified options are valid, also sanitizes options and provides sane defaults for missing
- * options.
- *
- * @private
- */
-function _assertAndSanitizeOptionsSync(options) {
-  const tmpDir = (options.tmpdir = _getTmpDirSync(options));
-
-  _assertOptionsBase(options, tmpDir);
-
-  const dir = _getRelativePathSync('dir', options.dir, tmpDir);
-  options.dir = _isUndefined(dir) ? '' : dir;
-
-  options.template = _getRelativePathSync('template', options.template, tmpDir);
-
-  return options;
+    let resolvedPath = _resolvePath(name, tmpDir);
+    if (!resolvedPath.startsWith(tmpDir))
+      throw new Error(`${option} option must be relative to "${tmpDir}", found "${resolvedPath}".`);
+  }
 }
 
 /**
@@ -34684,18 +34760,11 @@ function setGracefulCleanup() {
  * Returns the currently configured tmp dir from os.tmpdir().
  *
  * @private
+ * @param {?Options} options
+ * @returns {string} the currently configured tmp dir
  */
-function _getTmpDir(options, cb) {
-  return fs.realpath((options && options.tmpdir) || os.tmpdir(), cb);
-}
-
-/**
- * Returns the currently configured tmp dir from os.tmpdir().
- *
- * @private
- */
-function _getTmpDirSync(options) {
-  return fs.realpathSync((options && options.tmpdir) || os.tmpdir());
+function _getTmpDir(options) {
+  return path.resolve(options && options.tmpdir || os.tmpdir());
 }
 
 // Install process exit listener
@@ -34796,7 +34865,7 @@ Object.defineProperty(module.exports, "tmpdir", ({
   enumerable: true,
   configurable: false,
   get: function () {
-    return _getTmpDirSync();
+    return _getTmpDir();
   }
 }));
 
@@ -40422,7 +40491,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(24408)
-const { stringify } = __nccwpck_require__(43121)
+const { stringify, getHeadersList } = __nccwpck_require__(43121)
 const { webidl } = __nccwpck_require__(21744)
 const { Headers } = __nccwpck_require__(10554)
 
@@ -40498,13 +40567,14 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = headers.getSetCookie()
+  const cookies = getHeadersList(headers).cookies
 
   if (!cookies) {
     return []
   }
 
-  return cookies.map((pair) => parseSetCookie(pair))
+  // In older versions of undici, cookies is a list of name:value.
+  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
 }
 
 /**
@@ -40932,15 +41002,14 @@ module.exports = {
 /***/ }),
 
 /***/ 43121:
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-/**
- * @param {string} value
- * @returns {boolean}
- */
+const assert = __nccwpck_require__(39491)
+const { kHeadersList } = __nccwpck_require__(72785)
+
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -41201,13 +41270,31 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
+let kHeadersListNode
+
+function getHeadersList (headers) {
+  if (headers[kHeadersList]) {
+    return headers[kHeadersList]
+  }
+
+  if (!kHeadersListNode) {
+    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
+      (symbol) => symbol.description === 'headers list'
+    )
+
+    assert(kHeadersListNode, 'Headers cannot be parsed')
+  }
+
+  const headersList = headers[kHeadersListNode]
+  assert(headersList)
+
+  return headersList
+}
+
 module.exports = {
   isCTLExcludingHtab,
-  validateCookieName,
-  validateCookiePath,
-  validateCookieValue,
-  toIMFDate,
-  stringify
+  stringify,
+  getHeadersList
 }
 
 
@@ -43136,14 +43223,6 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(29830)
 const { File: UndiciFile } = __nccwpck_require__(78511)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(685)
 
-let random
-try {
-  const crypto = __nccwpck_require__(6005)
-  random = (max) => crypto.randomInt(0, max)
-} catch {
-  random = (max) => Math.floor(Math.random(max))
-}
-
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -43229,7 +43308,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -45211,7 +45290,6 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(52538)
-const util = __nccwpck_require__(73837)
 const { webidl } = __nccwpck_require__(21744)
 const assert = __nccwpck_require__(39491)
 
@@ -45765,9 +45843,6 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
-  },
-  [util.inspect.custom]: {
-    enumerable: false
   }
 })
 
@@ -54944,20 +55019,6 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
-
-    this.on('connectionError', (origin, targets, error) => {
-      // If a connection error occurs, we remove the client from the pool,
-      // and emit a connectionError event. They will not be re-used.
-      // Fixes https://github.com/nodejs/undici/issues/3895
-      for (const target of targets) {
-        // Do not use kRemoveClient here, as it will close the client,
-        // but the client cannot be closed in this state.
-        const idx = this[kClients].indexOf(target)
-        if (idx !== -1) {
-          this[kClients].splice(idx, 1)
-        }
-      }
-    })
   }
 
   [kGetDispatcher] () {
@@ -58017,14 +58078,6 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("node:buffer");
-
-/***/ }),
-
-/***/ 6005:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:crypto");
 
 /***/ }),
 

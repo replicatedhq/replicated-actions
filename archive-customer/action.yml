@@ -4,9 +4,15 @@ inputs:
   api-token:
     description: "API Token."
     required: true
-  customer-id:
-    description: "The id of the customer."
+  app-slug:
+    description: "App Slug."
     required: true
+  customer-id:
+    description: "The id of the customer. Either customer-id or customer-name must be provided."
+    required: false
+  customer-name:
+    description: "The name of the customer. If provided, will look up the customer ID. Either customer-id or customer-name must be provided."
+    required: false
 runs:
   using: "node20"
   main: "index.js"
