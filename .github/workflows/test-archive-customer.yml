@@ -39,6 +39,7 @@ jobs:
           customer-name: "CI Test Customer 1 - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: customer-1-${{ github.sha }}@example.com
           license-type: test
+          channel-slug: test-channel-1
 
       - name: test archive-customer with customer-id
         id: archive-customer-id
@@ -56,6 +57,7 @@ jobs:
           customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: customer-2-${{ github.sha }}@example.com
           license-type: test
+          channel-slug: test-channel-1
 
       - name: test archive-customer with customer-name and app-slug
         id: archive-customer-name
@@ -74,6 +76,7 @@ jobs:
           customer-name: "CI Test Customer 3 - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: customer-3-${{ github.sha }}@example.com
           license-type: test
+          channel-slug: test-channel-1
 
       - name: test archive-customer with customer-name only
         id: archive-customer-name-only
