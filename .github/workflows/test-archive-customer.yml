@@ -36,7 +36,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          customer-name: "CI Test Customer - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-name: "CI Test Customer 1 - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: customer-1-${{ github.sha }}@example.com
           license-type: test
 
@@ -53,7 +53,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          customer-name: "CI Test Customer Name - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: customer-2-${{ github.sha }}@example.com
           license-type: test
 
@@ -62,7 +62,7 @@ jobs:
         uses: ./archive-customer
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-name: "CI Test Customer Name - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
           app-slug: replicated-actions-ci
 
       - name: create-customer for name-based test without app-slug
@@ -71,7 +71,7 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          customer-name: "CI Test Customer Name No App - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-name: "CI Test Customer 3 - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: customer-3-${{ github.sha }}@example.com
           license-type: test
 
@@ -80,7 +80,7 @@ jobs:
         uses: ./archive-customer
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-name: "CI Test Customer Name No App - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-name: "CI Test Customer 3 - ${{ github.ref_name }} - ${{ github.sha }}"
 
       - name: test archive-customer fails without customer-id or customer-name
         id: archive-customer-fail
