@@ -81,12 +81,27 @@ function actionArchiveCustomer() {
             // If customer-id is not provided, look it up by name
             let resolvedCustomerId = customerId;
             if (!resolvedCustomerId && customerName) {
-                const customers = yield (0, replicated_lib_1.listCustomersByName)(apiClient, appSlug || undefined, customerName);
+                // Retry lookup with exponential backoff to handle indexing delays
+                const maxRetries = 5;
+                const initialDelayMs = 1000; // Start with 1 second
+                let customers = [];
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    customers = yield (0, replicated_lib_1.listCustomersByName)(apiClient, appSlug || undefined, customerName);
+                    if (customers.length > 0) {
+                        break; // Found at least one customer, exit retry loop
+                    }
+                    if (attempt < maxRetries - 1) {
+                        // Wait before retrying (exponential backoff: 1s, 2s, 4s, 8s)
+                        const delayMs = initialDelayMs * Math.pow(2, attempt);
+                        core.info(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Retrying in ${delayMs}ms... (attempt ${attempt + 1}/${maxRetries})`);
+                        yield new Promise(resolve => setTimeout(resolve, delayMs));
+                    }
+                }
                 if (customers.length === 0) {
-                    throw new Error(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ''}`);
+                    throw new Error(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""} after ${maxRetries} attempts. The customer may not exist or may not be searchable yet.`);
                 }
                 if (customers.length > 1) {
-                    throw new Error(`Multiple customers found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ''}. Please provide customer-id or app-slug to narrow down the search.`);
+                    throw new Error(`Multiple customers found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Please provide customer-id or app-slug to narrow down the search.`);
                 }
                 resolvedCustomerId = customers[0].customerId;
                 core.info(`Found customer "${customerName}" with id ${resolvedCustomerId}`);
@@ -130,21 +145,21 @@ function actionCreateCluster() {
         try {
             const apiToken = core.getInput("api-token", { required: true });
             const k8sDistribution = core.getInput("kubernetes-distribution", { required: true });
-            const k8sVersion = core.getInput('kubernetes-version');
-            const licenseId = core.getInput('license-id');
-            const name = core.getInput('cluster-name');
-            const k8sTTL = core.getInput('ttl');
-            const diskGib = +(core.getInput('disk'));
-            const nodeCount = +(core.getInput('nodes'));
-            const minNodeCount = +(core.getInput('min-nodes'));
-            const maxNodeCount = +(core.getInput('max-nodes'));
-            const instanceType = core.getInput('instance-type');
-            const timeoutMinutes = +(core.getInput('timeout-minutes') || 20);
-            const nodeGroups = core.getInput('node-groups');
-            const tags = core.getInput('tags');
-            const ipFamily = core.getInput('ip-family');
-            let kubeconfigPath = core.getInput('kubeconfig-path');
-            const exportKubeconfig = core.getBooleanInput('export-kubeconfig');
+            const k8sVersion = core.getInput("kubernetes-version");
+            const licenseId = core.getInput("license-id");
+            const name = core.getInput("cluster-name");
+            const k8sTTL = core.getInput("ttl");
+            const diskGib = +core.getInput("disk");
+            const nodeCount = +core.getInput("nodes");
+            const minNodeCount = +core.getInput("min-nodes");
+            const maxNodeCount = +core.getInput("max-nodes");
+            const instanceType = core.getInput("instance-type");
+            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
+            const nodeGroups = core.getInput("node-groups");
+            const tags = core.getInput("tags");
+            const ipFamily = core.getInput("ip-family");
+            let kubeconfigPath = core.getInput("kubeconfig-path");
+            const exportKubeconfig = core.getBooleanInput("export-kubeconfig");
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
@@ -155,10 +170,10 @@ function actionCreateCluster() {
             const nodeGroupsArray = processNodeGroups(nodeGroups);
             let cluster = yield (0, replicated_lib_1.createClusterWithLicense)(apiClient, name, k8sDistribution, k8sVersion, licenseId, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroupsArray, tagsArray, ipFamily);
             core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
-            core.setOutput('cluster-id', cluster.id);
-            cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, 'running', timeoutMinutes * 60);
+            core.setOutput("cluster-id", cluster.id);
+            cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, "running", timeoutMinutes * 60);
             const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
-            core.setOutput('cluster-kubeconfig', kubeconfig);
+            core.setOutput("cluster-kubeconfig", kubeconfig);
             if (kubeconfigPath) {
                 writeFile(kubeconfigPath, kubeconfig);
                 core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
@@ -169,7 +184,7 @@ function actionCreateCluster() {
                     writeFile(kubeconfigPath, kubeconfig);
                     core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
                 }
-                core.exportVariable('KUBECONFIG', kubeconfigPath);
+                core.exportVariable("KUBECONFIG", kubeconfigPath);
                 core.info(`Set KUBECONFIG=${kubeconfigPath}`);
             }
         }
@@ -201,7 +216,7 @@ function processNodeGroups(nodeGroups) {
         const nodeGroupsYAML = (0, yaml_1.parse)(nodeGroups);
         // for each nodeGroup in nodeGroupsYAML, convert to json and add to array
         const nodeGroupsArray = nodeGroupsYAML.map((nodegroup) => {
-            return { name: nodegroup.name, node_count: nodegroup.nodes, instance_type: nodegroup['instance-type'], disk_gib: nodegroup.disk };
+            return { name: nodegroup.name, node_count: nodegroup.nodes, instance_type: nodegroup["instance-type"], disk_gib: nodegroup.disk };
         });
         return nodeGroupsArray;
     }
@@ -236,23 +251,21 @@ function actionCreateCustomer() {
             const apiToken = core.getInput("api-token", { required: true });
             const appSlug = core.getInput("app-slug", { required: true });
             const name = core.getInput("customer-name", { required: true });
-            const email = core.getInput('customer-email');
+            const email = core.getInput("customer-email");
             const licenseType = core.getInput("license-type") || "dev";
-            const channelSlug = core.getInput('channel-slug');
-            const expiresInDays = +(core.getInput('expires-in') || 0);
-            const entitlements = core.getInput('entitlements');
+            const channelSlug = core.getInput("channel-slug");
+            const expiresInDays = +(core.getInput("expires-in") || 0);
+            const entitlements = core.getInput("entitlements");
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
             // The default for isKotsInstallEnabled is undefined, which means it will not be set
             // As such we can not use core.getBooleanInput
             let isKotsInstallEnabled = undefined;
             if (core.getInput("is-kots-install-enabled") !== "") {
-                isKotsInstallEnabled =
-                    core.getInput("is-kots-install-enabled") === "true";
+                isKotsInstallEnabled = core.getInput("is-kots-install-enabled") === "true";
             }
             let isDevModeEnabled = undefined;
             if (core.getInput("is-dev-mode-enabled") !== "") {
-                isDevModeEnabled =
-                    core.getInput("is-dev-mode-enabled") === "true";
+                isDevModeEnabled = core.getInput("is-dev-mode-enabled") === "true";
             }
             const apiClient = new replicated_lib_1.VendorPortalApi();
             apiClient.apiToken = apiToken;
@@ -261,9 +274,9 @@ function actionCreateCustomer() {
             }
             const entitlementsArray = processEntitlements(entitlements);
             const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled, isDevModeEnabled);
-            core.setOutput('customer-id', customer.customerId);
-            core.setOutput('license-id', customer.licenseId);
-            core.setOutput('license-file', customer.license);
+            core.setOutput("customer-id", customer.customerId);
+            core.setOutput("license-id", customer.licenseId);
+            core.setOutput("license-file", customer.license);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -360,16 +373,16 @@ function actionCreateRelease() {
         try {
             const apiToken = core.getInput("api-token", { required: true });
             const appSlug = core.getInput("app-slug", { required: true });
-            const chart = core.getInput('chart');
-            const yamlDir = core.getInput('yaml-dir');
-            const promoteChannel = core.getInput('promote-channel');
-            const releaseVersion = core.getInput('version');
-            const releaseNotes = core.getInput('release-notes');
+            const chart = core.getInput("chart");
+            const yamlDir = core.getInput("yaml-dir");
+            const promoteChannel = core.getInput("promote-channel");
+            const releaseVersion = core.getInput("version");
+            const releaseNotes = core.getInput("release-notes");
             const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-            const waitForAirgapBuild = core.getInput('wait-for-airgap-build') || "false";
-            const parsedTimeout = parseInt(core.getInput('timeout-minutes') || '20');
+            const waitForAirgapBuild = core.getInput("wait-for-airgap-build") || "false";
+            const parsedTimeout = parseInt(core.getInput("timeout-minutes") || "20");
             if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
-                core.setFailed('timeout-minutes must be a positive number');
+                core.setFailed("timeout-minutes must be a positive number");
                 return;
             }
             const timeoutMinutes = parsedTimeout;
@@ -379,10 +392,10 @@ function actionCreateRelease() {
                 apiClient.endpoint = apiEndpoint;
             }
             if (chart && yamlDir) {
-                core.setFailed('You must provide either a chart or a YAML directory, not both');
+                core.setFailed("You must provide either a chart or a YAML directory, not both");
             }
             if (chart === "" && yamlDir === "") {
-                core.setFailed('You must provide either a chart or a YAML directory');
+                core.setFailed("You must provide either a chart or a YAML directory");
             }
             let release;
             if (chart) {
@@ -395,10 +408,10 @@ function actionCreateRelease() {
             if (promoteChannel) {
                 const channel = (0, replicated_lib_1.getChannelDetails)(apiClient, appSlug, { name: promoteChannel });
                 let resolvedChannel;
-                yield channel.then((channel) => {
+                yield channel.then(channel => {
                     console.log(channel.name);
                     resolvedChannel = channel;
-                }, (reason) => {
+                }, reason => {
                     if (reason.channel === null) {
                         console.error(reason.reason);
                     }
@@ -414,25 +427,25 @@ function actionCreateRelease() {
                             const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
                             if (status === "built") {
                                 const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, app.id, resolvedChannel.id, +release.sequence);
-                                core.setOutput('airgap-status', status);
-                                core.setOutput('airgap-url', downloadUrl);
+                                core.setOutput("airgap-status", status);
+                                core.setOutput("airgap-url", downloadUrl);
                             }
                             else {
-                                core.setOutput('airgap-status', status);
+                                core.setOutput("airgap-status", status);
                             }
                         }
                         catch (error) {
-                            core.setOutput('airgap-status', 'failed');
-                            console.warn('Failed to get airgap build status or download URL:', error.message);
+                            core.setOutput("airgap-status", "failed");
+                            console.warn("Failed to get airgap build status or download URL:", error.message);
                         }
                     }
                     else {
-                        core.setOutput('airgap-status', 'promoted-channel-not-airgap-enabled');
+                        core.setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
                     }
                 }
-                core.setOutput('channel-slug', resolvedChannel.slug);
+                core.setOutput("channel-slug", resolvedChannel.slug);
             }
-            core.setOutput('release-sequence', release.sequence);
+            core.setOutput("release-sequence", release.sequence);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -539,15 +552,7 @@ function login(helmPath, username, password, chart) {
             const parsed = url.parse(chart);
             const loginOptions = {};
             const hostname = parsed.hostname || "";
-            const params = [
-                "registry",
-                "login",
-                hostname,
-                "--username",
-                username,
-                "--password",
-                password,
-            ];
+            const params = ["registry", "login", hostname, "--username", username, "--password", password];
             yield exec.exec(helmPath, params, loginOptions);
         }
         catch (error) {
@@ -559,20 +564,10 @@ function installChart(helmPath, kubeconfig, chart, version, releaseName, namespa
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // write the kubeconfig to a temp file
-            const { fd, path: kubeconfigPath, cleanup, } = yield tmpPromise.file({ postfix: ".yaml" });
+            const { fd, path: kubeconfigPath, cleanup } = yield tmpPromise.file({ postfix: ".yaml" });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             const installOptions = {};
-            const params = [
-                "upgrade",
-                releaseName,
-                "--install",
-                "--kubeconfig",
-                kubeconfigPath,
-                "--namespace",
-                namespace,
-                "--create-namespace",
-                chart,
-            ];
+            const params = ["upgrade", releaseName, "--install", "--kubeconfig", kubeconfigPath, "--namespace", namespace, "--create-namespace", chart];
             if (version) {
                 params.push(`--version`, version);
             }
@@ -592,7 +587,7 @@ function templateChart(helmPath, chart, version, valuesPath) {
         try {
             let templateOutput = "";
             const { path: tmpDir, cleanup } = yield tmpPromise.dir({
-                unsafeCleanup: true,
+                unsafeCleanup: true
             });
             const installOptions = {};
             installOptions.silent = true;
@@ -602,7 +597,7 @@ function templateChart(helmPath, chart, version, valuesPath) {
                 },
                 stderr: (data) => {
                     core.info(data.toString());
-                },
+                }
             };
             const params = ["template", chart];
             if (version) {
@@ -661,9 +656,9 @@ function actionHelmInstall() {
         const version = core.getInput("version");
         const name = core.getInput("name", { required: true });
         // Write the values
-        let valuesFilePath = '';
+        let valuesFilePath = "";
         if (values) {
-            const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
             fs.writeFileSync(valuesPath, values);
             valuesFilePath = valuesPath;
         }
@@ -721,32 +716,29 @@ function downloadPreflight() {
             };
             const uri = `https://github.com/replicatedhq/troubleshoot/releases/latest/download/preflight_linux_amd64.tar.gz`;
             const { fd, path: downloadPath, cleanup } = yield (0, tmpPromise.file)({
-                postfix: '.tar.gz'
+                postfix: ".tar.gz"
             });
             core.debug(`Downloading preflight binary to temp file at ${downloadPath}`);
             const f = fs.createWriteStream(downloadPath);
             const res = yield http.get(uri);
             const preflightPath = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                core.info('Downloaded preflight binary');
-                res.message.pipe(f).on('close', () => __awaiter(this, void 0, void 0, function* () {
-                    let tarOutput, tarError = '';
+                core.info("Downloaded preflight binary");
+                res.message.pipe(f).on("close", () => __awaiter(this, void 0, void 0, function* () {
+                    let tarOutput, tarError = "";
                     const tarOptions = {};
                     tarOptions.listeners = {
-                        stdout: (data) => {
+                        stdout: data => {
                             tarOutput += data.toString();
                         },
-                        stderr: (data) => {
+                        stderr: data => {
                             tarError += data.toString();
                         }
                     };
                     tarOptions.cwd = path.dirname(downloadPath);
-                    yield exec.exec('tar', [
-                        'xzf',
-                        downloadPath
-                    ], tarOptions);
-                    core.info('Extracted preflight archive');
-                    const preflightPath = path.resolve(path.join(path.dirname(downloadPath), 'preflight'));
-                    core.setOutput('preflight-path', preflightPath);
+                    yield exec.exec("tar", ["xzf", downloadPath], tarOptions);
+                    core.info("Extracted preflight archive");
+                    const preflightPath = path.resolve(path.join(path.dirname(downloadPath), "preflight"));
+                    core.setOutput("preflight-path", preflightPath);
                     resolve(preflightPath);
                 }));
             }));
@@ -762,23 +754,17 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // write the kubeconfig to a temp file
-            const { fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            const { fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
             fs.writeFileSync(kubeconfigPath, kubeconfig);
             // write the templatedChart to a temp file
-            const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
             fs.writeFileSync(templatedChartPath, templatedChart);
             // write the output to a temp file
-            const { path: outputPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            const { path: outputPath } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
             const installOptions = {};
             installOptions.ignoreReturnCode = true;
             installOptions.silent = false;
-            const params = [
-                templatedChartPath,
-                '--kubeconfig', kubeconfigPath,
-                '--interactive=false',
-                '--format', 'json',
-                '--output', outputPath,
-            ];
+            const params = [templatedChartPath, "--kubeconfig", kubeconfigPath, "--interactive=false", "--format", "json", "--output", outputPath];
             yield exec.exec(preflightPath, params, installOptions);
             const strictFailures = yield checkForStrictFailures(outputPath);
             if (strictFailures.length > 0) {
@@ -786,7 +772,7 @@ function runPreflight(preflightPath, kubeconfig, templatedChart) {
                 for (let failure of strictFailures) {
                     core.error(failure);
                 }
-                throw new Error('Preflight checks failed');
+                throw new Error("Preflight checks failed");
             }
             cleanupKubeconfig();
             cleanupTemplatedChart();
@@ -801,7 +787,7 @@ function checkForStrictFailures(resultPath) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         try {
-            const result = fs.readFileSync(resultPath, 'utf8');
+            const result = fs.readFileSync(resultPath, "utf8");
             const report = JSON.parse(result);
             // strictFailures will contain all failures as array of strings
             let strictFailures = [];
@@ -860,22 +846,22 @@ function actionKotsInstall() {
         const waitDurationInput = core.getInput("wait-duration");
         const sharedPasswordInput = core.getInput("shared-password");
         const storageClassInput = core.getInput("storage-class");
-        let licenseFilePath = '';
+        let licenseFilePath = "";
         if (fs.existsSync(licenseFileInput)) {
             licenseFilePath = licenseFileInput;
         }
         else {
-            const { path: licensePath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+            const { path: licensePath } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
             fs.writeFileSync(licensePath, licenseFileInput);
             licenseFilePath = licensePath;
         }
-        let valuesFilePath = '';
+        let valuesFilePath = "";
         if (configValuesInput) {
             if (fs.existsSync(configValuesInput)) {
                 valuesFilePath = configValuesInput;
             }
             else {
-                const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: '.yaml' });
+                const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
                 fs.writeFileSync(valuesPath, configValuesInput);
                 valuesFilePath = valuesPath;
             }
@@ -888,7 +874,7 @@ function actionKotsInstall() {
             sharedPassword: sharedPasswordInput,
             appVersionLabel: appVersionLabelInput,
             waitDuration: waitDurationInput,
-            storageClass: storageClassInput,
+            storageClass: storageClassInput
         };
         yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath, opts);
     });
@@ -924,7 +910,7 @@ const randomstring = __nccwpck_require__(5581);
 function downloadKots(version) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (version === 'latest') {
+            if (version === "latest") {
                 version = yield getLatestKotsVersion();
             }
             core.info(`Downloading kots ${version}`);
@@ -934,32 +920,29 @@ function downloadKots(version) {
             };
             const uri = `https://github.com/replicatedhq/kots/releases/download/${version}/kots_linux_amd64.tar.gz`;
             const { fd, path: downloadPath, cleanup } = yield (0, tmpPromise.file)({
-                postfix: '.tar.gz'
+                postfix: ".tar.gz"
             });
             core.debug(`Downloading kots binary to temp file at ${downloadPath}`);
             const f = fs.createWriteStream(downloadPath);
             const res = yield http.get(uri);
             const kotsPath = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                core.info('Downloaded kots binary');
-                res.message.pipe(f).on('close', () => __awaiter(this, void 0, void 0, function* () {
-                    let tarOutput, tarError = '';
+                core.info("Downloaded kots binary");
+                res.message.pipe(f).on("close", () => __awaiter(this, void 0, void 0, function* () {
+                    let tarOutput, tarError = "";
                     const tarOptions = {};
                     tarOptions.listeners = {
-                        stdout: (data) => {
+                        stdout: data => {
                             tarOutput += data.toString();
                         },
-                        stderr: (data) => {
+                        stderr: data => {
                             tarError += data.toString();
                         }
                     };
                     tarOptions.cwd = path.dirname(downloadPath);
-                    yield exec.exec('tar', [
-                        'xzf',
-                        downloadPath
-                    ], tarOptions);
-                    core.info('Extracted kots archive');
-                    const kotsPath = path.resolve(path.join(path.dirname(downloadPath), 'kots'));
-                    core.setOutput('kots-path', kotsPath);
+                    yield exec.exec("tar", ["xzf", downloadPath], tarOptions);
+                    core.info("Extracted kots archive");
+                    const kotsPath = path.resolve(path.join(path.dirname(downloadPath), "kots"));
+                    core.setOutput("kots-path", kotsPath);
                     resolve(kotsPath);
                 }));
             }));
@@ -993,7 +976,7 @@ function installApp(kotsPath, licenseFilePath, configFilePath, opts) {
         try {
             // write the kubeconfig to a temp file
             const { fd, path: kubeconfigPath, cleanup } = yield (0, tmpPromise.file)({
-                postfix: '.yaml'
+                postfix: ".yaml"
             });
             fs.writeFileSync(kubeconfigPath, opts.kubeconfig);
             const installOptions = {};
@@ -1005,19 +988,10 @@ function installApp(kotsPath, licenseFilePath, configFilePath, opts) {
             else {
                 password = randomstring.generate(12);
             }
-            const params = [
-                'install',
-                opts.appSlug,
-                "--namespace",
-                opts.namespace,
-                "--shared-password",
-                password,
-                "--no-port-forward",
-                "--skip-preflights"
-            ];
+            const params = ["install", opts.appSlug, "--namespace", opts.namespace, "--shared-password", password, "--no-port-forward", "--skip-preflights"];
             params.push("--license-file", licenseFilePath);
             params.push("--kubeconfig", kubeconfigPath);
-            if (configFilePath !== '') {
+            if (configFilePath !== "") {
                 params.push("--config-values", configFilePath);
             }
             if (opts.appVersionLabel) {
