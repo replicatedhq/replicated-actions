@@ -1,8 +1,8 @@
-import * as core from '@actions/core';
-import { installChart, login, repoAdd, templateChart } from './helm';
-import { file } from 'tmp-promise';
-import * as fs from 'fs';
-import { downloadPreflight, runPreflight } from './preflight';
+import * as core from "@actions/core";
+import { installChart, login, repoAdd, templateChart } from "./helm";
+import { file } from "tmp-promise";
+import * as fs from "fs";
+import { downloadPreflight, runPreflight } from "./preflight";
 
 export async function actionHelmInstall() {
   const helmPath: string = core.getInput("helm-path", { required: true });
@@ -19,9 +19,9 @@ export async function actionHelmInstall() {
   const name: string = core.getInput("name", { required: true });
 
   // Write the values
-  let valuesFilePath = '';
+  let valuesFilePath = "";
   if (values) {
-    const {fd, path: valuesPath, cleanup: cleanupValues} = await file({postfix: '.yaml'});
+    const { fd, path: valuesPath, cleanup: cleanupValues } = await file({ postfix: ".yaml" });
     fs.writeFileSync(valuesPath, values);
     valuesFilePath = valuesPath;
   }
@@ -40,7 +40,7 @@ export async function actionHelmInstall() {
 
     // run preflight checks
     const templatedChart: string = await templateChart(helmPath, chart, version, valuesFilePath);
-    await runPreflight(preflightPath, kubeconfig, templatedChart)
+    await runPreflight(preflightPath, kubeconfig, templatedChart);
   }
 
   await installChart(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);

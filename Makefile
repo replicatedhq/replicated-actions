@@ -1,7 +1,15 @@
 SHELL := /bin/bash
 
 .PHONY: all
-all: package-all readme-all
+all: prettier package-main package-all readme-all
+
+.PHONY: prettier
+prettier: deps
+	npm run prettier
+
+.PHONY: prettier-check
+prettier-check: deps
+	npx prettier --config .prettierrc 'src/**/*.ts' --check
 
 .PHONY: package-all
 package-all: package-all-new \

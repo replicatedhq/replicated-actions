@@ -18,27 +18,13 @@ export async function actionExposePort() {
       apiClient.endpoint = apiEndpoint;
     }
 
-    let exposedPort = await exposeClusterPort(
-      apiClient,
-      clusterId,
-      Number(port),
-      protocols,
-      isWildcard
-    );
+    let exposedPort = await exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
 
     if (exposedPort.addon_id) {
-      core.info(
-        `Exposed port ${port} - waiting for it to be ready...`
-      );
+      core.info(`Exposed port ${port} - waiting for it to be ready...`);
       core.setOutput("addon-id", exposedPort.addon_id);
 
-      await pollForAddonStatus(
-        apiClient,
-        clusterId,
-        exposedPort.addon_id,
-        "ready",
-        timeoutMinutes * 60
-      );
+      await pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
     }
 
     core.info(`Exposed Port on ${exposedPort.hostname}`);

@@ -1,6 +1,5 @@
-import * as core from '@actions/core';
-import { VendorPortalApi, removeCluster } from 'replicated-lib';
-
+import * as core from "@actions/core";
+import { VendorPortalApi, removeCluster } from "replicated-lib";
 
 export async function actionRemoveCluster() {
   try {
@@ -12,7 +11,7 @@ export async function actionRemoveCluster() {
     apiClient.apiToken = apiToken;
 
     if (apiEndpoint) {
-      apiClient.endpoint = apiEndpoint
+      apiClient.endpoint = apiEndpoint;
     }
 
     core.debug(`Removing cluster ${clusterId}...`);
