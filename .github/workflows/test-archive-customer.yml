@@ -59,14 +59,6 @@ jobs:
           license-type: test
           channel-slug: test-channel-1
 
-      - name: test archive-customer with customer-name and app-slug
-        id: archive-customer-name
-        uses: ./archive-customer
-        with:
-          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
-          app-slug: replicated-actions-ci
-
       - name: create-customer for name-based test without app-slug
         id: create-customer-name-no-app
         uses: replicatedhq/replicated-actions/create-customer@v1
@@ -84,6 +76,14 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-name: "CI Test Customer 3 - ${{ github.ref_name }} - ${{ github.sha }}"
+
+      - name: test archive-customer with customer-name and app-slug
+        id: archive-customer-name
+        uses: ./archive-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
+          app-slug: replicated-actions-ci
 
       - name: test archive-customer fails without customer-id or customer-name
         id: archive-customer-fail
