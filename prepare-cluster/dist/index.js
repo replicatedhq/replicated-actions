@@ -33471,6 +33471,7 @@ exports.createCustomer = createCustomer;
 exports.archiveCustomer = archiveCustomer;
 exports.getUsedKubernetesDistributions = getUsedKubernetesDistributions;
 exports.listCustomersByName = listCustomersByName;
+exports.listCustomersByEmail = listCustomersByEmail;
 const channels_1 = __nccwpck_require__(67491);
 const applications_1 = __nccwpck_require__(23770);
 const date_fns_1 = __nccwpck_require__(73314);
@@ -33596,14 +33597,14 @@ async function getUsedKubernetesDistributions(vendorPortalApi, appSlug) {
     }
     return kubernetesDistributions;
 }
-async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
+async function searchCustomers(vendorPortalApi, appSlug, query) {
     const http = await vendorPortalApi.client();
     // Get the app ID from the app slug to filter results (if appSlug is provided)
     let app;
     if (appSlug) {
         app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
     }
-    // Use the searchTeamCustomers endpoint to search for customers by name and app
+    // Use the searchTeamCustomers endpoint to search for customers
     const searchCustomersUri = `${vendorPortalApi.endpoint}/customers/search`;
     let allCustomers = [];
     let offset = 0; // offset is the number of pages to skip
@@ -33619,7 +33620,7 @@ async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
             include_active: true,
             include_test: true,
             include_trial: true,
-            query: `name:${customerName}`,
+            query: query,
             offset: offset,
             page_size: pageSize
         };
@@ -33640,8 +33641,8 @@ async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
         }
         const searchCustomersBody = JSON.parse(await searchCustomersRes.readBody());
         // Convert response body into CustomerSummary array
-        if (searchCustomersBody.data && Array.isArray(searchCustomersBody.data)) {
-            for (const customer of searchCustomersBody.data) {
+        if (searchCustomersBody.customers && Array.isArray(searchCustomersBody.customers)) {
+            for (const customer of searchCustomersBody.customers) {
                 allCustomers.push({
                     name: customer.name,
                     customerId: customer.id
@@ -33649,13 +33650,19 @@ async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
             }
         }
         // Check if there are more pages to fetch
-        const totalCount = searchCustomersBody.total_count || 0;
-        const currentPageSize = searchCustomersBody.data ? searchCustomersBody.data.length : 0;
+        const totalCount = searchCustomersBody.total_hits || 0;
+        const currentPageSize = searchCustomersBody.customers ? searchCustomersBody.customers.length : 0;
         const totalPages = Math.ceil(totalCount / pageSize);
         hasMorePages = currentPageSize > 0 && offset + 1 < totalPages;
         offset++; // Increment offset by 1 (one more page to skip)
     }
     return allCustomers;
+}
+async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
+    return searchCustomers(vendorPortalApi, appSlug, `name:${customerName}`);
+}
+async function listCustomersByEmail(vendorPortalApi, appSlug, customerEmail) {
+    return searchCustomers(vendorPortalApi, appSlug, `email:${customerEmail}`);
 }
 
 
@@ -33667,7 +33674,7 @@ async function listCustomersByName(vendorPortalApi, appSlug, customerName) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.listCustomersByName = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.CustomerSummary = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
+exports.reportCompatibilityResult = exports.promoteRelease = exports.createReleaseFromChart = exports.createRelease = exports.listCustomersByEmail = exports.listCustomersByName = exports.getUsedKubernetesDistributions = exports.createCustomer = exports.archiveCustomer = exports.CustomerSummary = exports.KubernetesDistribution = exports.exposeClusterPort = exports.pollForAddonStatus = exports.createAddonObjectStore = exports.getClusterVersions = exports.upgradeCluster = exports.removeCluster = exports.getKubeconfig = exports.pollForStatus = exports.createClusterWithLicense = exports.createCluster = exports.ClusterVersion = exports.getDownloadUrlAirgapBuildRelease = exports.pollForAirgapReleaseStatus = exports.archiveChannel = exports.getChannelDetails = exports.createChannel = exports.Channel = exports.getApplicationDetails = exports.VendorPortalApi = void 0;
 var configuration_1 = __nccwpck_require__(44995);
 Object.defineProperty(exports, "VendorPortalApi", ({ enumerable: true, get: function () { return configuration_1.VendorPortalApi; } }));
 var applications_1 = __nccwpck_require__(23770);
@@ -33698,6 +33705,7 @@ Object.defineProperty(exports, "archiveCustomer", ({ enumerable: true, get: func
 Object.defineProperty(exports, "createCustomer", ({ enumerable: true, get: function () { return customers_1.createCustomer; } }));
 Object.defineProperty(exports, "getUsedKubernetesDistributions", ({ enumerable: true, get: function () { return customers_1.getUsedKubernetesDistributions; } }));
 Object.defineProperty(exports, "listCustomersByName", ({ enumerable: true, get: function () { return customers_1.listCustomersByName; } }));
+Object.defineProperty(exports, "listCustomersByEmail", ({ enumerable: true, get: function () { return customers_1.listCustomersByEmail; } }));
 var releases_1 = __nccwpck_require__(74873);
 Object.defineProperty(exports, "createRelease", ({ enumerable: true, get: function () { return releases_1.createRelease; } }));
 Object.defineProperty(exports, "createReleaseFromChart", ({ enumerable: true, get: function () { return releases_1.createReleaseFromChart; } }));

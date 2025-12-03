@@ -39,3 +39,11 @@ jobs:
           customer-name: "CI Test Customer - ${{ github.ref_name }} - ${{ github.sha }}"
           customer-email: ${{ github.sha }}@example.com
           license-type: test
+
+      - name: archive-customer cleanup
+        if: always()
+        uses: replicatedhq/replicated-actions/archive-customer@v1
+        continue-on-error: true # It could be that the customer is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer.outputs.customer-id }}
