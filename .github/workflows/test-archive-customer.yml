@@ -95,26 +95,26 @@ jobs:
           echo "Expected archive-customer to fail when neither customer-id nor customer-name are provided"
           exit 1
 
-      - name: archive-customer cleanup
-        if: always()
-        uses: replicatedhq/replicated-actions/archive-customer@v1
-        continue-on-error: true # It could be that the customer is already removed
-        with:
-          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-id: ${{ steps.create-customer.outputs.customer-id }}
-
-      - name: archive-customer cleanup name-based
-        if: always()
-        uses: replicatedhq/replicated-actions/archive-customer@v1
-        continue-on-error: true # It could be that the customer is already removed
-        with:
-          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-id: ${{ steps.create-customer-name.outputs.customer-id }}
-
-      - name: archive-customer cleanup name-based no app
-        if: always()
-        uses: replicatedhq/replicated-actions/archive-customer@v1
-        continue-on-error: true # It could be that the customer is already removed
-        with:
-          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
-          customer-id: ${{ steps.create-customer-name-no-app.outputs.customer-id }}
+      # - name: archive-customer cleanup
+      #   if: always()
+      #   uses: replicatedhq/replicated-actions/archive-customer@v1
+      #   continue-on-error: true # It could be that the customer is already removed
+      #   with:
+      #     api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+      #     customer-id: ${{ steps.create-customer.outputs.customer-id }}
+      #
+      # - name: archive-customer cleanup name-based
+      #   if: always()
+      #   uses: replicatedhq/replicated-actions/archive-customer@v1
+      #   continue-on-error: true # It could be that the customer is already removed
+      #   with:
+      #     api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+      #     customer-id: ${{ steps.create-customer-name.outputs.customer-id }}
+      #
+      # - name: archive-customer cleanup name-based no app
+      #   if: always()
+      #   uses: replicatedhq/replicated-actions/archive-customer@v1
+      #   continue-on-error: true # It could be that the customer is already removed
+      #   with:
+      #     api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+      #     customer-id: ${{ steps.create-customer-name-no-app.outputs.customer-id }}
