@@ -4,11 +4,11 @@ SHELL := /bin/bash
 all: prettier package-main package-all readme-all
 
 .PHONY: prettier
-prettier: deps
+prettier:
 	npm run prettier
 
 .PHONY: prettier-check
-prettier-check: deps
+prettier-check:
 	npx prettier --config .prettierrc 'src/**/*.ts' --check
 
 .PHONY: package-all
