@@ -30,7 +30,7 @@ jobs:
       - name: build
         run: make package-create-customer
 
-      - name: test create-customer
+      - name: test create-customer without a channel - should create a new customer
         id: create-customer
         uses: ./create-customer
         with:
@@ -40,6 +40,63 @@ jobs:
           customer-email: ${{ github.sha }}@example.com
           license-type: test
 
+      - name: test create-customer with channel - should create a new customer
+        id: create-customer-with-channel
+        uses: ./create-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer Channel - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: channel-${{ github.sha }}@example.com
+          license-type: test
+          channel-slug: test-channel
+
+      - name: test create-customer with same channel - should return existing
+        id: create-customer-same-channel
+        uses: ./create-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer Channel - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: channel-${{ github.sha }}@example.com
+          license-type: test
+          channel-slug: test-channel
+
+      - name: verify same customer ID returned for matching channel
+        run: |
+          if [ "${{ steps.create-customer-with-channel.outputs.customer-id }}" != "${{ steps.create-customer-same-channel.outputs.customer-id }}" ]; then
+            echo "❌ Customer IDs do not match!"
+            echo "First creation customer-id: ${{ steps.create-customer-with-channel.outputs.customer-id }}"
+            echo "Second creation customer-id: ${{ steps.create-customer-same-channel.outputs.customer-id }}"
+            echo "Expected: Both should return the same customer ID when creating with the same channel"
+            exit 1
+          fi
+          echo "✅ Customer IDs match - existing customer was correctly returned"
+
+      - name: test create-customer with different channel - should error
+        id: create-customer-different-channel
+        uses: ./create-customer
+        continue-on-error: true
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer Channel - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: channel-${{ github.sha }}@example.com
+          license-type: test
+          channel-slug: Unstable
+
+      - name: verify channel mismatch error occurred
+        if: steps.create-customer-different-channel.outcome == 'success'
+        run: |
+          echo "❌ Expected create-customer to fail with channel mismatch error, but it succeeded"
+          echo "The customer should have been created with 'stable' channel, but we tried to create it with 'beta' channel"
+          exit 1
+
+      - name: verify channel mismatch error message
+        if: steps.create-customer-different-channel.outcome == 'failure'
+        run: |
+          echo "✅ Correctly failed when trying to create customer with different channel"
+
       - name: archive-customer cleanup
         if: always()
         uses: replicatedhq/replicated-actions/archive-customer@v1
@@ -47,3 +104,11 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id: ${{ steps.create-customer.outputs.customer-id }}
+
+      - name: archive-customer cleanup (channel test)
+        if: always()
+        uses: replicatedhq/replicated-actions/archive-customer@v1
+        continue-on-error: true # It could be that the customer is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer-with-channel.outputs.customer-id }}
