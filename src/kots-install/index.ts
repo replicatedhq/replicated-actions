@@ -1,7 +1,7 @@
-import * as core from '@actions/core';
-import { downloadKots, installApp, installAppOptions } from './kots';
-import { file } from 'tmp-promise';
-import * as fs from 'fs';
+import * as core from "@actions/core";
+import { downloadKots, installApp, installAppOptions } from "./kots";
+import { file } from "tmp-promise";
+import * as fs from "fs";
 
 export async function actionKotsInstall() {
   const licenseFileInput = core.getInput("license-file", { required: true });
@@ -15,21 +15,21 @@ export async function actionKotsInstall() {
   const sharedPasswordInput: string = core.getInput("shared-password");
   const storageClassInput = core.getInput("storage-class");
 
-  let licenseFilePath = '';
+  let licenseFilePath = "";
   if (fs.existsSync(licenseFileInput)) {
     licenseFilePath = licenseFileInput;
   } else {
-    const {path: licensePath} = await file({postfix: '.yaml'});
+    const { path: licensePath } = await file({ postfix: ".yaml" });
     fs.writeFileSync(licensePath, licenseFileInput);
     licenseFilePath = licensePath;
   }
 
-  let valuesFilePath = '';
+  let valuesFilePath = "";
   if (configValuesInput) {
     if (fs.existsSync(configValuesInput)) {
       valuesFilePath = configValuesInput;
     } else {
-      const {path: valuesPath} = await file({postfix: '.yaml'});
+      const { path: valuesPath } = await file({ postfix: ".yaml" });
       fs.writeFileSync(valuesPath, configValuesInput);
       valuesFilePath = valuesPath;
     }
@@ -44,7 +44,7 @@ export async function actionKotsInstall() {
     sharedPassword: sharedPasswordInput,
     appVersionLabel: appVersionLabelInput,
     waitDuration: waitDurationInput,
-    storageClass: storageClassInput,
+    storageClass: storageClassInput
   };
   await installApp(kostPath, licenseFilePath, valuesFilePath, opts);
 }

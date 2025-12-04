@@ -36,21 +36,85 @@ jobs:
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           app-slug: replicated-actions-ci # from the Replicated QA team
-          customer-name: "CI Test Customer - ${{ github.ref_name }} - ${{ github.sha }}"
-          customer-email: ${{ github.sha }}@example.com
+          customer-name: "CI Test Customer 1 - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: customer-1-${{ github.sha }}@example.com
           license-type: test
 
-      - name: test archive-customer
-        id: archive-customer
+      - name: test archive-customer with customer-id
+        id: archive-customer-id
         uses: ./archive-customer
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id: ${{ steps.create-customer.outputs.customer-id }}
 
-      - name: archive-customer
+      - name: create-customer for name-based test
+        id: create-customer-name
+        uses: replicatedhq/replicated-actions/create-customer@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: customer-2-${{ github.sha }}@example.com
+          license-type: test
+
+      - name: test archive-customer with customer-name and app-slug
+        id: archive-customer-name
+        uses: ./archive-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-name: "CI Test Customer 2 - ${{ github.ref_name }} - ${{ github.sha }}"
+          app-slug: replicated-actions-ci
+
+      - name: create-customer for name-based test without app-slug
+        id: create-customer-name-no-app
+        uses: replicatedhq/replicated-actions/create-customer@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          app-slug: replicated-actions-ci # from the Replicated QA team
+          customer-name: "CI Test Customer 3 - ${{ github.ref_name }} - ${{ github.sha }}"
+          customer-email: customer-3-${{ github.sha }}@example.com
+          license-type: test
+
+      - name: test archive-customer with customer-name only
+        id: archive-customer-name-only
+        uses: ./archive-customer
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-name: "CI Test Customer 3 - ${{ github.ref_name }} - ${{ github.sha }}"
+
+      - name: test archive-customer fails without customer-id or customer-name
+        id: archive-customer-fail
+        uses: ./archive-customer
+        continue-on-error: true
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+
+      - name: verify archive-customer failed as expected
+        if: steps.archive-customer-fail.outcome == 'success'
+        run: |
+          echo "Expected archive-customer to fail when neither customer-id nor customer-name are provided"
+          exit 1
+
+      - name: archive-customer cleanup
         if: always()
         uses: replicatedhq/replicated-actions/archive-customer@v1
         continue-on-error: true # It could be that the customer is already removed
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           customer-id: ${{ steps.create-customer.outputs.customer-id }}
+
+      - name: archive-customer cleanup name-based
+        if: always()
+        uses: replicatedhq/replicated-actions/archive-customer@v1
+        continue-on-error: true # It could be that the customer is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer-name.outputs.customer-id }}
+
+      - name: archive-customer cleanup name-based no app
+        if: always()
+        uses: replicatedhq/replicated-actions/archive-customer@v1
+        continue-on-error: true # It could be that the customer is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          customer-id: ${{ steps.create-customer-name-no-app.outputs.customer-id }}
