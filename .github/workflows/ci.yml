@@ -28,6 +28,8 @@ jobs:
       - name: fail if files changed
         run: |
           if ! git diff --quiet --exit-code ; then
+            echo "Changed files:"
+            git diff --name-only
             echo "Please run 'make package-all' and 'make readme-all' locally and commit the changes."
             exit 1
           fi
