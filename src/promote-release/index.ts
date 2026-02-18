@@ -1,6 +1,5 @@
-import * as core from '@actions/core';
-import { VendorPortalApi, Channel, promoteRelease, getChannelDetails } from 'replicated-lib';
-
+import * as core from "@actions/core";
+import { VendorPortalApi, Channel, promoteRelease, getChannelDetails } from "replicated-lib";
 
 export async function actionPromoteRelease() {
   try {
@@ -15,13 +14,13 @@ export async function actionPromoteRelease() {
     apiClient.apiToken = apiToken;
 
     if (apiEndpoint) {
-      apiClient.endpoint = apiEndpoint
+      apiClient.endpoint = apiEndpoint;
     }
 
-    const channel: Channel = await getChannelDetails(apiClient, appSlug, {slug: channelSlug})
+    const channel: Channel = await getChannelDetails(apiClient, appSlug, { slug: channelSlug });
 
-    await promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion)
-    core.info(`Release ${releaseVersion} has been promoted to channel ${channelSlug}`)
+    await promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
+    core.info(`Release ${releaseVersion} has been promoted to channel ${channelSlug}`);
   } catch (error) {
     core.setFailed(error.message);
   }

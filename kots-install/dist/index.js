@@ -74572,6 +74572,28 @@ async function actionKotsInstall() {
     await installApp(kostPath, licenseFilePath, valuesFilePath, opts);
 }
 
+async function actionPromoteRelease() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const channelSlug = getInput("channel-to", { required: true });
+        const releaseSequence = getInput("release-sequence", { required: true });
+        const releaseVersion = getInput("release-version", { required: true });
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const channel = await distExports$1.getChannelDetails(apiClient, appSlug, { slug: channelSlug });
+        await distExports$1.promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
+        info(`Release ${releaseVersion} has been promoted to channel ${channelSlug}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+
 async function actionRemoveCluster() {
     try {
         const apiToken = getInput("api-token", { required: true });
@@ -74591,5 +74613,5 @@ async function actionRemoveCluster() {
     }
 }
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionHelmInstall, actionKotsInstall, actionRemoveCluster };
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster };
 //# sourceMappingURL=index.js.map
