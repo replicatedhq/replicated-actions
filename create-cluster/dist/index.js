@@ -1,9 +1,9 @@
 import * as os from 'os';
-import os__default, { EOL } from 'os';
+import os__default from 'os';
 import * as crypto from 'crypto';
 import crypto__default from 'crypto';
 import * as fs from 'fs';
-import fs__default, { promises, constants as constants$8 } from 'fs';
+import fs__default, { promises } from 'fs';
 import * as path from 'path';
 import path__default from 'path';
 import * as http from 'http';
@@ -11,14 +11,14 @@ import http__default from 'http';
 import * as https from 'https';
 import https__default from 'https';
 import 'net';
-import require$$1$2 from 'tls';
+import require$$1$1 from 'tls';
 import * as events$1 from 'events';
 import events__default from 'events';
 import 'assert';
 import require$$6$1 from 'util';
 import require$$0$2 from 'node:assert';
 import require$$0$4 from 'node:net';
-import require$$2$1 from 'node:http';
+import require$$2 from 'node:http';
 import require$$0$3 from 'node:stream';
 import require$$0$1 from 'node:buffer';
 import require$$0$5 from 'node:util';
@@ -26,58 +26,19 @@ import require$$7 from 'node:querystring';
 import require$$8 from 'node:events';
 import require$$0$6 from 'node:diagnostics_channel';
 import require$$5 from 'node:tls';
-import require$$1$4 from 'node:zlib';
+import require$$1$3 from 'node:zlib';
 import require$$5$1 from 'node:perf_hooks';
 import require$$8$1 from 'node:util/types';
-import require$$1$3 from 'node:worker_threads';
-import require$$1$5 from 'node:url';
+import require$$1$2 from 'node:worker_threads';
+import require$$1$4 from 'node:url';
 import require$$5$2 from 'node:async_hooks';
-import require$$1$6 from 'node:console';
-import require$$1$7 from 'node:dns';
-import require$$5$3, { StringDecoder } from 'string_decoder';
+import require$$1$5 from 'node:console';
+import require$$1$6 from 'node:dns';
+import require$$5$3 from 'string_decoder';
 import * as child from 'child_process';
 import { setTimeout as setTimeout$1 } from 'timers';
 import require$$0$7 from 'node:process';
-import require$$4 from 'url';
-
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-function getDefaultExportFromCjs (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-}
-
-function getAugmentedNamespace(n) {
-  if (Object.prototype.hasOwnProperty.call(n, '__esModule')) return n;
-  var f = n.default;
-	if (typeof f == "function") {
-		var a = function a () {
-			var isInstance = false;
-      try {
-        isInstance = this instanceof a;
-      } catch {}
-			if (isInstance) {
-        return Reflect.construct(f, arguments, this.constructor);
-			}
-			return f.apply(this, arguments);
-		};
-		a.prototype = f.prototype;
-  } else a = {};
-  Object.defineProperty(a, '__esModule', {value: true});
-	Object.keys(n).forEach(function (k) {
-		var d = Object.getOwnPropertyDescriptor(n, k);
-		Object.defineProperty(a, k, d.get ? d : {
-			enumerable: true,
-			get: function () {
-				return n[k];
-			}
-		});
-	});
-	return a;
-}
-
-var build = {};
-
-var archiveChannel = {};
+import * as url from 'url';
 
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -150,9 +111,6 @@ function toCommandProperties(annotationProperties) {
 function issueCommand(command, properties, message) {
     const cmd = new Command(command, properties, message);
     process.stdout.write(cmd.toString() + os.EOL);
-}
-function issue(name, message = '') {
-    issueCommand(name, {}, message);
 }
 const CMD_STRING = '::';
 class Command {
@@ -323,6 +281,37 @@ class DecodedURL extends URL {
     }
 }
 
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function getAugmentedNamespace(n) {
+  if (Object.prototype.hasOwnProperty.call(n, '__esModule')) return n;
+  var f = n.default;
+	if (typeof f == "function") {
+		var a = function a () {
+			var isInstance = false;
+      try {
+        isInstance = this instanceof a;
+      } catch {}
+			if (isInstance) {
+        return Reflect.construct(f, arguments, this.constructor);
+			}
+			return f.apply(this, arguments);
+		};
+		a.prototype = f.prototype;
+  } else a = {};
+  Object.defineProperty(a, '__esModule', {value: true});
+	Object.keys(n).forEach(function (k) {
+		var d = Object.getOwnPropertyDescriptor(n, k);
+		Object.defineProperty(a, k, d.get ? d : {
+			enumerable: true,
+			get: function () {
+				return n[k];
+			}
+		});
+	});
+	return a;
+}
+
 var tunnel$1 = {};
 
 var hasRequiredTunnel$1;
@@ -330,7 +319,7 @@ var hasRequiredTunnel$1;
 function requireTunnel$1 () {
 	if (hasRequiredTunnel$1) return tunnel$1;
 	hasRequiredTunnel$1 = 1;
-	var tls = require$$1$2;
+	var tls = require$$1$1;
 	var http = http__default;
 	var https = https__default;
 	var events = events__default;
@@ -1392,7 +1381,7 @@ function requireUtil$7 () {
 
 	const assert = require$$0$2;
 	const { kDestroyed, kBodyUsed, kListeners, kBody } = requireSymbols$4();
-	const { IncomingMessage } = require$$2$1;
+	const { IncomingMessage } = require$$2;
 	const stream = require$$0$3;
 	const net = require$$0$4;
 	const { Blob } = require$$0$1;
@@ -4946,7 +4935,7 @@ function requireWebidl () {
 	hasRequiredWebidl = 1;
 
 	const { types, inspect } = require$$0$5;
-	const { markAsUncloneable } = require$$1$3;
+	const { markAsUncloneable } = require$$1$2;
 	const { toUSVString } = requireUtil$7();
 
 	/** @type {import('../../../types/webidl').Webidl} */
@@ -5649,7 +5638,7 @@ function requireUtil$6 () {
 	hasRequiredUtil$6 = 1;
 
 	const { Transform } = require$$0$3;
-	const zlib = require$$1$4;
+	const zlib = require$$1$3;
 	const { redirectStatusSet, referrerPolicySet: referrerPolicyTokens, badPortsSet } = requireConstants$4();
 	const { getGlobalOrigin } = requireGlobal$1();
 	const { collectASequenceOfCodePoints, collectAnHTTPQuotedString, removeChars, parseMIMEType } = requireDataUrl();
@@ -11098,7 +11087,7 @@ function requireClient () {
 
 	const assert = require$$0$2;
 	const net = require$$0$4;
-	const http = require$$2$1;
+	const http = require$$2;
 	const util = requireUtil$7();
 	const { channels } = requireDiagnostics();
 	const Request = requireRequest$1();
@@ -12562,7 +12551,7 @@ function requireProxyAgent () {
 	hasRequiredProxyAgent = 1;
 
 	const { kProxy, kClose, kDestroy, kDispatch, kInterceptors } = requireSymbols$4();
-	const { URL } = require$$1$5;
+	const { URL } = require$$1$4;
 	const Agent = requireAgent();
 	const Pool = requirePool();
 	const DispatcherBase = requireDispatcherBase();
@@ -15029,7 +15018,7 @@ function requireMockUtils () {
 	  kGetNetConnect
 	} = requireMockSymbols();
 	const { buildURL } = requireUtil$7();
-	const { STATUS_CODES } = require$$2$1;
+	const { STATUS_CODES } = require$$2;
 	const {
 	  types: {
 	    isPromise
@@ -15783,7 +15772,7 @@ function requirePendingInterceptorsFormatter () {
 	hasRequiredPendingInterceptorsFormatter = 1;
 
 	const { Transform } = require$$0$3;
-	const { Console } = require$$1$6;
+	const { Console } = require$$1$5;
 
 	const PERSISTENT = process.versions.icu ? '✅' : 'Y ';
 	const NOT_PERSISTENT = process.versions.icu ? '❌' : 'N ';
@@ -16283,7 +16272,7 @@ function requireDns () {
 	if (hasRequiredDns) return dns;
 	hasRequiredDns = 1;
 	const { isIP } = require$$0$4;
-	const { lookup } = require$$1$7;
+	const { lookup } = require$$1$6;
 	const DecoratorHandler = requireDecoratorHandler();
 	const { InvalidArgumentError, InformationalError } = requireErrors$1();
 	const maxInt = Math.pow(2, 31) - 1;
@@ -19085,7 +19074,7 @@ function requireFetch () {
 	} = requireResponse();
 	const { HeadersList } = requireHeaders();
 	const { Request, cloneRequest } = requireRequest();
-	const zlib = require$$1$4;
+	const zlib = require$$1$3;
 	const {
 	  bytesMatch,
 	  makePolicyContainer,
@@ -19137,7 +19126,7 @@ function requireFetch () {
 	const { dataURLProcessor, serializeAMimeType, minimizeSupportedMimeType } = requireDataUrl();
 	const { getGlobalDispatcher } = requireGlobal();
 	const { webidl } = requireWebidl();
-	const { STATUS_CODES } = require$$2$1;
+	const { STATUS_CODES } = require$$2;
 	const GET_OR_HEAD = ['GET', 'HEAD'];
 
 	const defaultUserAgent = typeof __UNDICI_IS_NODE__ !== 'undefined' || typeof esbuildDetection !== 'undefined'
@@ -24356,7 +24345,7 @@ function requireEvents () {
 	const { webidl } = requireWebidl();
 	const { kEnumerableProperty } = requireUtil$7();
 	const { kConstruct } = requireSymbols$4();
-	const { MessagePort } = require$$1$3;
+	const { MessagePort } = require$$1$2;
 
 	/**
 	 * @see https://html.spec.whatwg.org/multipage/comms.html#messageevent
@@ -25586,7 +25575,7 @@ function requirePermessageDeflate () {
 	if (hasRequiredPermessageDeflate) return permessageDeflate;
 	hasRequiredPermessageDeflate = 1;
 
-	const { createInflateRaw, Z_DEFAULT_WINDOWBITS } = require$$1$4;
+	const { createInflateRaw, Z_DEFAULT_WINDOWBITS } = require$$1$3;
 	const { isValidClientWindowBits } = requireUtil$1();
 
 	const tail = Buffer.from([0x00, 0x00, 0xff, 0xff]);
@@ -27915,7 +27904,7 @@ function requireUndici () {
 var undiciExports = requireUndici();
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-var __awaiter$9 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -27999,8 +27988,8 @@ class HttpClientResponse {
         this.message = message;
     }
     readBody() {
-        return __awaiter$9(this, void 0, void 0, function* () {
-            return new Promise((resolve) => __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter$4(this, void 0, void 0, function* () {
                 let output = Buffer.alloc(0);
                 this.message.on('data', (chunk) => {
                     output = Buffer.concat([output, chunk]);
@@ -28012,8 +28001,8 @@ class HttpClientResponse {
         });
     }
     readBodyBuffer() {
-        return __awaiter$9(this, void 0, void 0, function* () {
-            return new Promise((resolve) => __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter$4(this, void 0, void 0, function* () {
                 const chunks = [];
                 this.message.on('data', (chunk) => {
                     chunks.push(chunk);
@@ -28068,42 +28057,42 @@ class HttpClient {
         }
     }
     options(requestUrl, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('OPTIONS', requestUrl, null, additionalHeaders || {});
         });
     }
     get(requestUrl, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('GET', requestUrl, null, additionalHeaders || {});
         });
     }
     del(requestUrl, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('DELETE', requestUrl, null, additionalHeaders || {});
         });
     }
     post(requestUrl, data, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('POST', requestUrl, data, additionalHeaders || {});
         });
     }
     patch(requestUrl, data, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('PATCH', requestUrl, data, additionalHeaders || {});
         });
     }
     put(requestUrl, data, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('PUT', requestUrl, data, additionalHeaders || {});
         });
     }
     head(requestUrl, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request('HEAD', requestUrl, null, additionalHeaders || {});
         });
     }
     sendStream(verb, requestUrl, stream, additionalHeaders) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return this.request(verb, requestUrl, stream, additionalHeaders);
         });
     }
@@ -28112,14 +28101,14 @@ class HttpClient {
      * Be aware that not found returns a null.  Other errors (4xx, 5xx) reject the promise
      */
     getJson(requestUrl_1) {
-        return __awaiter$9(this, arguments, void 0, function* (requestUrl, additionalHeaders = {}) {
+        return __awaiter$4(this, arguments, void 0, function* (requestUrl, additionalHeaders = {}) {
             additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
             const res = yield this.get(requestUrl, additionalHeaders);
             return this._processResponse(res, this.requestOptions);
         });
     }
     postJson(requestUrl_1, obj_1) {
-        return __awaiter$9(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter$4(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
             const data = JSON.stringify(obj, null, 2);
             additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
             additionalHeaders[Headers.ContentType] =
@@ -28129,7 +28118,7 @@ class HttpClient {
         });
     }
     putJson(requestUrl_1, obj_1) {
-        return __awaiter$9(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter$4(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
             const data = JSON.stringify(obj, null, 2);
             additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
             additionalHeaders[Headers.ContentType] =
@@ -28139,7 +28128,7 @@ class HttpClient {
         });
     }
     patchJson(requestUrl_1, obj_1) {
-        return __awaiter$9(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
+        return __awaiter$4(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
             const data = JSON.stringify(obj, null, 2);
             additionalHeaders[Headers.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers.Accept, MediaTypes.ApplicationJson);
             additionalHeaders[Headers.ContentType] =
@@ -28154,7 +28143,7 @@ class HttpClient {
      * Prefer get, del, post and patch
      */
     request(verb, requestUrl, data, headers) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             if (this._disposed) {
                 throw new Error('Client has already been disposed.');
             }
@@ -28250,7 +28239,7 @@ class HttpClient {
      * @param data
      */
     requestRaw(info, data) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 function callbackForResult(err, res) {
                     if (err) {
@@ -28531,15 +28520,15 @@ class HttpClient {
         return baseUserAgent;
     }
     _performExponentialBackoff(retryNumber) {
-        return __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
             retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
             const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
             return new Promise(resolve => setTimeout(() => resolve(), ms));
         });
     }
     _processResponse(res, options) {
-        return __awaiter$9(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => __awaiter$9(this, void 0, void 0, function* () {
+        return __awaiter$4(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter$4(this, void 0, void 0, function* () {
                 const statusCode = res.message.statusCode || 0;
                 const response = {
                     statusCode,
@@ -28606,18 +28595,18 @@ class HttpClient {
 const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCase()] = obj[k]), c), {});
 
 var lib = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	get Headers () { return Headers; },
-	HttpClient: HttpClient,
-	HttpClientError: HttpClientError,
-	HttpClientResponse: HttpClientResponse,
-	get HttpCodes () { return HttpCodes; },
-	get MediaTypes () { return MediaTypes; },
-	getProxyUrl: getProxyUrl,
-	isHttps: isHttps
+    __proto__: null,
+    get Headers () { return Headers; },
+    HttpClient: HttpClient,
+    HttpClientError: HttpClientError,
+    HttpClientResponse: HttpClientResponse,
+    get HttpCodes () { return HttpCodes; },
+    get MediaTypes () { return MediaTypes; },
+    getProxyUrl: getProxyUrl,
+    isHttps: isHttps
 });
 
-var __awaiter$8 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+(undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -28626,30 +28615,8 @@ var __awaiter$8 = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-class BearerCredentialHandler {
-    constructor(token) {
-        this.token = token;
-    }
-    // currently implements pre-authorization
-    // TODO: support preAuth = false where it hooks on 401
-    prepareRequest(options) {
-        if (!options.headers) {
-            throw Error('The request has no headers');
-        }
-        options.headers['Authorization'] = `Bearer ${this.token}`;
-    }
-    // This handler cannot handle 401
-    canHandleAuthentication() {
-        return false;
-    }
-    handleAuthentication() {
-        return __awaiter$8(this, void 0, void 0, function* () {
-            throw new Error('not implemented');
-        });
-    }
-}
 
-var __awaiter$7 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+(undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -28658,68 +28625,8 @@ var __awaiter$7 = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-class OidcClient {
-    static createHttpClient(allowRetry = true, maxRetry = 10) {
-        const requestOptions = {
-            allowRetries: allowRetry,
-            maxRetries: maxRetry
-        };
-        return new HttpClient('actions/oidc-client', [new BearerCredentialHandler(OidcClient.getRequestToken())], requestOptions);
-    }
-    static getRequestToken() {
-        const token = process.env['ACTIONS_ID_TOKEN_REQUEST_TOKEN'];
-        if (!token) {
-            throw new Error('Unable to get ACTIONS_ID_TOKEN_REQUEST_TOKEN env variable');
-        }
-        return token;
-    }
-    static getIDTokenUrl() {
-        const runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL'];
-        if (!runtimeUrl) {
-            throw new Error('Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable');
-        }
-        return runtimeUrl;
-    }
-    static getCall(id_token_url) {
-        return __awaiter$7(this, void 0, void 0, function* () {
-            var _a;
-            const httpclient = OidcClient.createHttpClient();
-            const res = yield httpclient
-                .getJson(id_token_url)
-                .catch(error => {
-                throw new Error(`Failed to get ID Token. \n 
-        Error Code : ${error.statusCode}\n 
-        Error Message: ${error.message}`);
-            });
-            const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
-            if (!id_token) {
-                throw new Error('Response json body do not have ID Token field');
-            }
-            return id_token;
-        });
-    }
-    static getIDToken(audience) {
-        return __awaiter$7(this, void 0, void 0, function* () {
-            try {
-                // New ID Token is requested from action service
-                let id_token_url = OidcClient.getIDTokenUrl();
-                if (audience) {
-                    const encodedAudience = encodeURIComponent(audience);
-                    id_token_url = `${id_token_url}&audience=${encodedAudience}`;
-                }
-                debug(`ID token url is ${id_token_url}`);
-                const id_token = yield OidcClient.getCall(id_token_url);
-                setSecret(id_token);
-                return id_token;
-            }
-            catch (error) {
-                throw new Error(`Error message: ${error.message}`);
-            }
-        });
-    }
-}
 
-var __awaiter$6 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+(undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -28728,307 +28635,9 @@ var __awaiter$6 = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { access, appendFile, writeFile } = promises;
-const SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
-class Summary {
-    constructor() {
-        this._buffer = '';
-    }
-    /**
-     * Finds the summary file path from the environment, rejects if env var is not found or file does not exist
-     * Also checks r/w permissions.
-     *
-     * @returns step summary file path
-     */
-    filePath() {
-        return __awaiter$6(this, void 0, void 0, function* () {
-            if (this._filePath) {
-                return this._filePath;
-            }
-            const pathFromEnv = process.env[SUMMARY_ENV_VAR];
-            if (!pathFromEnv) {
-                throw new Error(`Unable to find environment variable for $${SUMMARY_ENV_VAR}. Check if your runtime environment supports job summaries.`);
-            }
-            try {
-                yield access(pathFromEnv, constants$8.R_OK | constants$8.W_OK);
-            }
-            catch (_a) {
-                throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
-            }
-            this._filePath = pathFromEnv;
-            return this._filePath;
-        });
-    }
-    /**
-     * Wraps content in an HTML tag, adding any HTML attributes
-     *
-     * @param {string} tag HTML tag to wrap
-     * @param {string | null} content content within the tag
-     * @param {[attribute: string]: string} attrs key-value list of HTML attributes to add
-     *
-     * @returns {string} content wrapped in HTML element
-     */
-    wrap(tag, content, attrs = {}) {
-        const htmlAttrs = Object.entries(attrs)
-            .map(([key, value]) => ` ${key}="${value}"`)
-            .join('');
-        if (!content) {
-            return `<${tag}${htmlAttrs}>`;
-        }
-        return `<${tag}${htmlAttrs}>${content}</${tag}>`;
-    }
-    /**
-     * Writes text in the buffer to the summary buffer file and empties buffer. Will append by default.
-     *
-     * @param {SummaryWriteOptions} [options] (optional) options for write operation
-     *
-     * @returns {Promise<Summary>} summary instance
-     */
-    write(options) {
-        return __awaiter$6(this, void 0, void 0, function* () {
-            const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
-            const filePath = yield this.filePath();
-            const writeFunc = overwrite ? writeFile : appendFile;
-            yield writeFunc(filePath, this._buffer, { encoding: 'utf8' });
-            return this.emptyBuffer();
-        });
-    }
-    /**
-     * Clears the summary buffer and wipes the summary file
-     *
-     * @returns {Summary} summary instance
-     */
-    clear() {
-        return __awaiter$6(this, void 0, void 0, function* () {
-            return this.emptyBuffer().write({ overwrite: true });
-        });
-    }
-    /**
-     * Returns the current summary buffer as a string
-     *
-     * @returns {string} string of summary buffer
-     */
-    stringify() {
-        return this._buffer;
-    }
-    /**
-     * If the summary buffer is empty
-     *
-     * @returns {boolen} true if the buffer is empty
-     */
-    isEmptyBuffer() {
-        return this._buffer.length === 0;
-    }
-    /**
-     * Resets the summary buffer without writing to summary file
-     *
-     * @returns {Summary} summary instance
-     */
-    emptyBuffer() {
-        this._buffer = '';
-        return this;
-    }
-    /**
-     * Adds raw text to the summary buffer
-     *
-     * @param {string} text content to add
-     * @param {boolean} [addEOL=false] (optional) append an EOL to the raw text (default: false)
-     *
-     * @returns {Summary} summary instance
-     */
-    addRaw(text, addEOL = false) {
-        this._buffer += text;
-        return addEOL ? this.addEOL() : this;
-    }
-    /**
-     * Adds the operating system-specific end-of-line marker to the buffer
-     *
-     * @returns {Summary} summary instance
-     */
-    addEOL() {
-        return this.addRaw(EOL);
-    }
-    /**
-     * Adds an HTML codeblock to the summary buffer
-     *
-     * @param {string} code content to render within fenced code block
-     * @param {string} lang (optional) language to syntax highlight code
-     *
-     * @returns {Summary} summary instance
-     */
-    addCodeBlock(code, lang) {
-        const attrs = Object.assign({}, (lang && { lang }));
-        const element = this.wrap('pre', this.wrap('code', code), attrs);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML list to the summary buffer
-     *
-     * @param {string[]} items list of items to render
-     * @param {boolean} [ordered=false] (optional) if the rendered list should be ordered or not (default: false)
-     *
-     * @returns {Summary} summary instance
-     */
-    addList(items, ordered = false) {
-        const tag = ordered ? 'ol' : 'ul';
-        const listItems = items.map(item => this.wrap('li', item)).join('');
-        const element = this.wrap(tag, listItems);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML table to the summary buffer
-     *
-     * @param {SummaryTableCell[]} rows table rows
-     *
-     * @returns {Summary} summary instance
-     */
-    addTable(rows) {
-        const tableBody = rows
-            .map(row => {
-            const cells = row
-                .map(cell => {
-                if (typeof cell === 'string') {
-                    return this.wrap('td', cell);
-                }
-                const { header, data, colspan, rowspan } = cell;
-                const tag = header ? 'th' : 'td';
-                const attrs = Object.assign(Object.assign({}, (colspan && { colspan })), (rowspan && { rowspan }));
-                return this.wrap(tag, data, attrs);
-            })
-                .join('');
-            return this.wrap('tr', cells);
-        })
-            .join('');
-        const element = this.wrap('table', tableBody);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds a collapsable HTML details element to the summary buffer
-     *
-     * @param {string} label text for the closed state
-     * @param {string} content collapsable content
-     *
-     * @returns {Summary} summary instance
-     */
-    addDetails(label, content) {
-        const element = this.wrap('details', this.wrap('summary', label) + content);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML image tag to the summary buffer
-     *
-     * @param {string} src path to the image you to embed
-     * @param {string} alt text description of the image
-     * @param {SummaryImageOptions} options (optional) addition image attributes
-     *
-     * @returns {Summary} summary instance
-     */
-    addImage(src, alt, options) {
-        const { width, height } = options || {};
-        const attrs = Object.assign(Object.assign({}, (width && { width })), (height && { height }));
-        const element = this.wrap('img', null, Object.assign({ src, alt }, attrs));
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML section heading element
-     *
-     * @param {string} text heading text
-     * @param {number | string} [level=1] (optional) the heading level, default: 1
-     *
-     * @returns {Summary} summary instance
-     */
-    addHeading(text, level) {
-        const tag = `h${level}`;
-        const allowedTag = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)
-            ? tag
-            : 'h1';
-        const element = this.wrap(allowedTag, text);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML thematic break (<hr>) to the summary buffer
-     *
-     * @returns {Summary} summary instance
-     */
-    addSeparator() {
-        const element = this.wrap('hr', null);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML line break (<br>) to the summary buffer
-     *
-     * @returns {Summary} summary instance
-     */
-    addBreak() {
-        const element = this.wrap('br', null);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML blockquote to the summary buffer
-     *
-     * @param {string} text quote text
-     * @param {string} cite (optional) citation url
-     *
-     * @returns {Summary} summary instance
-     */
-    addQuote(text, cite) {
-        const attrs = Object.assign({}, (cite && { cite }));
-        const element = this.wrap('blockquote', text, attrs);
-        return this.addRaw(element).addEOL();
-    }
-    /**
-     * Adds an HTML anchor tag to the summary buffer
-     *
-     * @param {string} text link text/content
-     * @param {string} href hyperlink
-     *
-     * @returns {Summary} summary instance
-     */
-    addLink(text, href) {
-        const element = this.wrap('a', text, { href });
-        return this.addRaw(element).addEOL();
-    }
-}
-const _summary = new Summary();
-/**
- * @deprecated use `core.summary`
- */
-const markdownSummary = _summary;
-const summary = _summary;
+const { access, appendFile, writeFile: writeFile$1 } = promises;
 
-/**
- * toPosixPath converts the given path to the posix form. On Windows, \\ will be
- * replaced with /.
- *
- * @param pth. Path to transform.
- * @return string Posix path.
- */
-function toPosixPath(pth) {
-    return pth.replace(/[\\]/g, '/');
-}
-/**
- * toWin32Path converts the given path to the win32 form. On Linux, / will be
- * replaced with \\.
- *
- * @param pth. Path to transform.
- * @return string Win32 path.
- */
-function toWin32Path(pth) {
-    return pth.replace(/[/]/g, '\\');
-}
-/**
- * toPlatformPath converts the given path to a platform-specific path. It does
- * this by replacing instances of / and \ with the platform-specific path
- * separator.
- *
- * @param pth The path to platformize.
- * @return string The platform-specific path.
- */
-function toPlatformPath(pth) {
-    return pth.replace(/[/\\]/g, path.sep);
-}
-
-var __awaiter$5 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29042,7 +28651,7 @@ const { chmod, copyFile, lstat, mkdir, open, readdir, rename, rm, rmdir, stat, s
 const IS_WINDOWS$1 = process.platform === 'win32';
 fs.constants.O_RDONLY;
 function exists(fsPath) {
-    return __awaiter$5(this, void 0, void 0, function* () {
+    return __awaiter$3(this, void 0, void 0, function* () {
         try {
             yield stat(fsPath);
         }
@@ -29077,7 +28686,7 @@ function isRooted(p) {
  * @return if file exists and is executable, returns the file path. otherwise empty string.
  */
 function tryGetExecutablePath(filePath, extensions) {
-    return __awaiter$5(this, void 0, void 0, function* () {
+    return __awaiter$3(this, void 0, void 0, function* () {
         let stats = undefined;
         try {
             // test file exists
@@ -29170,7 +28779,7 @@ function isUnixExecutable(stats) {
             stats.uid === process.getuid()));
 }
 
-var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29188,7 +28797,7 @@ var __awaiter$4 = (undefined && undefined.__awaiter) || function (thisArg, _argu
  * @returns   Promise<string>   path to tool
  */
 function which(tool, check) {
-    return __awaiter$4(this, void 0, void 0, function* () {
+    return __awaiter$2(this, void 0, void 0, function* () {
         if (!tool) {
             throw new Error("parameter 'tool' is required");
         }
@@ -29218,7 +28827,7 @@ function which(tool, check) {
  * @returns   Promise<string[]>  the paths of the tool
  */
 function findInPath(tool) {
-    return __awaiter$4(this, void 0, void 0, function* () {
+    return __awaiter$2(this, void 0, void 0, function* () {
         if (!tool) {
             throw new Error("parameter 'tool' is required");
         }
@@ -29269,7 +28878,7 @@ function findInPath(tool) {
     });
 }
 
-var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29617,7 +29226,7 @@ class ToolRunner extends events$1.EventEmitter {
      * @returns   number
      */
     exec() {
-        return __awaiter$3(this, void 0, void 0, function* () {
+        return __awaiter$1(this, void 0, void 0, function* () {
             // root the tool path if it is unrooted and contains relative pathing
             if (!isRooted(this.toolPath) &&
                 (this.toolPath.includes('/') ||
@@ -29628,7 +29237,7 @@ class ToolRunner extends events$1.EventEmitter {
             // if the tool is only a file name, then resolve it from the PATH
             // otherwise verify it exists (add extension on Windows if necessary)
             this.toolPath = yield which(this.toolPath, true);
-            return new Promise((resolve, reject) => __awaiter$3(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter$1(this, void 0, void 0, function* () {
                 this._debug(`exec tool: ${this.toolPath}`);
                 this._debug('arguments:');
                 for (const arg of this.args) {
@@ -29849,7 +29458,7 @@ class ExecState extends events$1.EventEmitter {
     }
 }
 
-var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29869,7 +29478,7 @@ var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _argu
  * @returns   Promise<number>    exit code
  */
 function exec(commandLine, args, options) {
-    return __awaiter$2(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = argStringToArray(commandLine);
         if (commandArgs.length === 0) {
             throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
@@ -29881,58 +29490,8 @@ function exec(commandLine, args, options) {
         return runner.exec();
     });
 }
-/**
- * Exec a command and get the output.
- * Output will be streamed to the live console.
- * Returns promise with the exit code and collected stdout and stderr
- *
- * @param     commandLine           command to execute (can include additional args). Must be correctly escaped.
- * @param     args                  optional arguments for tool. Escaping is handled by the lib.
- * @param     options               optional exec options.  See ExecOptions
- * @returns   Promise<ExecOutput>   exit code, stdout, and stderr
- */
-function getExecOutput(commandLine, args, options) {
-    return __awaiter$2(this, void 0, void 0, function* () {
-        var _a, _b;
-        let stdout = '';
-        let stderr = '';
-        //Using string decoder covers the case where a mult-byte character is split
-        const stdoutDecoder = new StringDecoder('utf8');
-        const stderrDecoder = new StringDecoder('utf8');
-        const originalStdoutListener = (_a = options === null || options === void 0 ? void 0 : options.listeners) === null || _a === void 0 ? void 0 : _a.stdout;
-        const originalStdErrListener = (_b = options === null || options === void 0 ? void 0 : options.listeners) === null || _b === void 0 ? void 0 : _b.stderr;
-        const stdErrListener = (data) => {
-            stderr += stderrDecoder.write(data);
-            if (originalStdErrListener) {
-                originalStdErrListener(data);
-            }
-        };
-        const stdOutListener = (data) => {
-            stdout += stdoutDecoder.write(data);
-            if (originalStdoutListener) {
-                originalStdoutListener(data);
-            }
-        };
-        const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
-        //flush any remaining characters
-        stdout += stdoutDecoder.end();
-        stderr += stderrDecoder.end();
-        return {
-            exitCode,
-            stdout,
-            stderr
-        };
-    });
-}
 
-var exec$1 = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	exec: exec,
-	getExecOutput: getExecOutput
-});
-
-var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+(undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -29941,70 +29500,10 @@ var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const getWindowsInfo = () => __awaiter$1(void 0, void 0, void 0, function* () {
-    const { stdout: version } = yield getExecOutput('powershell -command "(Get-CimInstance -ClassName Win32_OperatingSystem).Version"', undefined, {
-        silent: true
-    });
-    const { stdout: name } = yield getExecOutput('powershell -command "(Get-CimInstance -ClassName Win32_OperatingSystem).Caption"', undefined, {
-        silent: true
-    });
-    return {
-        name: name.trim(),
-        version: version.trim()
-    };
-});
-const getMacOsInfo = () => __awaiter$1(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
-    const { stdout } = yield getExecOutput('sw_vers', undefined, {
-        silent: true
-    });
-    const version = (_b = (_a = stdout.match(/ProductVersion:\s*(.+)/)) === null || _a === void 0 ? void 0 : _a[1]) !== null && _b !== void 0 ? _b : '';
-    const name = (_d = (_c = stdout.match(/ProductName:\s*(.+)/)) === null || _c === void 0 ? void 0 : _c[1]) !== null && _d !== void 0 ? _d : '';
-    return {
-        name,
-        version
-    };
-});
-const getLinuxInfo = () => __awaiter$1(void 0, void 0, void 0, function* () {
-    const { stdout } = yield getExecOutput('lsb_release', ['-i', '-r', '-s'], {
-        silent: true
-    });
-    const [name, version] = stdout.trim().split('\n');
-    return {
-        name,
-        version
-    };
-});
-const platform = os__default.platform();
-const arch = os__default.arch();
-const isWindows = platform === 'win32';
-const isMacOS = platform === 'darwin';
-const isLinux = platform === 'linux';
-function getDetails() {
-    return __awaiter$1(this, void 0, void 0, function* () {
-        return Object.assign(Object.assign({}, (yield (isWindows
-            ? getWindowsInfo()
-            : isMacOS
-                ? getMacOsInfo()
-                : getLinuxInfo()))), { platform,
-            arch,
-            isWindows,
-            isMacOS,
-            isLinux });
-    });
-}
+os__default.platform();
+os__default.arch();
 
-var platform$1 = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	arch: arch,
-	getDetails: getDetails,
-	isLinux: isLinux,
-	isMacOS: isMacOS,
-	isWindows: isWindows,
-	platform: platform
-});
-
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+(undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -30046,52 +29545,6 @@ function exportVariable(name, val) {
     issueCommand('set-env', { name }, convertedVal);
 }
 /**
- * Registers a secret which will get masked from logs
- *
- * @param secret - Value of the secret to be masked
- * @remarks
- * This function instructs the Actions runner to mask the specified value in any
- * logs produced during the workflow run. Once registered, the secret value will
- * be replaced with asterisks (***) whenever it appears in console output, logs,
- * or error messages.
- *
- * This is useful for protecting sensitive information such as:
- * - API keys
- * - Access tokens
- * - Authentication credentials
- * - URL parameters containing signatures (SAS tokens)
- *
- * Note that masking only affects future logs; any previous appearances of the
- * secret in logs before calling this function will remain unmasked.
- *
- * @example
- * ```typescript
- * // Register an API token as a secret
- * const apiToken = "abc123xyz456";
- * setSecret(apiToken);
- *
- * // Now any logs containing this value will show *** instead
- * console.log(`Using token: ${apiToken}`); // Outputs: "Using token: ***"
- * ```
- */
-function setSecret(secret) {
-    issueCommand('add-mask', {}, secret);
-}
-/**
- * Prepends inputPath to the PATH (for this action and future actions)
- * @param inputPath
- */
-function addPath(inputPath) {
-    const filePath = process.env['GITHUB_PATH'] || '';
-    if (filePath) {
-        issueFileCommand('PATH', inputPath);
-    }
-    else {
-        issueCommand('add-path', {}, inputPath);
-    }
-    process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
-}
-/**
  * Gets the value of an input.
  * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
  * Returns an empty string if the value is not defined.
@@ -30109,23 +29562,6 @@ function getInput(name, options) {
         return val;
     }
     return val.trim();
-}
-/**
- * Gets the values of an multiline input.  Each value is also trimmed.
- *
- * @param     name     name of the input to get
- * @param     options  optional. See InputOptions.
- * @returns   string[]
- *
- */
-function getMultilineInput(name, options) {
-    const inputs = getInput(name, options)
-        .split('\n')
-        .filter(x => x !== '');
-    if (options && options.trimWhitespace === false) {
-        return inputs;
-    }
-    return inputs.map(input => input.trim());
 }
 /**
  * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
@@ -30163,14 +29599,6 @@ function setOutput(name, value) {
     process.stdout.write(os.EOL);
     issueCommand('set-output', { name }, toCommandValue(value));
 }
-/**
- * Enables or disables the echoing of commands into stdout for the rest of the step.
- * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
- *
- */
-function setCommandEcho(enabled) {
-    issue('echo', enabled ? 'on' : 'off');
-}
 //-----------------------------------------------------------------------
 // Results
 //-----------------------------------------------------------------------
@@ -30182,15 +29610,6 @@ function setCommandEcho(enabled) {
 function setFailed(message) {
     process.exitCode = ExitCode.Failure;
     error(message);
-}
-//-----------------------------------------------------------------------
-// Logging Commands
-//-----------------------------------------------------------------------
-/**
- * Gets whether Actions Step Debug is on or not
- */
-function isDebug() {
-    return process.env['RUNNER_DEBUG'] === '1';
 }
 /**
  * Writes debug message to user log
@@ -30208,136 +29627,18 @@ function error(message, properties = {}) {
     issueCommand('error', toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 /**
- * Adds a warning issue
- * @param message warning issue message. Errors will be converted to string via toString()
- * @param properties optional properties to add to the annotation.
- */
-function warning(message, properties = {}) {
-    issueCommand('warning', toCommandProperties(properties), message instanceof Error ? message.toString() : message);
-}
-/**
- * Adds a notice issue
- * @param message notice issue message. Errors will be converted to string via toString()
- * @param properties optional properties to add to the annotation.
- */
-function notice(message, properties = {}) {
-    issueCommand('notice', toCommandProperties(properties), message instanceof Error ? message.toString() : message);
-}
-/**
  * Writes info to log with console.log.
  * @param message info message
  */
 function info(message) {
     process.stdout.write(message + os.EOL);
 }
-/**
- * Begin an output group.
- *
- * Output until the next `groupEnd` will be foldable in this group
- *
- * @param name The name of the output group
- */
-function startGroup(name) {
-    issue('group', name);
-}
-/**
- * End an output group.
- */
-function endGroup() {
-    issue('endgroup');
-}
-/**
- * Wrap an asynchronous function call in a group.
- *
- * Returns the same type as the function itself.
- *
- * @param name The name of the group
- * @param fn The function to wrap in the group
- */
-function group(name, fn) {
-    return __awaiter(this, void 0, void 0, function* () {
-        startGroup(name);
-        let result;
-        try {
-            result = yield fn();
-        }
-        finally {
-            endGroup();
-        }
-        return result;
-    });
-}
-//-----------------------------------------------------------------------
-// Wrapper action state
-//-----------------------------------------------------------------------
-/**
- * Saves state for current action, the state can only be retrieved by this action's post job execution.
- *
- * @param     name     name of the state to store
- * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function saveState(name, value) {
-    const filePath = process.env['GITHUB_STATE'] || '';
-    if (filePath) {
-        return issueFileCommand('STATE', prepareKeyValueMessage(name, value));
-    }
-    issueCommand('save-state', { name }, toCommandValue(value));
-}
-/**
- * Gets the value of an state set by this action's main execution.
- *
- * @param     name     name of the state to get
- * @returns   string
- */
-function getState(name) {
-    return process.env[`STATE_${name}`] || '';
-}
-function getIDToken(aud) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield OidcClient.getIDToken(aud);
-    });
-}
-
-var core = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	get ExitCode () { return ExitCode; },
-	addPath: addPath,
-	debug: debug,
-	endGroup: endGroup,
-	error: error,
-	exportVariable: exportVariable,
-	getBooleanInput: getBooleanInput,
-	getIDToken: getIDToken,
-	getInput: getInput,
-	getMultilineInput: getMultilineInput,
-	getState: getState,
-	group: group,
-	info: info,
-	isDebug: isDebug,
-	markdownSummary: markdownSummary,
-	notice: notice,
-	platform: platform$1,
-	saveState: saveState,
-	setCommandEcho: setCommandEcho,
-	setFailed: setFailed,
-	setOutput: setOutput,
-	setSecret: setSecret,
-	startGroup: startGroup,
-	summary: summary,
-	toPlatformPath: toPlatformPath,
-	toPosixPath: toPosixPath,
-	toWin32Path: toWin32Path,
-	warning: warning
-});
-
-var require$$0 = /*@__PURE__*/getAugmentedNamespace(core);
 
 var dist$1 = {};
 
 var configuration = {};
 
-var require$$2 = /*@__PURE__*/getAugmentedNamespace(lib);
+var require$$0 = /*@__PURE__*/getAugmentedNamespace(lib);
 
 var hasRequiredConfiguration;
 
@@ -30380,7 +29681,7 @@ function requireConfiguration () {
 	Object.defineProperty(configuration, "__esModule", { value: true });
 	configuration.VendorPortalApi = void 0;
 	// Replicated Library Configuration
-	const httpClient = __importStar(require$$2);
+	const httpClient = __importStar(require$$0);
 	class VendorPortalApi {
 	    constructor() {
 	        this.endpoint = "https://api.replicated.com/vendor/v3";
@@ -57151,13 +56452,13 @@ function getTimezoneOffset(timeZone, date) {
 }
 
 var esm = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	format: format,
-	formatInTimeZone: formatInTimeZone,
-	fromZonedTime: fromZonedTime,
-	getTimezoneOffset: getTimezoneOffset,
-	toDate: toDate,
-	toZonedTime: toZonedTime
+    __proto__: null,
+    format: format,
+    formatInTimeZone: formatInTimeZone,
+    fromZonedTime: fromZonedTime,
+    getTimezoneOffset: getTimezoneOffset,
+    toDate: toDate,
+    toZonedTime: toZonedTime
 });
 
 var require$$6 = /*@__PURE__*/getAugmentedNamespace(esm);
@@ -64241,20 +63542,20 @@ var pako = {
 };
 
 var pako_esm = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	Deflate: Deflate_1,
-	Inflate: Inflate_1,
-	constants: constants_1,
-	default: pako,
-	deflate: deflate_1,
-	deflateRaw: deflateRaw_1,
-	gzip: gzip_1,
-	inflate: inflate_1,
-	inflateRaw: inflateRaw_1,
-	ungzip: ungzip_1
+    __proto__: null,
+    Deflate: Deflate_1,
+    Inflate: Inflate_1,
+    constants: constants_1,
+    default: pako,
+    deflate: deflate_1,
+    deflateRaw: deflateRaw_1,
+    gzip: gzip_1,
+    inflate: inflate_1,
+    inflateRaw: inflateRaw_1,
+    ungzip: ungzip_1
 });
 
-var require$$1$1 = /*@__PURE__*/getAugmentedNamespace(pako_esm);
+var require$$1 = /*@__PURE__*/getAugmentedNamespace(pako_esm);
 
 var base64Js = {};
 
@@ -64461,7 +63762,7 @@ function requireReleases () {
 		exports$1.promoteRelease = promoteRelease;
 		exports$1.reportCompatibilityResult = reportCompatibilityResult;
 		const applications_1 = requireApplications();
-		const pako_1 = require$$1$1;
+		const pako_1 = require$$1;
 		const path = __importStar(path__default);
 		const fs = __importStar(fs__default);
 		const util = __importStar(require$$6$1);
@@ -64790,126 +64091,78 @@ function requireDist$1 () {
 	return dist$1;
 }
 
-var hasRequiredArchiveChannel;
+var distExports$1 = requireDist$1();
 
-function requireArchiveChannel () {
-	if (hasRequiredArchiveChannel) return archiveChannel;
-	hasRequiredArchiveChannel = 1;
-	var __awaiter = (archiveChannel && archiveChannel.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(archiveChannel, "__esModule", { value: true });
-	archiveChannel.actionArchiveChannel = actionArchiveChannel;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	function actionArchiveChannel() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const appSlug = core.getInput("app-slug", { required: true });
-	            const channelSlug = core.getInput("channel-slug", { required: true });
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            yield (0, replicated_lib_1.archiveChannel)(apiClient, appSlug, channelSlug);
-	            core.info(`Archived channel ${channelSlug} for app ${appSlug}`);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return archiveChannel;
+async function actionArchiveChannel() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const channelSlug = getInput("channel-slug", { required: true });
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        await distExports$1.archiveChannel(apiClient, appSlug, channelSlug);
+        info(`Archived channel ${channelSlug} for app ${appSlug}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
 
-var archiveCustomer = {};
-
-var hasRequiredArchiveCustomer;
-
-function requireArchiveCustomer () {
-	if (hasRequiredArchiveCustomer) return archiveCustomer;
-	hasRequiredArchiveCustomer = 1;
-	var __awaiter = (archiveCustomer && archiveCustomer.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(archiveCustomer, "__esModule", { value: true });
-	archiveCustomer.actionArchiveCustomer = actionArchiveCustomer;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	function actionArchiveCustomer() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const customerId = core.getInput("customer-id");
-	            const customerName = core.getInput("customer-name");
-	            const appSlug = core.getInput("app-slug");
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            // Fail if neither customer-id nor customer-name are provided
-	            if (!customerId && !customerName) {
-	                throw new Error("Either customer-id or customer-name must be provided");
-	            }
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            // If customer-id is not provided, look it up by name
-	            let resolvedCustomerId = customerId;
-	            if (!resolvedCustomerId && customerName) {
-	                // Retry lookup with exponential backoff to handle indexing delays
-	                const maxRetries = 5;
-	                const initialDelayMs = 1000; // Start with 1 second
-	                let customers = [];
-	                for (let attempt = 0; attempt < maxRetries; attempt++) {
-	                    customers = yield (0, replicated_lib_1.listCustomersByName)(apiClient, appSlug || undefined, customerName);
-	                    if (customers.length > 0) {
-	                        break; // Found at least one customer, exit retry loop
-	                    }
-	                    if (attempt < maxRetries - 1) {
-	                        // Wait before retrying (exponential backoff: 1s, 2s, 4s, 8s)
-	                        const delayMs = initialDelayMs * Math.pow(2, attempt);
-	                        core.info(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Retrying in ${delayMs}ms... (attempt ${attempt + 1}/${maxRetries})`);
-	                        yield new Promise(resolve => setTimeout(resolve, delayMs));
-	                    }
-	                }
-	                if (customers.length === 0) {
-	                    throw new Error(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""} after ${maxRetries} attempts. The customer may not exist or may not be searchable yet.`);
-	                }
-	                if (customers.length > 1) {
-	                    throw new Error(`Multiple customers found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Please provide customer-id or app-slug to narrow down the search.`);
-	                }
-	                resolvedCustomerId = customers[0].customerId;
-	                core.info(`Found customer "${customerName}" with id ${resolvedCustomerId}`);
-	            }
-	            yield (0, replicated_lib_1.archiveCustomer)(apiClient, resolvedCustomerId);
-	            core.info(`Archived customer ${resolvedCustomerId}`);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return archiveCustomer;
+async function actionArchiveCustomer() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const customerId = getInput("customer-id");
+        const customerName = getInput("customer-name");
+        const appSlug = getInput("app-slug");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        // Fail if neither customer-id nor customer-name are provided
+        if (!customerId && !customerName) {
+            throw new Error("Either customer-id or customer-name must be provided");
+        }
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        // If customer-id is not provided, look it up by name
+        let resolvedCustomerId = customerId;
+        if (!resolvedCustomerId && customerName) {
+            // Retry lookup with exponential backoff to handle indexing delays
+            const maxRetries = 5;
+            const initialDelayMs = 1000; // Start with 1 second
+            let customers = [];
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                customers = await distExports$1.listCustomersByName(apiClient, appSlug || undefined, customerName);
+                if (customers.length > 0) {
+                    break; // Found at least one customer, exit retry loop
+                }
+                if (attempt < maxRetries - 1) {
+                    // Wait before retrying (exponential backoff: 1s, 2s, 4s, 8s)
+                    const delayMs = initialDelayMs * Math.pow(2, attempt);
+                    info(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Retrying in ${delayMs}ms... (attempt ${attempt + 1}/${maxRetries})`);
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                }
+            }
+            if (customers.length === 0) {
+                throw new Error(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""} after ${maxRetries} attempts. The customer may not exist or may not be searchable yet.`);
+            }
+            if (customers.length > 1) {
+                throw new Error(`Multiple customers found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Please provide customer-id or app-slug to narrow down the search.`);
+            }
+            resolvedCustomerId = customers[0].customerId;
+            info(`Found customer "${customerName}" with id ${resolvedCustomerId}`);
+        }
+        await distExports$1.archiveCustomer(apiClient, resolvedCustomerId);
+        info(`Archived customer ${resolvedCustomerId}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
-
-var createCluster = {};
 
 var dist = {};
 
@@ -73557,408 +72810,275 @@ function requireDist () {
 	return dist;
 }
 
-var hasRequiredCreateCluster;
+var distExports = requireDist();
 
-function requireCreateCluster () {
-	if (hasRequiredCreateCluster) return createCluster;
-	hasRequiredCreateCluster = 1;
-	var __awaiter = (createCluster && createCluster.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(createCluster, "__esModule", { value: true });
-	createCluster.actionCreateCluster = actionCreateCluster;
-	const core = require$$0;
-	const fs = fs__default;
-	const path = path__default;
-	const os = os__default;
-	const replicated_lib_1 = requireDist$1();
-	const yaml_1 = requireDist();
-	function actionCreateCluster() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const k8sDistribution = core.getInput("kubernetes-distribution", { required: true });
-	            const k8sVersion = core.getInput("kubernetes-version");
-	            const licenseId = core.getInput("license-id");
-	            const name = core.getInput("cluster-name");
-	            const k8sTTL = core.getInput("ttl");
-	            const diskGib = +core.getInput("disk");
-	            const nodeCount = +core.getInput("nodes");
-	            const minNodeCount = +core.getInput("min-nodes");
-	            const maxNodeCount = +core.getInput("max-nodes");
-	            const instanceType = core.getInput("instance-type");
-	            const timeoutMinutes = +(core.getInput("timeout-minutes") || 20);
-	            const nodeGroups = core.getInput("node-groups");
-	            const tags = core.getInput("tags");
-	            const ipFamily = core.getInput("ip-family");
-	            let kubeconfigPath = core.getInput("kubeconfig-path");
-	            const exportKubeconfig = core.getBooleanInput("export-kubeconfig");
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            const tagsArray = processTags(tags);
-	            const nodeGroupsArray = processNodeGroups(nodeGroups);
-	            let cluster = yield (0, replicated_lib_1.createClusterWithLicense)(apiClient, name, k8sDistribution, k8sVersion, licenseId, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroupsArray, tagsArray, ipFamily);
-	            core.info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
-	            core.setOutput("cluster-id", cluster.id);
-	            cluster = yield (0, replicated_lib_1.pollForStatus)(apiClient, cluster.id, "running", timeoutMinutes * 60);
-	            const kubeconfig = yield (0, replicated_lib_1.getKubeconfig)(apiClient, cluster.id);
-	            core.setOutput("cluster-kubeconfig", kubeconfig);
-	            if (kubeconfigPath) {
-	                writeFile(kubeconfigPath, kubeconfig);
-	                core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
-	            }
-	            if (exportKubeconfig) {
-	                if (!kubeconfigPath) {
-	                    kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${k8sDistribution}-${k8sVersion}`;
-	                    writeFile(kubeconfigPath, kubeconfig);
-	                    core.info(`Wrote kubeconfig to ${kubeconfigPath}`);
-	                }
-	                core.exportVariable("KUBECONFIG", kubeconfigPath);
-	                core.info(`Set KUBECONFIG=${kubeconfigPath}`);
-	            }
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	function writeFile(filePath, contents) {
-	    const directoryPath = path.dirname(filePath);
-	    if (!fs.existsSync(directoryPath)) {
-	        fs.mkdirSync(directoryPath, { recursive: true });
-	    }
-	    fs.writeFileSync(filePath, contents);
-	}
-	function processTags(tags) {
-	    if (tags) {
-	        const tagsYAML = (0, yaml_1.parse)(tags);
-	        // for each tag in tagsYAML, convert to json and add to array
-	        const tagsArray = tagsYAML.map((tag) => {
-	            return { key: tag.key, value: tag.value };
-	        });
-	        return tagsArray;
-	    }
-	    return undefined;
-	}
-	function processNodeGroups(nodeGroups) {
-	    if (nodeGroups) {
-	        const nodeGroupsYAML = (0, yaml_1.parse)(nodeGroups);
-	        // for each nodeGroup in nodeGroupsYAML, convert to json and add to array
-	        const nodeGroupsArray = nodeGroupsYAML.map((nodegroup) => {
-	            return { name: nodegroup.name, node_count: nodegroup.nodes, instance_type: nodegroup["instance-type"], disk_gib: nodegroup.disk };
-	        });
-	        return nodeGroupsArray;
-	    }
-	    return undefined;
-	}
-	
-	return createCluster;
+async function actionCreateCluster() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const k8sDistribution = getInput("kubernetes-distribution", { required: true });
+        const k8sVersion = getInput("kubernetes-version");
+        const licenseId = getInput("license-id");
+        const name = getInput("cluster-name");
+        const k8sTTL = getInput("ttl");
+        const diskGib = +getInput("disk");
+        const nodeCount = +getInput("nodes");
+        const minNodeCount = +getInput("min-nodes");
+        const maxNodeCount = +getInput("max-nodes");
+        const instanceType = getInput("instance-type");
+        const timeoutMinutes = +(getInput("timeout-minutes") || 20);
+        const nodeGroups = getInput("node-groups");
+        const tags = getInput("tags");
+        const ipFamily = getInput("ip-family");
+        let kubeconfigPath = getInput("kubeconfig-path");
+        const exportKubeconfig = getBooleanInput("export-kubeconfig");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const tagsArray = processTags(tags);
+        const nodeGroupsArray = processNodeGroups(nodeGroups);
+        let cluster = await distExports$1.createClusterWithLicense(apiClient, name, k8sDistribution, k8sVersion, licenseId, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroupsArray, tagsArray, ipFamily);
+        info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
+        setOutput("cluster-id", cluster.id);
+        cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
+        const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
+        setOutput("cluster-kubeconfig", kubeconfig);
+        if (kubeconfigPath) {
+            writeFile(kubeconfigPath, kubeconfig);
+            info(`Wrote kubeconfig to ${kubeconfigPath}`);
+        }
+        if (exportKubeconfig) {
+            if (!kubeconfigPath) {
+                kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${k8sDistribution}-${k8sVersion}`;
+                writeFile(kubeconfigPath, kubeconfig);
+                info(`Wrote kubeconfig to ${kubeconfigPath}`);
+            }
+            exportVariable("KUBECONFIG", kubeconfigPath);
+            info(`Set KUBECONFIG=${kubeconfigPath}`);
+        }
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+function writeFile(filePath, contents) {
+    const directoryPath = path.dirname(filePath);
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+    fs.writeFileSync(filePath, contents);
+}
+function processTags(tags) {
+    if (tags) {
+        const tagsYAML = distExports.parse(tags);
+        // for each tag in tagsYAML, convert to json and add to array
+        const tagsArray = tagsYAML.map((tag) => {
+            return { key: tag.key, value: tag.value };
+        });
+        return tagsArray;
+    }
+    return undefined;
+}
+function processNodeGroups(nodeGroups) {
+    if (nodeGroups) {
+        const nodeGroupsYAML = distExports.parse(nodeGroups);
+        // for each nodeGroup in nodeGroupsYAML, convert to json and add to array
+        const nodeGroupsArray = nodeGroupsYAML.map((nodegroup) => {
+            return { name: nodegroup.name, node_count: nodegroup.nodes, instance_type: nodegroup["instance-type"], disk_gib: nodegroup.disk };
+        });
+        return nodeGroupsArray;
+    }
+    return undefined;
 }
 
-var createCustomer = {};
-
-var hasRequiredCreateCustomer;
-
-function requireCreateCustomer () {
-	if (hasRequiredCreateCustomer) return createCustomer;
-	hasRequiredCreateCustomer = 1;
-	var __awaiter = (createCustomer && createCustomer.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(createCustomer, "__esModule", { value: true });
-	createCustomer.actionCreateCustomer = actionCreateCustomer;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	const yaml_1 = requireDist();
-	function actionCreateCustomer() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const appSlug = core.getInput("app-slug", { required: true });
-	            const name = core.getInput("customer-name", { required: true });
-	            const email = core.getInput("customer-email");
-	            const licenseType = core.getInput("license-type") || "dev";
-	            const channelSlug = core.getInput("channel-slug");
-	            const expiresInDays = +(core.getInput("expires-in") || 0);
-	            const entitlements = core.getInput("entitlements");
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            // The default for isKotsInstallEnabled is undefined, which means it will not be set
-	            // As such we can not use core.getBooleanInput
-	            let isKotsInstallEnabled = undefined;
-	            if (core.getInput("is-kots-install-enabled") !== "") {
-	                isKotsInstallEnabled = core.getInput("is-kots-install-enabled") === "true";
-	            }
-	            let isDevModeEnabled = undefined;
-	            if (core.getInput("is-dev-mode-enabled") !== "") {
-	                isDevModeEnabled = core.getInput("is-dev-mode-enabled") === "true";
-	            }
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            const entitlementsArray = processEntitlements(entitlements);
-	            const customer = yield (0, replicated_lib_1.createCustomer)(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled, isDevModeEnabled);
-	            core.setOutput("customer-id", customer.customerId);
-	            core.setOutput("license-id", customer.licenseId);
-	            core.setOutput("license-file", customer.license);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	function processEntitlements(entitlements) {
-	    if (entitlements) {
-	        const entitlementsYAML = (0, yaml_1.parse)(entitlements);
-	        // for each entitlement in entitlementsYAML, convert to json and add to array
-	        const entitlementsArray = entitlementsYAML.map((entitlement) => {
-	            return { name: entitlement.name, value: entitlement.value };
-	        });
-	        return entitlementsArray;
-	    }
-	    return undefined;
-	}
-	
-	return createCustomer;
+async function actionCreateCustomer() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const name = getInput("customer-name", { required: true });
+        const email = getInput("customer-email");
+        const licenseType = getInput("license-type") || "dev";
+        const channelSlug = getInput("channel-slug");
+        const expiresInDays = +(getInput("expires-in") || 0);
+        const entitlements = getInput("entitlements");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        // The default for isKotsInstallEnabled is undefined, which means it will not be set
+        // As such we can not use core.getBooleanInput
+        let isKotsInstallEnabled = undefined;
+        if (getInput("is-kots-install-enabled") !== "") {
+            isKotsInstallEnabled = getInput("is-kots-install-enabled") === "true";
+        }
+        let isDevModeEnabled = undefined;
+        if (getInput("is-dev-mode-enabled") !== "") {
+            isDevModeEnabled = getInput("is-dev-mode-enabled") === "true";
+        }
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const entitlementsArray = processEntitlements(entitlements);
+        const customer = await distExports$1.createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled, isDevModeEnabled);
+        setOutput("customer-id", customer.customerId);
+        setOutput("license-id", customer.licenseId);
+        setOutput("license-file", customer.license);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+function processEntitlements(entitlements) {
+    if (entitlements) {
+        const entitlementsYAML = distExports.parse(entitlements);
+        // for each entitlement in entitlementsYAML, convert to json and add to array
+        const entitlementsArray = entitlementsYAML.map((entitlement) => {
+            return { name: entitlement.name, value: entitlement.value };
+        });
+        return entitlementsArray;
+    }
+    return undefined;
 }
 
-var createObjectStore = {};
-
-var hasRequiredCreateObjectStore;
-
-function requireCreateObjectStore () {
-	if (hasRequiredCreateObjectStore) return createObjectStore;
-	hasRequiredCreateObjectStore = 1;
-	var __awaiter = (createObjectStore && createObjectStore.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(createObjectStore, "__esModule", { value: true });
-	createObjectStore.actionCreateObjectStore = actionCreateObjectStore;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	function actionCreateObjectStore() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        var _a, _b, _c, _d, _e;
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const clusterId = core.getInput("cluster-id", { required: true });
-	            const bucketPrefix = core.getInput("bucket-prefix", { required: true });
-	            const timeoutMinutes = +(core.getInput("timeout-minutes") || 5);
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            let addon = yield (0, replicated_lib_1.createAddonObjectStore)(apiClient, clusterId, bucketPrefix);
-	            core.info(`Created Object Store ${addon.id} - waiting for it to be ready...`);
-	            core.setOutput("addon-id", addon.id);
-	            addon = yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
-	            core.info(`Addon ${addon.id} is ready!`);
-	            core.setOutput("bucket-name", (_a = addon.object_store) === null || _a === void 0 ? void 0 : _a.bucket_name);
-	            core.setOutput("bucket-prefix", (_b = addon.object_store) === null || _b === void 0 ? void 0 : _b.bucket_prefix);
-	            core.setOutput("service-account-name", (_c = addon.object_store) === null || _c === void 0 ? void 0 : _c.service_account_name);
-	            core.setOutput("service-account-name-read-only", (_d = addon.object_store) === null || _d === void 0 ? void 0 : _d.service_account_name_read_only);
-	            core.setOutput("service-account-namespace", (_e = addon.object_store) === null || _e === void 0 ? void 0 : _e.service_account_namespace);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return createObjectStore;
+async function actionCreateObjectStore() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const clusterId = getInput("cluster-id", { required: true });
+        const bucketPrefix = getInput("bucket-prefix", { required: true });
+        const timeoutMinutes = +(getInput("timeout-minutes") || 5);
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        let addon = await distExports$1.createAddonObjectStore(apiClient, clusterId, bucketPrefix);
+        info(`Created Object Store ${addon.id} - waiting for it to be ready...`);
+        setOutput("addon-id", addon.id);
+        addon = await distExports$1.pollForAddonStatus(apiClient, clusterId, addon.id, "ready", timeoutMinutes * 60);
+        info(`Addon ${addon.id} is ready!`);
+        setOutput("bucket-name", addon.object_store?.bucket_name);
+        setOutput("bucket-prefix", addon.object_store?.bucket_prefix);
+        setOutput("service-account-name", addon.object_store?.service_account_name);
+        setOutput("service-account-name-read-only", addon.object_store?.service_account_name_read_only);
+        setOutput("service-account-namespace", addon.object_store?.service_account_namespace);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
 
-var createRelease = {};
-
-var hasRequiredCreateRelease;
-
-function requireCreateRelease () {
-	if (hasRequiredCreateRelease) return createRelease;
-	hasRequiredCreateRelease = 1;
-	var __awaiter = (createRelease && createRelease.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(createRelease, "__esModule", { value: true });
-	createRelease.actionCreateRelease = actionCreateRelease;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	function actionCreateRelease() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const appSlug = core.getInput("app-slug", { required: true });
-	            const chart = core.getInput("chart");
-	            const yamlDir = core.getInput("yaml-dir");
-	            const promoteChannel = core.getInput("promote-channel");
-	            const releaseVersion = core.getInput("version");
-	            const releaseNotes = core.getInput("release-notes");
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            const waitForAirgapBuild = core.getInput("wait-for-airgap-build") || "false";
-	            const parsedTimeout = parseInt(core.getInput("timeout-minutes") || "20");
-	            if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
-	                core.setFailed("timeout-minutes must be a positive number");
-	                return;
-	            }
-	            const timeoutMinutes = parsedTimeout;
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            if (chart && yamlDir) {
-	                core.setFailed("You must provide either a chart or a YAML directory, not both");
-	            }
-	            if (chart === "" && yamlDir === "") {
-	                core.setFailed("You must provide either a chart or a YAML directory");
-	            }
-	            let release;
-	            if (chart) {
-	                release = yield (0, replicated_lib_1.createReleaseFromChart)(apiClient, appSlug, chart);
-	            }
-	            else {
-	                release = yield (0, replicated_lib_1.createRelease)(apiClient, appSlug, yamlDir);
-	            }
-	            // If promote channel is specified, promote release
-	            if (promoteChannel) {
-	                const channel = (0, replicated_lib_1.getChannelDetails)(apiClient, appSlug, { name: promoteChannel });
-	                let resolvedChannel;
-	                yield channel.then(channel => {
-	                    console.log(channel.name);
-	                    resolvedChannel = channel;
-	                }, reason => {
-	                    if (reason.channel === null) {
-	                        console.error(reason.reason);
-	                    }
-	                });
-	                if (!resolvedChannel) {
-	                    resolvedChannel = yield (0, replicated_lib_1.createChannel)(apiClient, appSlug, promoteChannel);
-	                }
-	                yield (0, replicated_lib_1.promoteRelease)(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
-	                if (waitForAirgapBuild == "true") {
-	                    if (resolvedChannel.buildAirgapAutomatically) {
-	                        try {
-	                            const app = yield (0, replicated_lib_1.getApplicationDetails)(apiClient, appSlug);
-	                            const status = yield (0, replicated_lib_1.pollForAirgapReleaseStatus)(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
-	                            if (status === "built") {
-	                                const downloadUrl = yield (0, replicated_lib_1.getDownloadUrlAirgapBuildRelease)(apiClient, app.id, resolvedChannel.id, +release.sequence);
-	                                core.setOutput("airgap-status", status);
-	                                core.setOutput("airgap-url", downloadUrl);
-	                            }
-	                            else {
-	                                core.setOutput("airgap-status", status);
-	                            }
-	                        }
-	                        catch (error) {
-	                            core.setOutput("airgap-status", "failed");
-	                            console.warn("Failed to get airgap build status or download URL:", error.message);
-	                        }
-	                    }
-	                    else {
-	                        core.setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
-	                    }
-	                }
-	                core.setOutput("channel-slug", resolvedChannel.slug);
-	            }
-	            core.setOutput("release-sequence", release.sequence);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return createRelease;
+async function actionCreateRelease() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const chart = getInput("chart");
+        const yamlDir = getInput("yaml-dir");
+        const promoteChannel = getInput("promote-channel");
+        const releaseVersion = getInput("version");
+        const releaseNotes = getInput("release-notes");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const waitForAirgapBuild = getInput("wait-for-airgap-build") || "false";
+        const parsedTimeout = parseInt(getInput("timeout-minutes") || "20");
+        if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
+            setFailed("timeout-minutes must be a positive number");
+            return;
+        }
+        const timeoutMinutes = parsedTimeout;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        if (chart && yamlDir) {
+            setFailed("You must provide either a chart or a YAML directory, not both");
+        }
+        if (chart === "" && yamlDir === "") {
+            setFailed("You must provide either a chart or a YAML directory");
+        }
+        let release;
+        if (chart) {
+            release = await distExports$1.createReleaseFromChart(apiClient, appSlug, chart);
+        }
+        else {
+            release = await distExports$1.createRelease(apiClient, appSlug, yamlDir);
+        }
+        // If promote channel is specified, promote release
+        if (promoteChannel) {
+            const channel = distExports$1.getChannelDetails(apiClient, appSlug, { name: promoteChannel });
+            let resolvedChannel;
+            await channel.then(channel => {
+                console.log(channel.name);
+                resolvedChannel = channel;
+            }, reason => {
+                if (reason.channel === null) {
+                    console.error(reason.reason);
+                }
+            });
+            if (!resolvedChannel) {
+                resolvedChannel = await distExports$1.createChannel(apiClient, appSlug, promoteChannel);
+            }
+            await distExports$1.promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+            if (waitForAirgapBuild == "true") {
+                if (resolvedChannel.buildAirgapAutomatically) {
+                    try {
+                        const app = await distExports$1.getApplicationDetails(apiClient, appSlug);
+                        const status = await distExports$1.pollForAirgapReleaseStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
+                        if (status === "built") {
+                            const downloadUrl = await distExports$1.getDownloadUrlAirgapBuildRelease(apiClient, app.id, resolvedChannel.id, +release.sequence);
+                            setOutput("airgap-status", status);
+                            setOutput("airgap-url", downloadUrl);
+                        }
+                        else {
+                            setOutput("airgap-status", status);
+                        }
+                    }
+                    catch (error) {
+                        setOutput("airgap-status", "failed");
+                        console.warn("Failed to get airgap build status or download URL:", error.message);
+                    }
+                }
+                else {
+                    setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
+                }
+            }
+            setOutput("channel-slug", resolvedChannel.slug);
+        }
+        setOutput("release-sequence", release.sequence);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
 
-var exposePort = {};
-
-var hasRequiredExposePort;
-
-function requireExposePort () {
-	if (hasRequiredExposePort) return exposePort;
-	hasRequiredExposePort = 1;
-	var __awaiter = (exposePort && exposePort.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(exposePort, "__esModule", { value: true });
-	exposePort.actionExposePort = actionExposePort;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	function actionExposePort() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const clusterId = core.getInput("cluster-id", { required: true });
-	            const port = core.getInput("port");
-	            const protocols = (core.getInput("protocols") || "https").split(",");
-	            const isWildcard = core.getBooleanInput("wildcard");
-	            const timeoutMinutes = +(core.getInput("timeout-minutes") || 5);
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            let exposedPort = yield (0, replicated_lib_1.exposeClusterPort)(apiClient, clusterId, Number(port), protocols, isWildcard);
-	            if (exposedPort.addon_id) {
-	                core.info(`Exposed port ${port} - waiting for it to be ready...`);
-	                core.setOutput("addon-id", exposedPort.addon_id);
-	                yield (0, replicated_lib_1.pollForAddonStatus)(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
-	            }
-	            core.info(`Exposed Port on ${exposedPort.hostname}`);
-	            core.setOutput("hostname", exposedPort.hostname);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return exposePort;
+async function actionExposePort() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const clusterId = getInput("cluster-id", { required: true });
+        const port = getInput("port");
+        const protocols = (getInput("protocols") || "https").split(",");
+        const isWildcard = getBooleanInput("wildcard");
+        const timeoutMinutes = +(getInput("timeout-minutes") || 5);
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        let exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
+        if (exposedPort.addon_id) {
+            info(`Exposed port ${port} - waiting for it to be ready...`);
+            setOutput("addon-id", exposedPort.addon_id);
+            await distExports$1.pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
+        }
+        info(`Exposed Port on ${exposedPort.hostname}`);
+        setOutput("hostname", exposedPort.hostname);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
-
-var helmInstall = {};
-
-var helm = {};
-
-var require$$1 = /*@__PURE__*/getAugmentedNamespace(exec$1);
 
 var tmpPromise = {exports: {}};
 
@@ -74875,318 +73995,219 @@ function requireTmpPromise () {
 	return tmpPromise.exports;
 }
 
-var hasRequiredHelm;
+var tmpPromiseExports = requireTmpPromise();
 
-function requireHelm () {
-	if (hasRequiredHelm) return helm;
-	hasRequiredHelm = 1;
-	var __awaiter = (helm && helm.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(helm, "__esModule", { value: true });
-	helm.repoAdd = repoAdd;
-	helm.login = login;
-	helm.installChart = installChart;
-	helm.templateChart = templateChart;
-	const core = require$$0;
-	const exec = require$$1;
-	const fs = fs__default;
-	const tmpPromise = requireTmpPromise();
-	const url = require$$4;
-	function repoAdd(helmPath, repoName, repoUrl) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const params = ["repo", "add", repoName, repoUrl];
-	            yield exec.exec(helmPath, params);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	function login(helmPath, username, password, chart) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            if (!username || !password) {
-	                core.info("No username or password provided, skipping login");
-	                return;
-	            }
-	            const parsed = url.parse(chart);
-	            const loginOptions = {};
-	            const hostname = parsed.hostname || "";
-	            const params = ["registry", "login", hostname, "--username", username, "--password", password];
-	            yield exec.exec(helmPath, params, loginOptions);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	function installChart(helmPath, kubeconfig, chart, version, releaseName, namespace, valuesPath) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            // write the kubeconfig to a temp file
-	            const { fd, path: kubeconfigPath, cleanup } = yield tmpPromise.file({ postfix: ".yaml" });
-	            fs.writeFileSync(kubeconfigPath, kubeconfig);
-	            const installOptions = {};
-	            const params = ["upgrade", releaseName, "--install", "--kubeconfig", kubeconfigPath, "--namespace", namespace, "--create-namespace", chart];
-	            if (version) {
-	                params.push(`--version`, version);
-	            }
-	            if (valuesPath !== "") {
-	                params.push("--values", valuesPath);
-	            }
-	            yield exec.exec(helmPath, params, installOptions);
-	            cleanup();
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	function templateChart(helmPath, chart, version, valuesPath) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            let templateOutput = "";
-	            const { path: tmpDir, cleanup } = yield tmpPromise.dir({
-	                unsafeCleanup: true
-	            });
-	            const installOptions = {};
-	            installOptions.silent = true;
-	            installOptions.listeners = {
-	                stdout: (data) => {
-	                    templateOutput += data.toString();
-	                },
-	                stderr: (data) => {
-	                    core.info(data.toString());
-	                }
-	            };
-	            const params = ["template", chart];
-	            if (version) {
-	                params.push(`--version`, version);
-	            }
-	            if (valuesPath !== "") {
-	                params.push("--values", valuesPath);
-	            }
-	            yield exec.exec(helmPath, params, installOptions);
-	            cleanup();
-	            return templateOutput;
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	            throw error;
-	        }
-	    });
-	}
-	
-	return helm;
+async function repoAdd(helmPath, repoName, repoUrl) {
+    try {
+        const params = ["repo", "add", repoName, repoUrl];
+        await exec(helmPath, params);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+async function login(helmPath, username, password, chart) {
+    try {
+        if (!username || !password) {
+            info("No username or password provided, skipping login");
+            return;
+        }
+        const parsed = url.parse(chart);
+        const loginOptions = {};
+        const hostname = parsed.hostname || "";
+        const params = ["registry", "login", hostname, "--username", username, "--password", password];
+        await exec(helmPath, params, loginOptions);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+async function installChart(helmPath, kubeconfig, chart, version, releaseName, namespace, valuesPath) {
+    try {
+        // write the kubeconfig to a temp file
+        const { fd, path: kubeconfigPath, cleanup } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        fs.writeFileSync(kubeconfigPath, kubeconfig);
+        const installOptions = {};
+        const params = ["upgrade", releaseName, "--install", "--kubeconfig", kubeconfigPath, "--namespace", namespace, "--create-namespace", chart];
+        if (version) {
+            params.push(`--version`, version);
+        }
+        if (valuesPath !== "") {
+            params.push("--values", valuesPath);
+        }
+        await exec(helmPath, params, installOptions);
+        cleanup();
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+async function templateChart(helmPath, chart, version, valuesPath) {
+    try {
+        let templateOutput = "";
+        const { path: tmpDir, cleanup } = await tmpPromiseExports.dir({
+            unsafeCleanup: true
+        });
+        const installOptions = {};
+        installOptions.silent = true;
+        installOptions.listeners = {
+            stdout: (data) => {
+                templateOutput += data.toString();
+            },
+            stderr: (data) => {
+                info(data.toString());
+            }
+        };
+        const params = ["template", chart];
+        if (version) {
+            params.push(`--version`, version);
+        }
+        if (valuesPath !== "") {
+            params.push("--values", valuesPath);
+        }
+        await exec(helmPath, params, installOptions);
+        cleanup();
+        return templateOutput;
+    }
+    catch (error) {
+        setFailed(error.message);
+        throw error;
+    }
 }
 
-var preflight = {};
-
-var hasRequiredPreflight;
-
-function requirePreflight () {
-	if (hasRequiredPreflight) return preflight;
-	hasRequiredPreflight = 1;
-	var __awaiter = (preflight && preflight.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(preflight, "__esModule", { value: true });
-	preflight.downloadPreflight = downloadPreflight;
-	preflight.runPreflight = runPreflight;
-	const core = require$$0;
-	const exec = require$$1;
-	const httpClient = require$$2;
-	const tmpPromise = requireTmpPromise();
-	const fs = fs__default;
-	const path = path__default;
-	const tmp_promise_1 = requireTmpPromise();
-	function downloadPreflight() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            core.info(`Downloading latest preflight`);
-	            const http = new httpClient.HttpClient();
-	            http.requestOptions = {
-	                allowRedirects: true
-	            };
-	            const uri = `https://github.com/replicatedhq/troubleshoot/releases/latest/download/preflight_linux_amd64.tar.gz`;
-	            const { fd, path: downloadPath, cleanup } = yield (0, tmpPromise.file)({
-	                postfix: ".tar.gz"
-	            });
-	            core.debug(`Downloading preflight binary to temp file at ${downloadPath}`);
-	            const f = fs.createWriteStream(downloadPath);
-	            const res = yield http.get(uri);
-	            const preflightPath = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-	                core.info("Downloaded preflight binary");
-	                res.message.pipe(f).on("close", () => __awaiter(this, void 0, void 0, function* () {
-	                    let tarOutput, tarError = "";
-	                    const tarOptions = {};
-	                    tarOptions.listeners = {
-	                        stdout: data => {
-	                            tarOutput += data.toString();
-	                        },
-	                        stderr: data => {
-	                            tarError += data.toString();
-	                        }
-	                    };
-	                    tarOptions.cwd = path.dirname(downloadPath);
-	                    yield exec.exec("tar", ["xzf", downloadPath], tarOptions);
-	                    core.info("Extracted preflight archive");
-	                    const preflightPath = path.resolve(path.join(path.dirname(downloadPath), "preflight"));
-	                    core.setOutput("preflight-path", preflightPath);
-	                    resolve(preflightPath);
-	                }));
-	            }));
-	            return preflightPath;
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	            throw error;
-	        }
-	    });
-	}
-	function runPreflight(preflightPath, kubeconfig, templatedChart) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            // write the kubeconfig to a temp file
-	            const { fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
-	            fs.writeFileSync(kubeconfigPath, kubeconfig);
-	            // write the templatedChart to a temp file
-	            const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
-	            fs.writeFileSync(templatedChartPath, templatedChart);
-	            // write the output to a temp file
-	            const { path: outputPath } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
-	            const installOptions = {};
-	            installOptions.ignoreReturnCode = true;
-	            installOptions.silent = false;
-	            const params = [templatedChartPath, "--kubeconfig", kubeconfigPath, "--interactive=false", "--format", "json", "--output", outputPath];
-	            yield exec.exec(preflightPath, params, installOptions);
-	            const strictFailures = yield checkForStrictFailures(outputPath);
-	            if (strictFailures.length > 0) {
-	                core.error(`Found ${strictFailures.length} strict failures:`);
-	                for (let failure of strictFailures) {
-	                    core.error(failure);
-	                }
-	                throw new Error("Preflight checks failed");
-	            }
-	            cleanupKubeconfig();
-	            cleanupTemplatedChart();
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	            throw error;
-	        }
-	    });
-	}
-	function checkForStrictFailures(resultPath) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        var _a;
-	        try {
-	            const result = fs.readFileSync(resultPath, "utf8");
-	            const report = JSON.parse(result);
-	            // strictFailures will contain all failures as array of strings
-	            let strictFailures = [];
-	            // if report contains 'fail' results, set strictFailures to true
-	            if (((_a = report.fail) === null || _a === void 0 ? void 0 : _a.length) > 0) {
-	                for (const fail of report.fail) {
-	                    if (fail.strict && fail.strict === true) {
-	                        strictFailures.push(fail.message);
-	                    }
-	                }
-	            }
-	            return strictFailures;
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	            throw error;
-	        }
-	        finally {
-	            fs.unlinkSync(resultPath);
-	        }
-	    });
-	}
-	
-	return preflight;
+async function downloadPreflight() {
+    try {
+        info(`Downloading latest preflight`);
+        const http = new HttpClient();
+        http.requestOptions = {
+            allowRedirects: true
+        };
+        const uri = `https://github.com/replicatedhq/troubleshoot/releases/latest/download/preflight_linux_amd64.tar.gz`;
+        const { fd, path: downloadPath, cleanup } = await (0, tmpPromiseExports.file)({
+            postfix: ".tar.gz"
+        });
+        debug(`Downloading preflight binary to temp file at ${downloadPath}`);
+        const f = fs.createWriteStream(downloadPath);
+        const res = await http.get(uri);
+        const preflightPath = new Promise(async (resolve, reject) => {
+            info("Downloaded preflight binary");
+            res.message.pipe(f).on("close", async () => {
+                let tarOutput, tarError = "";
+                const tarOptions = {};
+                tarOptions.listeners = {
+                    stdout: data => {
+                        tarOutput += data.toString();
+                    },
+                    stderr: data => {
+                        tarError += data.toString();
+                    }
+                };
+                tarOptions.cwd = path.dirname(downloadPath);
+                await exec("tar", ["xzf", downloadPath], tarOptions);
+                info("Extracted preflight archive");
+                const preflightPath = path.resolve(path.join(path.dirname(downloadPath), "preflight"));
+                setOutput("preflight-path", preflightPath);
+                resolve(preflightPath);
+            });
+        });
+        return preflightPath;
+    }
+    catch (error) {
+        setFailed(error.message);
+        throw error;
+    }
+}
+async function runPreflight(preflightPath, kubeconfig, templatedChart) {
+    try {
+        // write the kubeconfig to a temp file
+        const { fd: kubeconfgiFD, path: kubeconfigPath, cleanup: cleanupKubeconfig } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        fs.writeFileSync(kubeconfigPath, kubeconfig);
+        // write the templatedChart to a temp file
+        const { fd: templatedChartFD, path: templatedChartPath, cleanup: cleanupTemplatedChart } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        fs.writeFileSync(templatedChartPath, templatedChart);
+        // write the output to a temp file
+        const { path: outputPath } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        const installOptions = {};
+        installOptions.ignoreReturnCode = true;
+        installOptions.silent = false;
+        const params = [templatedChartPath, "--kubeconfig", kubeconfigPath, "--interactive=false", "--format", "json", "--output", outputPath];
+        await exec(preflightPath, params, installOptions);
+        const strictFailures = await checkForStrictFailures(outputPath);
+        if (strictFailures.length > 0) {
+            error(`Found ${strictFailures.length} strict failures:`);
+            for (let failure of strictFailures) {
+                error(failure);
+            }
+            throw new Error("Preflight checks failed");
+        }
+        cleanupKubeconfig();
+        cleanupTemplatedChart();
+    }
+    catch (error) {
+        setFailed(error.message);
+        throw error;
+    }
+}
+async function checkForStrictFailures(resultPath) {
+    try {
+        const result = fs.readFileSync(resultPath, "utf8");
+        const report = JSON.parse(result);
+        // strictFailures will contain all failures as array of strings
+        let strictFailures = [];
+        // if report contains 'fail' results, set strictFailures to true
+        if (report.fail?.length > 0) {
+            for (const fail of report.fail) {
+                if (fail.strict && fail.strict === true) {
+                    strictFailures.push(fail.message);
+                }
+            }
+        }
+        return strictFailures;
+    }
+    catch (error) {
+        setFailed(error.message);
+        throw error;
+    }
+    finally {
+        fs.unlinkSync(resultPath);
+    }
 }
 
-var hasRequiredHelmInstall;
-
-function requireHelmInstall () {
-	if (hasRequiredHelmInstall) return helmInstall;
-	hasRequiredHelmInstall = 1;
-	var __awaiter = (helmInstall && helmInstall.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(helmInstall, "__esModule", { value: true });
-	helmInstall.actionHelmInstall = actionHelmInstall;
-	const core = require$$0;
-	const helm_1 = requireHelm();
-	const tmp_promise_1 = requireTmpPromise();
-	const fs = fs__default;
-	const preflight_1 = requirePreflight();
-	function actionHelmInstall() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        const helmPath = core.getInput("helm-path", { required: true });
-	        const kubeconfig = core.getInput("kubeconfig", { required: true });
-	        const namespace = core.getInput("namespace", { required: true }) || "default";
-	        const registryUsername = core.getInput("registry-username");
-	        const registryPassword = core.getInput("registry-password");
-	        const runPreflights = core.getBooleanInput("run-preflights");
-	        const values = core.getInput("values");
-	        const repoName = core.getInput("repo-name");
-	        const repoUrl = core.getInput("repo-url");
-	        const chart = core.getInput("chart", { required: true });
-	        const version = core.getInput("version");
-	        const name = core.getInput("name", { required: true });
-	        // Write the values
-	        let valuesFilePath = "";
-	        if (values) {
-	            const { fd, path: valuesPath, cleanup: cleanupValues } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
-	            fs.writeFileSync(valuesPath, values);
-	            valuesFilePath = valuesPath;
-	        }
-	        // if there's a repo, this is not a oci or local chart
-	        if (repoName && repoUrl) {
-	            yield (0, helm_1.repoAdd)(helmPath, repoName, repoUrl);
-	        }
-	        // registry login
-	        yield (0, helm_1.login)(helmPath, registryUsername, registryPassword, chart);
-	        if (runPreflights) {
-	            // install troubleshoot.sh preflight kubectl plugin
-	            const preflightPath = yield (0, preflight_1.downloadPreflight)();
-	            // run preflight checks
-	            const templatedChart = yield (0, helm_1.templateChart)(helmPath, chart, version, valuesFilePath);
-	            yield (0, preflight_1.runPreflight)(preflightPath, kubeconfig, templatedChart);
-	        }
-	        yield (0, helm_1.installChart)(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);
-	    });
-	}
-	
-	return helmInstall;
+async function actionHelmInstall() {
+    const helmPath = getInput("helm-path", { required: true });
+    const kubeconfig = getInput("kubeconfig", { required: true });
+    const namespace = getInput("namespace", { required: true }) || "default";
+    const registryUsername = getInput("registry-username");
+    const registryPassword = getInput("registry-password");
+    const runPreflights = getBooleanInput("run-preflights");
+    const values = getInput("values");
+    const repoName = getInput("repo-name");
+    const repoUrl = getInput("repo-url");
+    const chart = getInput("chart", { required: true });
+    const version = getInput("version");
+    const name = getInput("name", { required: true });
+    // Write the values
+    let valuesFilePath = "";
+    if (values) {
+        const { fd, path: valuesPath, cleanup: cleanupValues } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        fs.writeFileSync(valuesPath, values);
+        valuesFilePath = valuesPath;
+    }
+    // if there's a repo, this is not a oci or local chart
+    if (repoName && repoUrl) {
+        await repoAdd(helmPath, repoName, repoUrl);
+    }
+    // registry login
+    await login(helmPath, registryUsername, registryPassword, chart);
+    if (runPreflights) {
+        // install troubleshoot.sh preflight kubectl plugin
+        const preflightPath = await downloadPreflight();
+        // run preflight checks
+        const templatedChart = await templateChart(helmPath, chart, version, valuesFilePath);
+        await runPreflight(preflightPath, kubeconfig, templatedChart);
+    }
+    await installChart(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);
 }
-
-var kotsInstall = {};
-
-var kots = {};
 
 var randomstring$1 = {};
 
@@ -75406,283 +74427,178 @@ function requireRandomstring () {
 	return randomstring;
 }
 
-var hasRequiredKots;
+var randomstringExports = requireRandomstring();
 
-function requireKots () {
-	if (hasRequiredKots) return kots;
-	hasRequiredKots = 1;
-	var __awaiter = (kots && kots.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(kots, "__esModule", { value: true });
-	kots.downloadKots = downloadKots;
-	kots.installApp = installApp;
-	const core = require$$0;
-	const exec = require$$1;
-	const httpClient = require$$2;
-	const fs = fs__default;
-	const tmpPromise = requireTmpPromise();
-	const path = path__default;
-	const randomstring = requireRandomstring();
-	function downloadKots(version) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            if (version === "latest") {
-	                version = yield getLatestKotsVersion();
-	            }
-	            core.info(`Downloading kots ${version}`);
-	            const http = new httpClient.HttpClient();
-	            http.requestOptions = {
-	                allowRedirects: true
-	            };
-	            const uri = `https://github.com/replicatedhq/kots/releases/download/${version}/kots_linux_amd64.tar.gz`;
-	            const { fd, path: downloadPath, cleanup } = yield (0, tmpPromise.file)({
-	                postfix: ".tar.gz"
-	            });
-	            core.debug(`Downloading kots binary to temp file at ${downloadPath}`);
-	            const f = fs.createWriteStream(downloadPath);
-	            const res = yield http.get(uri);
-	            const kotsPath = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-	                core.info("Downloaded kots binary");
-	                res.message.pipe(f).on("close", () => __awaiter(this, void 0, void 0, function* () {
-	                    let tarOutput, tarError = "";
-	                    const tarOptions = {};
-	                    tarOptions.listeners = {
-	                        stdout: data => {
-	                            tarOutput += data.toString();
-	                        },
-	                        stderr: data => {
-	                            tarError += data.toString();
-	                        }
-	                    };
-	                    tarOptions.cwd = path.dirname(downloadPath);
-	                    yield exec.exec("tar", ["xzf", downloadPath], tarOptions);
-	                    core.info("Extracted kots archive");
-	                    const kotsPath = path.resolve(path.join(path.dirname(downloadPath), "kots"));
-	                    core.setOutput("kots-path", kotsPath);
-	                    resolve(kotsPath);
-	                }));
-	            }));
-	            return kotsPath;
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	            throw error;
-	        }
-	    });
-	}
-	function getLatestKotsVersion() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const http = new httpClient.HttpClient();
-	            const res = yield http.get(`https://kots.io/install?version`);
-	            if (res.message.statusCode != 200) {
-	                throw new Error(`Failed to get latest kots version: Server responded with ${res.message.statusCode}`);
-	            }
-	            const body = yield res.readBody();
-	            return body;
-	        }
-	        catch (err) {
-	            core.setFailed(err.message);
-	            throw err;
-	        }
-	    });
-	}
-	function installApp(kotsPath, licenseFilePath, configFilePath, opts) {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            // write the kubeconfig to a temp file
-	            const { fd, path: kubeconfigPath, cleanup } = yield (0, tmpPromise.file)({
-	                postfix: ".yaml"
-	            });
-	            fs.writeFileSync(kubeconfigPath, opts.kubeconfig);
-	            const installOptions = {};
-	            // Allow configuring the shared password
-	            let password;
-	            if (opts.sharedPassword) {
-	                password = opts.sharedPassword;
-	            }
-	            else {
-	                password = randomstring.generate(12);
-	            }
-	            const params = ["install", opts.appSlug, "--namespace", opts.namespace, "--shared-password", password, "--no-port-forward", "--skip-preflights"];
-	            params.push("--license-file", licenseFilePath);
-	            params.push("--kubeconfig", kubeconfigPath);
-	            if (configFilePath !== "") {
-	                params.push("--config-values", configFilePath);
-	            }
-	            if (opts.appVersionLabel) {
-	                params.push("--app-version-label", opts.appVersionLabel);
-	            }
-	            if (opts.waitDuration) {
-	                params.push("--wait-duration", opts.waitDuration);
-	            }
-	            if (opts.storageClass) {
-	                params.push("--storage-class", opts.storageClass);
-	            }
-	            yield exec.exec(kotsPath, params, installOptions);
-	            cleanup();
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return kots;
+async function downloadKots(version) {
+    try {
+        if (version === "latest") {
+            version = await getLatestKotsVersion();
+        }
+        info(`Downloading kots ${version}`);
+        const http = new HttpClient();
+        http.requestOptions = {
+            allowRedirects: true
+        };
+        const uri = `https://github.com/replicatedhq/kots/releases/download/${version}/kots_linux_amd64.tar.gz`;
+        const { fd, path: downloadPath, cleanup } = await (0, tmpPromiseExports.file)({
+            postfix: ".tar.gz"
+        });
+        debug(`Downloading kots binary to temp file at ${downloadPath}`);
+        const f = fs.createWriteStream(downloadPath);
+        const res = await http.get(uri);
+        const kotsPath = new Promise(async (resolve, reject) => {
+            info("Downloaded kots binary");
+            res.message.pipe(f).on("close", async () => {
+                let tarOutput, tarError = "";
+                const tarOptions = {};
+                tarOptions.listeners = {
+                    stdout: data => {
+                        tarOutput += data.toString();
+                    },
+                    stderr: data => {
+                        tarError += data.toString();
+                    }
+                };
+                tarOptions.cwd = path.dirname(downloadPath);
+                await exec("tar", ["xzf", downloadPath], tarOptions);
+                info("Extracted kots archive");
+                const kotsPath = path.resolve(path.join(path.dirname(downloadPath), "kots"));
+                setOutput("kots-path", kotsPath);
+                resolve(kotsPath);
+            });
+        });
+        return kotsPath;
+    }
+    catch (error) {
+        setFailed(error.message);
+        throw error;
+    }
+}
+async function getLatestKotsVersion() {
+    try {
+        const http = new HttpClient();
+        const res = await http.get(`https://kots.io/install?version`);
+        if (res.message.statusCode != 200) {
+            throw new Error(`Failed to get latest kots version: Server responded with ${res.message.statusCode}`);
+        }
+        const body = await res.readBody();
+        return body;
+    }
+    catch (err) {
+        setFailed(err.message);
+        throw err;
+    }
+}
+async function installApp(kotsPath, licenseFilePath, configFilePath, opts) {
+    try {
+        // write the kubeconfig to a temp file
+        const { fd, path: kubeconfigPath, cleanup } = await (0, tmpPromiseExports.file)({
+            postfix: ".yaml"
+        });
+        fs.writeFileSync(kubeconfigPath, opts.kubeconfig);
+        const installOptions = {};
+        // Allow configuring the shared password
+        let password;
+        if (opts.sharedPassword) {
+            password = opts.sharedPassword;
+        }
+        else {
+            password = randomstringExports.generate(12);
+        }
+        const params = ["install", opts.appSlug, "--namespace", opts.namespace, "--shared-password", password, "--no-port-forward", "--skip-preflights"];
+        params.push("--license-file", licenseFilePath);
+        params.push("--kubeconfig", kubeconfigPath);
+        if (configFilePath !== "") {
+            params.push("--config-values", configFilePath);
+        }
+        if (opts.appVersionLabel) {
+            params.push("--app-version-label", opts.appVersionLabel);
+        }
+        if (opts.waitDuration) {
+            params.push("--wait-duration", opts.waitDuration);
+        }
+        if (opts.storageClass) {
+            params.push("--storage-class", opts.storageClass);
+        }
+        await exec(kotsPath, params, installOptions);
+        cleanup();
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
 
-var hasRequiredKotsInstall;
-
-function requireKotsInstall () {
-	if (hasRequiredKotsInstall) return kotsInstall;
-	hasRequiredKotsInstall = 1;
-	var __awaiter = (kotsInstall && kotsInstall.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(kotsInstall, "__esModule", { value: true });
-	kotsInstall.actionKotsInstall = actionKotsInstall;
-	const core = require$$0;
-	const kots_1 = requireKots();
-	const tmp_promise_1 = requireTmpPromise();
-	const fs = fs__default;
-	function actionKotsInstall() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        const licenseFileInput = core.getInput("license-file", { required: true });
-	        const kotsVersionInput = core.getInput("kots-version", { required: true }) || "latest";
-	        const configValuesInput = core.getInput("config-values");
-	        const kubeconfigInput = core.getInput("kubeconfig", { required: true });
-	        const appSlugInput = core.getInput("app-slug", { required: true });
-	        const appVersionLabelInput = core.getInput("app-version-label");
-	        const namespaceInput = core.getInput("namespace") || "default";
-	        const waitDurationInput = core.getInput("wait-duration");
-	        const sharedPasswordInput = core.getInput("shared-password");
-	        const storageClassInput = core.getInput("storage-class");
-	        let licenseFilePath = "";
-	        if (fs.existsSync(licenseFileInput)) {
-	            licenseFilePath = licenseFileInput;
-	        }
-	        else {
-	            const { path: licensePath } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
-	            fs.writeFileSync(licensePath, licenseFileInput);
-	            licenseFilePath = licensePath;
-	        }
-	        let valuesFilePath = "";
-	        if (configValuesInput) {
-	            if (fs.existsSync(configValuesInput)) {
-	                valuesFilePath = configValuesInput;
-	            }
-	            else {
-	                const { path: valuesPath } = yield (0, tmp_promise_1.file)({ postfix: ".yaml" });
-	                fs.writeFileSync(valuesPath, configValuesInput);
-	                valuesFilePath = valuesPath;
-	            }
-	        }
-	        const kostPath = yield (0, kots_1.downloadKots)(kotsVersionInput);
-	        const opts = {
-	            kubeconfig: kubeconfigInput,
-	            appSlug: appSlugInput,
-	            namespace: namespaceInput,
-	            sharedPassword: sharedPasswordInput,
-	            appVersionLabel: appVersionLabelInput,
-	            waitDuration: waitDurationInput,
-	            storageClass: storageClassInput
-	        };
-	        yield (0, kots_1.installApp)(kostPath, licenseFilePath, valuesFilePath, opts);
-	    });
-	}
-	
-	return kotsInstall;
+async function actionKotsInstall() {
+    const licenseFileInput = getInput("license-file", { required: true });
+    const kotsVersionInput = getInput("kots-version", { required: true }) || "latest";
+    const configValuesInput = getInput("config-values");
+    const kubeconfigInput = getInput("kubeconfig", { required: true });
+    const appSlugInput = getInput("app-slug", { required: true });
+    const appVersionLabelInput = getInput("app-version-label");
+    const namespaceInput = getInput("namespace") || "default";
+    const waitDurationInput = getInput("wait-duration");
+    const sharedPasswordInput = getInput("shared-password");
+    const storageClassInput = getInput("storage-class");
+    let licenseFilePath = "";
+    if (fs.existsSync(licenseFileInput)) {
+        licenseFilePath = licenseFileInput;
+    }
+    else {
+        const { path: licensePath } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        fs.writeFileSync(licensePath, licenseFileInput);
+        licenseFilePath = licensePath;
+    }
+    let valuesFilePath = "";
+    if (configValuesInput) {
+        if (fs.existsSync(configValuesInput)) {
+            valuesFilePath = configValuesInput;
+        }
+        else {
+            const { path: valuesPath } = await tmpPromiseExports.file({ postfix: ".yaml" });
+            fs.writeFileSync(valuesPath, configValuesInput);
+            valuesFilePath = valuesPath;
+        }
+    }
+    const kostPath = await downloadKots(kotsVersionInput);
+    const opts = {
+        kubeconfig: kubeconfigInput,
+        appSlug: appSlugInput,
+        namespace: namespaceInput,
+        sharedPassword: sharedPasswordInput,
+        appVersionLabel: appVersionLabelInput,
+        waitDuration: waitDurationInput,
+        storageClass: storageClassInput
+    };
+    await installApp(kostPath, licenseFilePath, valuesFilePath, opts);
 }
 
-var removeCluster = {};
-
-var hasRequiredRemoveCluster;
-
-function requireRemoveCluster () {
-	if (hasRequiredRemoveCluster) return removeCluster;
-	hasRequiredRemoveCluster = 1;
-	var __awaiter = (removeCluster && removeCluster.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	Object.defineProperty(removeCluster, "__esModule", { value: true });
-	removeCluster.actionRemoveCluster = actionRemoveCluster;
-	const core = require$$0;
-	const replicated_lib_1 = requireDist$1();
-	function actionRemoveCluster() {
-	    return __awaiter(this, void 0, void 0, function* () {
-	        try {
-	            const apiToken = core.getInput("api-token", { required: true });
-	            const clusterId = core.getInput("cluster-id", { required: true });
-	            const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-	            const apiClient = new replicated_lib_1.VendorPortalApi();
-	            apiClient.apiToken = apiToken;
-	            if (apiEndpoint) {
-	                apiClient.endpoint = apiEndpoint;
-	            }
-	            core.debug(`Removing cluster ${clusterId}...`);
-	            yield (0, replicated_lib_1.removeCluster)(apiClient, clusterId);
-	            core.info(`Removed cluster ${clusterId}`);
-	        }
-	        catch (error) {
-	            core.setFailed(error.message);
-	        }
-	    });
-	}
-	
-	return removeCluster;
+async function actionRemoveCluster() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const clusterId = getInput("cluster-id", { required: true });
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        debug(`Removing cluster ${clusterId}...`);
+        await distExports$1.removeCluster(apiClient, clusterId);
+        info(`Removed cluster ${clusterId}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
 }
 
-var hasRequiredBuild;
-
-function requireBuild () {
-	if (hasRequiredBuild) return build;
-	hasRequiredBuild = 1;
-	Object.defineProperty(build, "__esModule", { value: true });
-	const archive_channel_1 = requireArchiveChannel();
-	const archive_customer_1 = requireArchiveCustomer();
-	const create_cluster_1 = requireCreateCluster();
-	const create_customer_1 = requireCreateCustomer();
-	const create_object_store_1 = requireCreateObjectStore();
-	const create_release_1 = requireCreateRelease();
-	const expose_port_1 = requireExposePort();
-	const helm_install_1 = requireHelmInstall();
-	const kots_install_1 = requireKotsInstall();
-	const remove_cluster_1 = requireRemoveCluster();
-	build.actionArchiveChannel = archive_channel_1.actionArchiveChannel;
-	build.actionArchiveCustomer = archive_customer_1.actionArchiveCustomer;
-	build.actionCreateCluster = create_cluster_1.actionCreateCluster;
-	build.actionCreateCustomer = create_customer_1.actionCreateCustomer;
-	build.actionCreateObjectStore = create_object_store_1.actionCreateObjectStore;
-	build.actionCreateRelease = create_release_1.actionCreateRelease;
-	build.actionExposePort = expose_port_1.actionExposePort;
-	build.actionHelmInstall = helm_install_1.actionHelmInstall;
-	build.actionKotsInstall = kots_install_1.actionKotsInstall;
-	build.actionRemoveCluster = remove_cluster_1.actionRemoveCluster;
-	
-	return build;
-}
-
-var buildExports = requireBuild();
-var index = /*@__PURE__*/getDefaultExportFromCjs(buildExports);
-
-export { index as default };
+exports.actionArchiveChannel = actionArchiveChannel;
+exports.actionArchiveCustomer = actionArchiveCustomer;
+exports.actionCreateCluster = actionCreateCluster;
+exports.actionCreateCustomer = actionCreateCustomer;
+exports.actionCreateObjectStore = actionCreateObjectStore;
+exports.actionCreateRelease = actionCreateRelease;
+exports.actionExposePort = actionExposePort;
+exports.actionHelmInstall = actionHelmInstall;
+exports.actionKotsInstall = actionKotsInstall;
+exports.actionRemoveCluster = actionRemoveCluster;
 //# sourceMappingURL=index.js.map
