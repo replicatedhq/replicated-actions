@@ -1,8 +1,7 @@
 import * as core from '@actions/core';
 import { VendorPortalApi, CompatibilityResult, reportCompatibilityResult} from 'replicated-lib';
 
-
-async function run() {
+export async function actionReportCompatibilityResult() {
   try {
     const apiToken = core.getInput("api-token", { required: true });
     const appSlug = core.getInput("app-slug", { required: true });
@@ -44,6 +43,3 @@ async function run() {
     core.setFailed(error.message);
   }
 }
-
-
-run()
