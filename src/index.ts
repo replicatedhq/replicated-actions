@@ -13,4 +13,19 @@ import { actionGetCustomerInstances } from "./get-customer-instances";
 import { actionUpgradeCluster } from "./upgrade-cluster";
 import { actionReportCompatibilityResult } from "./report-compatibility-result";
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionGetCustomerInstances, actionUpgradeCluster, actionReportCompatibilityResult };
+export {
+  actionArchiveChannel,
+  actionArchiveCustomer,
+  actionCreateCluster,
+  actionCreateCustomer,
+  actionCreateObjectStore,
+  actionCreateRelease,
+  actionExposePort,
+  actionHelmInstall,
+  actionKotsInstall,
+  actionPromoteRelease,
+  actionRemoveCluster,
+  actionGetCustomerInstances,
+  actionUpgradeCluster,
+  actionReportCompatibilityResult
+};

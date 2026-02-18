@@ -1,5 +1,5 @@
-import * as core from '@actions/core';
-import { VendorPortalApi, CompatibilityResult, reportCompatibilityResult} from 'replicated-lib';
+import * as core from "@actions/core";
+import { VendorPortalApi, CompatibilityResult, reportCompatibilityResult } from "replicated-lib";
 
 export async function actionReportCompatibilityResult() {
   try {
@@ -11,18 +11,18 @@ export async function actionReportCompatibilityResult() {
     const success = core.getBooleanInput("success", { required: true });
     const notes = core.getInput("notes");
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-    
+
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
 
     if (apiEndpoint) {
-      apiClient.endpoint = apiEndpoint
+      apiClient.endpoint = apiEndpoint;
     }
 
-    const c11yResult : CompatibilityResult = {
+    const c11yResult: CompatibilityResult = {
       distribution: k8sDistribution,
-      version: k8sVersion,
-    }
+      version: k8sVersion
+    };
 
     const now = new Date();
     if (success) {
@@ -31,14 +31,13 @@ export async function actionReportCompatibilityResult() {
         c11yResult.successNotes = notes;
       }
     } else {
-        c11yResult.failureAt = now;
-        if (notes) {
-          c11yResult.failureNotes = notes;
-        }
+      c11yResult.failureAt = now;
+      if (notes) {
+        c11yResult.failureNotes = notes;
       }
+    }
 
-    await reportCompatibilityResult(apiClient, appSlug, +releaseSequence, c11yResult)
-
+    await reportCompatibilityResult(apiClient, appSlug, +releaseSequence, c11yResult);
   } catch (error) {
     core.setFailed(error.message);
   }

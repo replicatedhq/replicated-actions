@@ -77346,7 +77346,7 @@ async function actionGetCustomerInstances() {
         const usedDistributions = await distExports$1.getUsedKubernetesDistributions(apiClient, appSlug);
         const availableDistributions = await distExports$1.getClusterVersions(apiClient);
         const matrix = processDistributions(usedDistributions, availableDistributions);
-        setOutput('matrix', JSON.stringify(matrix));
+        setOutput("matrix", JSON.stringify(matrix));
     }
     catch (error) {
         setFailed(error.message);
@@ -77359,7 +77359,7 @@ function processDistributions(usedDistributions, availableDistributions) {
     info(`Found ${usedDistributions.length} used distributions`);
     for (const ad of availableDistributions) {
         // Used for exact matches
-        const key = (ad.name + '-' + ad.version).toLowerCase();
+        const key = (ad.name + "-" + ad.version).toLowerCase();
         availableMap[key] = ad;
         // if semver is invalid, skip
         const sversion = semverExports.coerce(ad.version);
@@ -77368,10 +77368,10 @@ function processDistributions(usedDistributions, availableDistributions) {
             continue;
         }
         // Used for distro + semver matches
-        const semverKey = (ad.name + '-' + sversion).toLowerCase();
+        const semverKey = (ad.name + "-" + sversion).toLowerCase();
         availableMap[semverKey] = ad;
         // Used for distro + semver minor matches
-        const semverMinorKey = (ad.name + '-' + sversion.major + '.' + sversion.minor).toLowerCase();
+        const semverMinorKey = (ad.name + "-" + sversion.major + "." + sversion.minor).toLowerCase();
         if (availableMap[semverMinorKey]) {
             if (semverExports.gt(sversion, semverExports.coerce(availableMap[semverMinorKey].version))) {
                 availableMap[semverMinorKey] = ad;
@@ -77381,7 +77381,7 @@ function processDistributions(usedDistributions, availableDistributions) {
             availableMap[semverMinorKey] = ad;
         }
         // Used for distro + semver major matches
-        const semverMajorKey = (ad.name + '-' + sversion.major).toLowerCase();
+        const semverMajorKey = (ad.name + "-" + sversion.major).toLowerCase();
         if (availableMap[semverMajorKey]) {
             if (semverExports.gt(sversion, semverExports.coerce(availableMap[semverMajorKey].version))) {
                 availableMap[semverMajorKey] = ad;
@@ -77393,9 +77393,9 @@ function processDistributions(usedDistributions, availableDistributions) {
     }
     for (const ud of usedDistributions) {
         // Exact match for distribution and version
-        const key = (ud.k8sDistribution + '-' + ud.k8sVersion).toLowerCase();
+        const key = (ud.k8sDistribution + "-" + ud.k8sVersion).toLowerCase();
         if (availableMap[key]) {
-            const matrixKey = availableMap[key].name + '-' + availableMap[key].version;
+            const matrixKey = availableMap[key].name + "-" + availableMap[key].version;
             matrixMap[matrixKey] = { distribution: availableMap[key].name, version: availableMap[key].version };
             continue;
         }
@@ -77406,28 +77406,28 @@ function processDistributions(usedDistributions, availableDistributions) {
             continue;
         }
         // Exact match for distribution, but using semver
-        const semverKey = (ud.k8sDistribution + '-' + sversion).toLowerCase();
+        const semverKey = (ud.k8sDistribution + "-" + sversion).toLowerCase();
         if (availableMap[semverKey]) {
-            const matrixKey = availableMap[semverKey].name + '-' + availableMap[semverKey].version;
+            const matrixKey = availableMap[semverKey].name + "-" + availableMap[semverKey].version;
             matrixMap[matrixKey] = { distribution: availableMap[semverKey].name, version: availableMap[semverKey].version };
             continue;
         }
         // Exact match for distribution, but using up to minor version
-        const semverMinorKey = (ud.k8sDistribution + '-' + sversion.major + '.' + sversion.minor).toLowerCase();
+        const semverMinorKey = (ud.k8sDistribution + "-" + sversion.major + "." + sversion.minor).toLowerCase();
         if (availableMap[semverMinorKey]) {
-            const matrixKey = availableMap[semverMinorKey].name + '-' + availableMap[semverMinorKey].version;
+            const matrixKey = availableMap[semverMinorKey].name + "-" + availableMap[semverMinorKey].version;
             matrixMap[matrixKey] = { distribution: availableMap[semverMinorKey].name, version: availableMap[semverMinorKey].version };
             continue;
         }
         // Exact match for distribution, but using up to major version
-        const semverMajorKey = (ud.k8sDistribution + '-' + sversion.major).toLowerCase();
+        const semverMajorKey = (ud.k8sDistribution + "-" + sversion.major).toLowerCase();
         if (availableMap[semverMajorKey]) {
-            const matrixKey = availableMap[semverMajorKey].name + '-' + availableMap[semverMajorKey].version;
+            const matrixKey = availableMap[semverMajorKey].name + "-" + availableMap[semverMajorKey].version;
             matrixMap[matrixKey] = { distribution: availableMap[semverMajorKey].name, version: availableMap[semverMajorKey].version };
             continue;
         }
     }
-    const matrix = Object.values(matrixMap).map((value) => {
+    const matrix = Object.values(matrixMap).map(value => {
         return value;
     });
     return matrix;
@@ -77449,10 +77449,10 @@ async function actionUpgradeCluster() {
         }
         let cluster = await distExports$1.upgradeCluster(apiClient, clusterId, k8sVersion);
         info(`Upgrading cluster ${cluster.id} - waiting for it to be ready...`);
-        setOutput('cluster-id', cluster.id);
-        cluster = await distExports$1.pollForStatus(apiClient, cluster.id, 'running', timeoutMinutes * 60);
+        setOutput("cluster-id", cluster.id);
+        cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
-        setOutput('cluster-kubeconfig', kubeconfig);
+        setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
             writeFile(kubeconfigPath, kubeconfig);
             info(`Wrote kubeconfig to ${kubeconfigPath}`);
@@ -77463,7 +77463,7 @@ async function actionUpgradeCluster() {
                 writeFile(kubeconfigPath, kubeconfig);
                 info(`Wrote kubeconfig to ${kubeconfigPath}`);
             }
-            exportVariable('KUBECONFIG', kubeconfigPath);
+            exportVariable("KUBECONFIG", kubeconfigPath);
             info(`Set KUBECONFIG=${kubeconfigPath}`);
         }
     }
@@ -77479,5 +77479,44 @@ function writeFile(filePath, contents) {
     fs.writeFileSync(filePath, contents);
 }
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionGetCustomerInstances, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionUpgradeCluster };
+async function actionReportCompatibilityResult() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const releaseSequence = getInput("release-sequence", { required: true });
+        const k8sDistribution = getInput("kubernetes-distribution", { required: true });
+        const k8sVersion = getInput("kubernetes-version", { required: true });
+        const success = getBooleanInput("success", { required: true });
+        const notes = getInput("notes");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const c11yResult = {
+            distribution: k8sDistribution,
+            version: k8sVersion
+        };
+        const now = new Date();
+        if (success) {
+            c11yResult.successAt = now;
+            if (notes) {
+                c11yResult.successNotes = notes;
+            }
+        }
+        else {
+            c11yResult.failureAt = now;
+            if (notes) {
+                c11yResult.failureNotes = notes;
+            }
+        }
+        await distExports$1.reportCompatibilityResult(apiClient, appSlug, +releaseSequence, c11yResult);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionGetCustomerInstances, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionReportCompatibilityResult, actionUpgradeCluster };
 //# sourceMappingURL=index.js.map
