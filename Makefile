@@ -17,7 +17,6 @@ prettier-check: deps
 
 .PHONY: package-all
 package-all: package-all-new \
-			package-promote-release \
 			 package-get-customer-instances package-report-compatibility-result package-upgrade-cluster
 
 .PHONY: package-all-new
@@ -25,7 +24,8 @@ package-all-new: package-archive-channel package-archive-customer \
 				 package-create-customer package-create-release \
 				 package-helm-install package-kots-install \
 				 package-create-cluster package-remove-cluster package-prepare-cluster \
-				 package-create-object-store package-expose-port
+				 package-create-object-store package-expose-port \
+				 package-promote-release
 
 .PHONY: package-main
 package-main:
@@ -83,9 +83,9 @@ package-kots-install: package-main
 	cp -r dist kots-install/
 
 .PHONY: package-promote-release
-package-promote-release:
-	rm -rf ./promote-release/build ./promote-release/dist
-	cd ./promote-release && npm install && npm run build && npm run package
+package-promote-release: package-main
+	rm -rf ./promote-release/dist
+	cp -r dist promote-release/
 
 .PHONY: package-remove-cluster
 package-remove-cluster: package-main

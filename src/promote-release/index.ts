@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import { VendorPortalApi, Channel, promoteRelease, getChannelDetails } from 'replicated-lib';
 
 
-async function run() {
+export async function actionPromoteRelease() {
   try {
     const apiToken = core.getInput("api-token", { required: true });
     const appSlug = core.getInput("app-slug", { required: true });
@@ -10,7 +10,7 @@ async function run() {
     const releaseSequence = core.getInput("release-sequence", { required: true });
     const releaseVersion = core.getInput("release-version", { required: true });
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-    
+
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
 
@@ -26,6 +26,3 @@ async function run() {
     core.setFailed(error.message);
   }
 }
-
-
-run()
