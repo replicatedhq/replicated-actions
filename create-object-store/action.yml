@@ -29,5 +29,5 @@ outputs:
   service-account-namespace: # namespace of the service account
     description: "Contains the namespace of the service account."
 runs:
-  using: "node20"
+  using: "node24"
   main: "index.js"
