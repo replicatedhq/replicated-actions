@@ -17,7 +17,7 @@ prettier-check: deps
 
 .PHONY: package-all
 package-all: package-all-new \
-			 package-report-compatibility-result package-upgrade-cluster
+			 package-report-compatibility-result
 
 .PHONY: package-all-new
 package-all-new: package-archive-channel package-archive-customer \
@@ -26,7 +26,8 @@ package-all-new: package-archive-channel package-archive-customer \
 				 package-create-cluster package-remove-cluster package-prepare-cluster \
 				 package-create-object-store package-expose-port \
 				 package-promote-release \
-				 package-get-customer-instances
+				 package-get-customer-instances \
+				 package-upgrade-cluster
 
 .PHONY: package-main
 package-main:
@@ -104,9 +105,9 @@ package-report-compatibility-result:
 	cd ./report-compatibility-result && npm install && npm run build && npm run package
 
 .PHONY: package-upgrade-cluster
-package-upgrade-cluster:
+package-upgrade-cluster: package-main
 	rm -rf ./upgrade-cluster/build ./upgrade-cluster/dist
-	cd ./upgrade-cluster && npm install && npm run build && npm run package
+	cp -r dist upgrade-cluster/
 
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
