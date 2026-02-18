@@ -9,5 +9,6 @@ import { actionHelmInstall } from "./helm-install";
 import { actionKotsInstall } from "./kots-install";
 import { actionPromoteRelease } from "./promote-release";
 import { actionRemoveCluster } from "./remove-cluster";
+import { actionGetCustomerInstances } from "./get-customer-instances";
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster };
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionGetCustomerInstances };

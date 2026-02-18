@@ -17,7 +17,7 @@ prettier-check: deps
 
 .PHONY: package-all
 package-all: package-all-new \
-			 package-get-customer-instances package-report-compatibility-result package-upgrade-cluster
+			 package-report-compatibility-result package-upgrade-cluster
 
 .PHONY: package-all-new
 package-all-new: package-archive-channel package-archive-customer \
@@ -25,7 +25,8 @@ package-all-new: package-archive-channel package-archive-customer \
 				 package-helm-install package-kots-install \
 				 package-create-cluster package-remove-cluster package-prepare-cluster \
 				 package-create-object-store package-expose-port \
-				 package-promote-release
+				 package-promote-release \
+				 package-get-customer-instances
 
 .PHONY: package-main
 package-main:
@@ -93,9 +94,9 @@ package-remove-cluster: package-main
 	cp -r dist remove-cluster/
 
 .PHONY: package-get-customer-instances
-package-get-customer-instances:
+package-get-customer-instances: package-main
 	rm -rf ./get-customer-instances/build ./get-customer-instances/dist
-	cd ./get-customer-instances && npm install && npm run build && npm run package
+	cp -r dist get-customer-instances/
 
 .PHONY: package-report-compatibility-result
 package-report-compatibility-result:
