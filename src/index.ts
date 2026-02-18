@@ -9,13 +9,15 @@ import { actionHelmInstall } from "./helm-install";
 import { actionKotsInstall } from "./kots-install";
 import { actionRemoveCluster } from "./remove-cluster";
 
-exports.actionArchiveChannel = actionArchiveChannel;
-exports.actionArchiveCustomer = actionArchiveCustomer;
-exports.actionCreateCluster = actionCreateCluster;
-exports.actionCreateCustomer = actionCreateCustomer;
-exports.actionCreateObjectStore = actionCreateObjectStore;
-exports.actionCreateRelease = actionCreateRelease;
-exports.actionExposePort = actionExposePort;
-exports.actionHelmInstall = actionHelmInstall;
-exports.actionKotsInstall = actionKotsInstall;
-exports.actionRemoveCluster = actionRemoveCluster;
+export {
+  actionArchiveChannel,
+  actionArchiveCustomer,
+  actionCreateCluster,
+  actionCreateCustomer,
+  actionCreateObjectStore,
+  actionCreateRelease,
+  actionExposePort,
+  actionHelmInstall,
+  actionKotsInstall,
+  actionRemoveCluster
+};
