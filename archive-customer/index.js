@@ -1,1 +1,2 @@
-require('./dist/index').actionArchiveCustomer();
+import { actionArchiveCustomer } from './dist/index';
+actionArchiveCustomer();

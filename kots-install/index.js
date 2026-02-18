@@ -1,1 +1,2 @@
-require('./dist/index').actionKotsInstall();
+import { actionKotsInstall } from './dist/index';
+actionKotsInstall();

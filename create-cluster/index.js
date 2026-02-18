@@ -1,1 +1,2 @@
-require('./dist/index').actionCreateCluster();
+import { actionCreateCluster } from './dist/index.js';
+actionCreateCluster();

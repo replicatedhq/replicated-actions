@@ -1,1 +1,2 @@
-require('./dist/index').actionArchiveChannel();
+import { actionArchiveChannel } from './dist/index';
+actionArchiveChannel();

@@ -1,1 +1,2 @@
-require('./dist/index').actionCreateRelease();
+import { actionCreateRelease } from './dist/index';
+actionCreateRelease();
