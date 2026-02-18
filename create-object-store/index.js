@@ -1,2 +1,2 @@
-import { actionCreateObjectStore } from './dist/index';
+import { actionCreateObjectStore } from './dist/index.js';
 actionCreateObjectStore();

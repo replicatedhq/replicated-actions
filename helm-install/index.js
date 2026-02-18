@@ -1,2 +1,2 @@
-import { actionHelmInstall } from './dist/index';
+import { actionHelmInstall } from './dist/index.js';
 actionHelmInstall();

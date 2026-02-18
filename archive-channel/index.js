@@ -1,2 +1,2 @@
-import { actionArchiveChannel } from './dist/index';
+import { actionArchiveChannel } from './dist/index.js';
 actionArchiveChannel();

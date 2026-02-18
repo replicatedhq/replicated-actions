@@ -1,2 +1,2 @@
-import { actionCreateCustomer } from './dist/index';
+import { actionCreateCustomer } from './dist/index.js';
 actionCreateCustomer();

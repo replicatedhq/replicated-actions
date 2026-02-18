@@ -1,2 +1,2 @@
-import { actionArchiveCustomer } from './dist/index';
+import { actionArchiveCustomer } from './dist/index.js';
 actionArchiveCustomer();
