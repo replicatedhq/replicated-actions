@@ -17,5 +17,5 @@ inputs:
     description: "The version field of the Release to promote."
     required: true
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: "node24"
+  main: "index.js"

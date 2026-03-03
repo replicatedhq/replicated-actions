@@ -7,15 +7,25 @@ import { actionCreateRelease } from "./create-release";
 import { actionExposePort } from "./expose-port";
 import { actionHelmInstall } from "./helm-install";
 import { actionKotsInstall } from "./kots-install";
+import { actionPromoteRelease } from "./promote-release";
 import { actionRemoveCluster } from "./remove-cluster";
+import { actionGetCustomerInstances } from "./get-customer-instances";
+import { actionUpgradeCluster } from "./upgrade-cluster";
+import { actionReportCompatibilityResult } from "./report-compatibility-result";
 
-exports.actionArchiveChannel = actionArchiveChannel;
-exports.actionArchiveCustomer = actionArchiveCustomer;
-exports.actionCreateCluster = actionCreateCluster;
-exports.actionCreateCustomer = actionCreateCustomer;
-exports.actionCreateObjectStore = actionCreateObjectStore;
-exports.actionCreateRelease = actionCreateRelease;
-exports.actionExposePort = actionExposePort;
-exports.actionHelmInstall = actionHelmInstall;
-exports.actionKotsInstall = actionKotsInstall;
-exports.actionRemoveCluster = actionRemoveCluster;
+export {
+  actionArchiveChannel,
+  actionArchiveCustomer,
+  actionCreateCluster,
+  actionCreateCustomer,
+  actionCreateObjectStore,
+  actionCreateRelease,
+  actionExposePort,
+  actionHelmInstall,
+  actionKotsInstall,
+  actionPromoteRelease,
+  actionRemoveCluster,
+  actionGetCustomerInstances,
+  actionUpgradeCluster,
+  actionReportCompatibilityResult
+};

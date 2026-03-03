@@ -1,1 +1,2 @@
-require('./dist/index').actionCreateCustomer();
+import { actionCreateCustomer } from './dist/index.js';
+actionCreateCustomer();

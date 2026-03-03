@@ -1,1 +1,2 @@
-require('./dist/index').actionHelmInstall();
+import { actionHelmInstall } from './dist/index.js';
+actionHelmInstall();

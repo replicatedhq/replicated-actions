@@ -46,5 +46,5 @@ outputs:
   license-file: # contains the license file
     description: "Contains he license file."
 runs:
-  using: "node20"
+  using: "node24"
   main: "index.js"

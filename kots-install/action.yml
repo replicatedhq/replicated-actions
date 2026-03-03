@@ -34,5 +34,5 @@ inputs:
     description: "Sets the storage class to use for the KOTS Admin Console components. Default: unset, which means the default storage class will be used."
     required: false
 runs:
-  using: "node20"
+  using: "node24"
   main: "index.js"

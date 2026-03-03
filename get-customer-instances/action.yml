@@ -11,5 +11,5 @@ outputs:
   matrix: # matrix to test with
     description: "Matrix to test with (json)."
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: "node24"
+  main: "index.js"

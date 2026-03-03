@@ -1,1 +1,2 @@
-require('./dist/index').actionExposePort();
+import { actionExposePort } from './dist/index.js';
+actionExposePort();
