@@ -44,7 +44,12 @@ export async function actionUpgradeCluster() {
       core.info(`Set KUBECONFIG=${kubeconfigPath}`);
     }
   } catch (error) {
-    core.setFailed(error.message);
+    const message = error instanceof Error ? error.message : String(error);
+    core.error(message);
+    if (error instanceof Error && error.stack) {
+      core.debug(error.stack);
+    }
+    core.setFailed(message);
   }
 }
 

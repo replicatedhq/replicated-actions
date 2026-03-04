@@ -72859,8 +72859,13 @@ async function actionCreateCluster() {
             info(`Set KUBECONFIG=${kubeconfigPath}`);
         }
     }
-    catch (error) {
-        setFailed(error.message);
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
     }
 }
 function writeFile$1(filePath, contents) {
@@ -77467,8 +77472,13 @@ async function actionUpgradeCluster() {
             info(`Set KUBECONFIG=${kubeconfigPath}`);
         }
     }
-    catch (error) {
-        setFailed(error.message);
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
     }
 }
 function writeFile(filePath, contents) {
