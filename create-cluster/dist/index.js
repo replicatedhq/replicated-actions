@@ -72843,6 +72843,7 @@ async function actionCreateCluster() {
         info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
         setOutput("cluster-id", cluster.id);
         cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
+        info(`Cluster ${cluster.id} is running.`);
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
@@ -77456,6 +77457,7 @@ async function actionUpgradeCluster() {
         info(`Upgrading cluster ${cluster.id} - waiting for it to be ready...`);
         setOutput("cluster-id", cluster.id);
         cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
+        info(`Cluster ${cluster.id} is running.`);
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
