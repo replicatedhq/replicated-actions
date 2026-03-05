@@ -30052,9 +30052,9 @@ function requireClusters () {
 	            if (clusterDetails.status === expectedStatus) {
 	                return clusterDetails;
 	            }
-	            // Once state is "error", it will never change. So we can shortcut polling.
 	            if (clusterDetails.status === "error") {
-	                throw new Error(`Cluster has entered error state.`);
+	                const schedulingStatus = clusterDetails.last_scheduling_status ? `, last scheduling status: ${clusterDetails.last_scheduling_status}` : "";
+	                throw new Error(`Cluster has entered error state${schedulingStatus}`);
 	            }
 	            console.debug(`Cluster status is ${clusterDetails.status}, sleeping for ${sleeptimeMs / 1000} seconds`);
 	        }
@@ -30090,7 +30090,8 @@ function requireClusters () {
 	    return {
 	        name: body.cluster.name,
 	        id: body.cluster.id,
-	        status: body.cluster.status
+	        status: body.cluster.status,
+	        last_scheduling_status: body.cluster.last_scheduling_status
 	    };
 	}
 	async function getKubeconfig(vendorPortalApi, clusterId) {
