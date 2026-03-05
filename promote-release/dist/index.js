@@ -72843,6 +72843,7 @@ async function actionCreateCluster() {
         info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
         setOutput("cluster-id", cluster.id);
         cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
+        info(`Cluster ${cluster.id} is running.`);
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
@@ -72859,8 +72860,13 @@ async function actionCreateCluster() {
             info(`Set KUBECONFIG=${kubeconfigPath}`);
         }
     }
-    catch (error) {
-        setFailed(error.message);
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
     }
 }
 function writeFile$1(filePath, contents) {
@@ -77451,6 +77457,7 @@ async function actionUpgradeCluster() {
         info(`Upgrading cluster ${cluster.id} - waiting for it to be ready...`);
         setOutput("cluster-id", cluster.id);
         cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
+        info(`Cluster ${cluster.id} is running.`);
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
@@ -77467,8 +77474,13 @@ async function actionUpgradeCluster() {
             info(`Set KUBECONFIG=${kubeconfigPath}`);
         }
     }
-    catch (error) {
-        setFailed(error.message);
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
     }
 }
 function writeFile(filePath, contents) {
