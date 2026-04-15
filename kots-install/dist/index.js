@@ -74297,7 +74297,7 @@ async function actionHelmInstall() {
     const chart = getInput("chart", { required: true });
     const version = getInput("version");
     const name = getInput("name", { required: true });
-    const wait = getBooleanInput("wait");
+    const wait = getInput("wait") === "true";
     const extraHelmFlags = getInput("extra-helm-flags");
     // Write the values
     let valuesFilePath = "";
