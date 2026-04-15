@@ -74099,7 +74099,7 @@ var tmpPromiseExports = requireTmpPromise();
  */
 function parseExtraFlags(input) {
     const tokens = input.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
-    return tokens.map((t) => t.replace(/^["']|["']$/g, ""));
+    return tokens.map(t => t.replace(/^["']|["']$/g, ""));
 }
 
 async function repoAdd(helmPath, repoName, repoUrl) {

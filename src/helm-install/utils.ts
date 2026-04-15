@@ -5,5 +5,5 @@
  */
 export function parseExtraFlags(input: string): string[] {
   const tokens = input.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
-  return tokens.map((t) => t.replace(/^["']|["']$/g, ""));
+  return tokens.map(t => t.replace(/^["']|["']$/g, ""));
 }

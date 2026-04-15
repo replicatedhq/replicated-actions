@@ -26,27 +26,19 @@ describe("parseExtraFlags", () => {
   });
 
   it("handles multiple quoted segments", () => {
-    expect(parseExtraFlags(`--set "a=1 2" --set "b=3 4"`)).toEqual([
-      "--set", "a=1 2", "--set", "b=3 4",
-    ]);
+    expect(parseExtraFlags(`--set "a=1 2" --set "b=3 4"`)).toEqual(["--set", "a=1 2", "--set", "b=3 4"]);
   });
 
   it("handles extra whitespace between tokens", () => {
-    expect(parseExtraFlags("  --debug   --timeout  10m0s  ")).toEqual([
-      "--debug", "--timeout", "10m0s",
-    ]);
+    expect(parseExtraFlags("  --debug   --timeout  10m0s  ")).toEqual(["--debug", "--timeout", "10m0s"]);
   });
 
   it("handles tabs and mixed whitespace", () => {
-    expect(parseExtraFlags("--debug\t--timeout\t10m0s")).toEqual([
-      "--debug", "--timeout", "10m0s",
-    ]);
+    expect(parseExtraFlags("--debug\t--timeout\t10m0s")).toEqual(["--debug", "--timeout", "10m0s"]);
   });
 
   it("handles quoted string with equals sign", () => {
-    expect(parseExtraFlags(`--set-string "image.tag=v1.2.3"`)).toEqual([
-      "--set-string", "image.tag=v1.2.3",
-    ]);
+    expect(parseExtraFlags(`--set-string "image.tag=v1.2.3"`)).toEqual(["--set-string", "image.tag=v1.2.3"]);
   });
 
   it("handles a single flag with no value", () => {
@@ -54,8 +46,6 @@ describe("parseExtraFlags", () => {
   });
 
   it("handles adjacent quoted and unquoted tokens", () => {
-    expect(parseExtraFlags('--timeout 10m0s --set "key=a b" --debug')).toEqual([
-      "--timeout", "10m0s", "--set", "key=a b", "--debug",
-    ]);
+    expect(parseExtraFlags('--timeout 10m0s --set "key=a b" --debug')).toEqual(["--timeout", "10m0s", "--set", "key=a b", "--debug"]);
   });
 });

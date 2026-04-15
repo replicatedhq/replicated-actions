@@ -22,22 +22,12 @@ describe("installChart", () => {
     namespace: "default",
     valuesPath: "",
     wait: false,
-    extraHelmFlags: "",
+    extraHelmFlags: ""
   };
 
   async function install(overrides: Partial<typeof defaults> = {}) {
     const opts = { ...defaults, ...overrides };
-    await installChart(
-      opts.helmPath,
-      opts.kubeconfig,
-      opts.chart,
-      opts.version,
-      opts.releaseName,
-      opts.namespace,
-      opts.valuesPath,
-      opts.wait,
-      opts.extraHelmFlags
-    );
+    await installChart(opts.helmPath, opts.kubeconfig, opts.chart, opts.version, opts.releaseName, opts.namespace, opts.valuesPath, opts.wait, opts.extraHelmFlags);
   }
 
   it("runs helm upgrade --install with base params", async () => {
