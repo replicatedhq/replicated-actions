@@ -7,8 +7,8 @@ all: deps prettier package-main package-all readme-all
 deps:
 	npm install
 
-.PHONY: tests
-tests: deps
+.PHONY: unit-tests
+unit-tests: deps
 	npm test
 
 .PHONY: prettier
