@@ -74092,6 +74092,16 @@ function requireTmpPromise () {
 
 var tmpPromiseExports = requireTmpPromise();
 
+/**
+ * Splits a string of helm flags into an array of arguments,
+ * preserving quoted substrings as single tokens and stripping
+ * the surrounding quotes.
+ */
+function parseExtraFlags(input) {
+    const tokens = input.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
+    return tokens.map(t => t.replace(/^["']|["']$/g, ""));
+}
+
 async function repoAdd(helmPath, repoName, repoUrl) {
     try {
         const params = ["repo", "add", repoName, repoUrl];
@@ -74117,7 +74127,7 @@ async function login(helmPath, username, password, chart) {
         setFailed(error.message);
     }
 }
-async function installChart(helmPath, kubeconfig, chart, version, releaseName, namespace, valuesPath) {
+async function installChart(helmPath, kubeconfig, chart, version, releaseName, namespace, valuesPath, wait, extraHelmFlags) {
     try {
         // write the kubeconfig to a temp file
         const { fd, path: kubeconfigPath, cleanup } = await tmpPromiseExports.file({ postfix: ".yaml" });
@@ -74129,6 +74139,12 @@ async function installChart(helmPath, kubeconfig, chart, version, releaseName, n
         }
         if (valuesPath !== "") {
             params.push("--values", valuesPath);
+        }
+        if (wait) {
+            params.push("--wait");
+        }
+        if (extraHelmFlags) {
+            params.push(...parseExtraFlags(extraHelmFlags));
         }
         await exec(helmPath, params, installOptions);
         cleanup();
@@ -74281,6 +74297,8 @@ async function actionHelmInstall() {
     const chart = getInput("chart", { required: true });
     const version = getInput("version");
     const name = getInput("name", { required: true });
+    const wait = getInput("wait") === "true";
+    const extraHelmFlags = getInput("extra-helm-flags");
     // Write the values
     let valuesFilePath = "";
     if (values) {
@@ -74301,7 +74319,7 @@ async function actionHelmInstall() {
         const templatedChart = await templateChart(helmPath, chart, version, valuesFilePath);
         await runPreflight(preflightPath, kubeconfig, templatedChart);
     }
-    await installChart(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);
+    await installChart(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath, wait, extraHelmFlags);
 }
 
 var randomstring$1 = {};

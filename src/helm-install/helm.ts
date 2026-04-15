@@ -3,6 +3,7 @@ import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as tmpPromise from "tmp-promise";
 import * as url from "url";
+import { parseExtraFlags } from "./utils";
 
 export async function repoAdd(helmPath: string, repoName: string, repoUrl: string) {
   try {
@@ -34,7 +35,7 @@ export async function login(helmPath: string, username: string, password: string
   }
 }
 
-export async function installChart(helmPath: string, kubeconfig: string, chart: string, version: string, releaseName: string, namespace: string, valuesPath: string) {
+export async function installChart(helmPath: string, kubeconfig: string, chart: string, version: string, releaseName: string, namespace: string, valuesPath: string, wait: boolean, extraHelmFlags: string) {
   try {
     // write the kubeconfig to a temp file
     const { fd, path: kubeconfigPath, cleanup } = await tmpPromise.file({ postfix: ".yaml" });
@@ -49,6 +50,12 @@ export async function installChart(helmPath: string, kubeconfig: string, chart: 
     }
     if (valuesPath !== "") {
       params.push("--values", valuesPath);
+    }
+    if (wait) {
+      params.push("--wait");
+    }
+    if (extraHelmFlags) {
+      params.push(...parseExtraFlags(extraHelmFlags));
     }
 
     await exec.exec(helmPath, params, installOptions);

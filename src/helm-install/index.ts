@@ -17,6 +17,8 @@ export async function actionHelmInstall() {
   const chart: string = core.getInput("chart", { required: true });
   const version: string = core.getInput("version");
   const name: string = core.getInput("name", { required: true });
+  const wait: boolean = core.getInput("wait") === "true";
+  const extraHelmFlags: string = core.getInput("extra-helm-flags");
 
   // Write the values
   let valuesFilePath = "";
@@ -43,5 +45,5 @@ export async function actionHelmInstall() {
     await runPreflight(preflightPath, kubeconfig, templatedChart);
   }
 
-  await installChart(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath);
+  await installChart(helmPath, kubeconfig, chart, version, name, namespace, valuesFilePath, wait, extraHelmFlags);
 }

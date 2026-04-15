@@ -7,6 +7,10 @@ all: deps prettier package-main package-all readme-all
 deps:
 	npm install
 
+.PHONY: unit-tests
+unit-tests: deps
+	npm test
+
 .PHONY: prettier
 prettier: deps
 	npx prettier --config .prettierrc 'src/**/*.ts' --write

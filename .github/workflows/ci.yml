@@ -17,10 +17,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: "package.json" 
+          node-version-file: "package.json"
           cache: "npm"
           cache-dependency-path: |
             **/package-lock.json
+
+      - name: unit tests
+        run: make unit-tests
 
       - name: build
         run: make
