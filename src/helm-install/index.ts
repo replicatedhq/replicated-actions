@@ -17,7 +17,7 @@ export async function actionHelmInstall() {
   const chart: string = core.getInput("chart", { required: true });
   const version: string = core.getInput("version");
   const name: string = core.getInput("name", { required: true });
-  const wait: boolean = core.getBooleanInput("wait");
+  const wait: boolean = core.getInput("wait") === "true";
   const extraHelmFlags: string = core.getInput("extra-helm-flags");
 
   // Write the values
