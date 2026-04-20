@@ -32,11 +32,47 @@ inputs:
         - name: "number-of-users"
           value: "10"</pre>
     required: false
+  custom-id:
+    description: "Custom ID to assign to the customer."
+    required: false
   is-kots-install-enabled:
     description: "If KOTS install should be enabled for the customer."
     required: false
   is-dev-mode-enabled:
     description: "If Dev Mode should be enabled for the customer. Can only be enabled for dev licenses."
+    required: false
+  is-airgap-enabled:
+    description: "If airgap installs should be enabled for the customer."
+    required: false
+  is-gitops-supported:
+    description: "If GitOps should be supported for the customer."
+    required: false
+  is-snapshot-supported:
+    description: "If snapshots should be supported for the customer."
+    required: false
+  is-helm-install-enabled:
+    description: "If Helm installs should be enabled for the customer."
+    required: false
+  is-kurl-install-enabled:
+    description: "If kURL installs should be enabled for the customer."
+    required: false
+  is-embedded-cluster-download-enabled:
+    description: "If Embedded Cluster downloads should be enabled for the customer."
+    required: false
+  is-embedded-cluster-multinode-enabled:
+    description: "If Embedded Cluster multi-node should be enabled for the customer."
+    required: false
+  is-geoaxis-supported:
+    description: "If GeoAxis should be supported for the customer."
+    required: false
+  is-identity-service-supported:
+    description: "If the Identity Service should be supported for the customer."
+    required: false
+  is-installer-support-enabled:
+    description: "If installer support should be enabled for the customer."
+    required: false
+  is-support-bundle-upload-enabled:
+    description: "If support bundle uploads should be enabled for the customer."
     required: false
 outputs:
   customer-id: # id of the customer

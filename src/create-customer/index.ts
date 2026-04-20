@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { VendorPortalApi, createCustomer } from "replicated-lib";
+import { VendorPortalApi, createCustomer, CreateCustomerOptions } from "replicated-lib";
 
 import { parse } from "yaml";
 
@@ -13,19 +13,8 @@ export async function actionCreateCustomer() {
     const channelSlug = core.getInput("channel-slug");
     const expiresInDays: number = +(core.getInput("expires-in") || 0);
     const entitlements = core.getInput("entitlements");
+    const customId = core.getInput("custom-id");
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-
-    // The default for isKotsInstallEnabled is undefined, which means it will not be set
-    // As such we can not use core.getBooleanInput
-    let isKotsInstallEnabled: boolean | undefined = undefined;
-    if (core.getInput("is-kots-install-enabled") !== "") {
-      isKotsInstallEnabled = core.getInput("is-kots-install-enabled") === "true";
-    }
-
-    let isDevModeEnabled: boolean | undefined = undefined;
-    if (core.getInput("is-dev-mode-enabled") !== "") {
-      isDevModeEnabled = core.getInput("is-dev-mode-enabled") === "true";
-    }
 
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
@@ -35,7 +24,32 @@ export async function actionCreateCustomer() {
     }
 
     const entitlementsArray = processEntitlements(entitlements);
-    const customer = await createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled, isDevModeEnabled);
+
+    const options: CreateCustomerOptions = {
+      appSlug,
+      name,
+      licenseType,
+      email,
+      channelSlug,
+      expiresIn: expiresInDays,
+      entitlementValues: entitlementsArray,
+      customId: customId || undefined,
+      isKotsInstallEnabled: optionalBooleanInput("is-kots-install-enabled"),
+      isDevModeEnabled: optionalBooleanInput("is-dev-mode-enabled"),
+      isAirgapEnabled: optionalBooleanInput("is-airgap-enabled"),
+      isGitopsSupported: optionalBooleanInput("is-gitops-supported"),
+      isSnapshotSupported: optionalBooleanInput("is-snapshot-supported"),
+      isHelmInstallEnabled: optionalBooleanInput("is-helm-install-enabled"),
+      isKurlInstallEnabled: optionalBooleanInput("is-kurl-install-enabled"),
+      isEmbeddedClusterDownloadEnabled: optionalBooleanInput("is-embedded-cluster-download-enabled"),
+      isEmbeddedClusterMultinodeEnabled: optionalBooleanInput("is-embedded-cluster-multinode-enabled"),
+      isGeoaxisSupported: optionalBooleanInput("is-geoaxis-supported"),
+      isIdentityServiceSupported: optionalBooleanInput("is-identity-service-supported"),
+      isInstallerSupportEnabled: optionalBooleanInput("is-installer-support-enabled"),
+      isSupportBundleUploadEnabled: optionalBooleanInput("is-support-bundle-upload-enabled")
+    };
+
+    const customer = await createCustomer(apiClient, options);
 
     core.setOutput("customer-id", customer.customerId);
     core.setOutput("license-id", customer.licenseId);
@@ -43,6 +57,15 @@ export async function actionCreateCustomer() {
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+// Returns undefined when the input isn't set, so the field is omitted from the API request.
+function optionalBooleanInput(name: string): boolean | undefined {
+  const value = core.getInput(name);
+  if (value === "") {
+    return undefined;
+  }
+  return value === "true";
 }
 
 function processEntitlements(entitlements: string): [] | undefined {

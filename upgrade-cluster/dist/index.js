@@ -56577,8 +56577,9 @@ function requireCustomers () {
 	class KubernetesDistribution {
 	}
 	customers.KubernetesDistribution = KubernetesDistribution;
-	async function createCustomer(vendorPortalApi, appSlug, name, email, licenseType, channelSlug, expiresIn, entitlementValues, isKotsInstallEnabled, isDevModeEnabled) {
+	async function createCustomer(vendorPortalApi, options) {
 	    try {
+	        const { appSlug, name, licenseType, email, channelSlug, expiresIn, entitlementValues } = options;
 	        const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
 	        console.log("Creating customer on appId " + app.id);
 	        const http = await vendorPortalApi.client();
@@ -56590,15 +56591,12 @@ function requireCustomers () {
 	            type: licenseType,
 	            app_id: app.id
 	        };
-	        if (isKotsInstallEnabled !== undefined) {
-	            createCustomerReqBody["is_kots_install_enabled"] = isKotsInstallEnabled;
-	        }
 	        if (channelSlug) {
 	            const channel = await (0, channels_1.getChannelDetails)(vendorPortalApi, appSlug, { slug: channelSlug });
 	            createCustomerReqBody["channel_id"] = channel.id;
 	        }
 	        // expiresIn is in days, if it's 0 or less, ignore it - non-expiring license
-	        if (expiresIn > 0) {
+	        if (expiresIn !== undefined && expiresIn > 0) {
 	            const now = new Date();
 	            const expiresAt = (0, date_fns_tz_1.fromZonedTime)((0, date_fns_1.add)(now, { days: expiresIn }), "UTC");
 	            createCustomerReqBody["expires_at"] = expiresAt.toISOString();
@@ -56606,8 +56604,47 @@ function requireCustomers () {
 	        if (entitlementValues) {
 	            createCustomerReqBody["entitlementValues"] = entitlementValues;
 	        }
-	        if (isDevModeEnabled !== undefined) {
-	            createCustomerReqBody["is_dev_mode_enabled"] = isDevModeEnabled;
+	        if (options.customId !== undefined) {
+	            createCustomerReqBody["custom_id"] = options.customId;
+	        }
+	        if (options.isKotsInstallEnabled !== undefined) {
+	            createCustomerReqBody["is_kots_install_enabled"] = options.isKotsInstallEnabled;
+	        }
+	        if (options.isDevModeEnabled !== undefined) {
+	            createCustomerReqBody["is_dev_mode_enabled"] = options.isDevModeEnabled;
+	        }
+	        if (options.isAirgapEnabled !== undefined) {
+	            createCustomerReqBody["is_airgap_enabled"] = options.isAirgapEnabled;
+	        }
+	        if (options.isGitopsSupported !== undefined) {
+	            createCustomerReqBody["is_gitops_supported"] = options.isGitopsSupported;
+	        }
+	        if (options.isSnapshotSupported !== undefined) {
+	            createCustomerReqBody["is_snapshot_supported"] = options.isSnapshotSupported;
+	        }
+	        if (options.isHelmInstallEnabled !== undefined) {
+	            createCustomerReqBody["is_helm_install_enabled"] = options.isHelmInstallEnabled;
+	        }
+	        if (options.isKurlInstallEnabled !== undefined) {
+	            createCustomerReqBody["is_kurl_install_enabled"] = options.isKurlInstallEnabled;
+	        }
+	        if (options.isEmbeddedClusterDownloadEnabled !== undefined) {
+	            createCustomerReqBody["is_embedded_cluster_download_enabled"] = options.isEmbeddedClusterDownloadEnabled;
+	        }
+	        if (options.isEmbeddedClusterMultinodeEnabled !== undefined) {
+	            createCustomerReqBody["is_embedded_cluster_multinode_enabled"] = options.isEmbeddedClusterMultinodeEnabled;
+	        }
+	        if (options.isGeoaxisSupported !== undefined) {
+	            createCustomerReqBody["is_geoaxis_supported"] = options.isGeoaxisSupported;
+	        }
+	        if (options.isIdentityServiceSupported !== undefined) {
+	            createCustomerReqBody["is_identity_service_supported"] = options.isIdentityServiceSupported;
+	        }
+	        if (options.isInstallerSupportEnabled !== undefined) {
+	            createCustomerReqBody["is_installer_support_enabled"] = options.isInstallerSupportEnabled;
+	        }
+	        if (options.isSupportBundleUploadEnabled !== undefined) {
+	            createCustomerReqBody["is_support_bundle_upload_enabled"] = options.isSupportBundleUploadEnabled;
 	        }
 	        const createCustomerRes = await http.post(createCustomerUri, JSON.stringify(createCustomerReqBody));
 	        if (createCustomerRes.message.statusCode != 201) {
@@ -72998,24 +73035,38 @@ async function actionCreateCustomer() {
         const channelSlug = getInput("channel-slug");
         const expiresInDays = +(getInput("expires-in") || 0);
         const entitlements = getInput("entitlements");
+        const customId = getInput("custom-id");
         const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        // The default for isKotsInstallEnabled is undefined, which means it will not be set
-        // As such we can not use core.getBooleanInput
-        let isKotsInstallEnabled = undefined;
-        if (getInput("is-kots-install-enabled") !== "") {
-            isKotsInstallEnabled = getInput("is-kots-install-enabled") === "true";
-        }
-        let isDevModeEnabled = undefined;
-        if (getInput("is-dev-mode-enabled") !== "") {
-            isDevModeEnabled = getInput("is-dev-mode-enabled") === "true";
-        }
         const apiClient = new distExports$1.VendorPortalApi();
         apiClient.apiToken = apiToken;
         if (apiEndpoint) {
             apiClient.endpoint = apiEndpoint;
         }
         const entitlementsArray = processEntitlements(entitlements);
-        const customer = await distExports$1.createCustomer(apiClient, appSlug, name, email, licenseType, channelSlug, expiresInDays, entitlementsArray, isKotsInstallEnabled, isDevModeEnabled);
+        const options = {
+            appSlug,
+            name,
+            licenseType,
+            email,
+            channelSlug,
+            expiresIn: expiresInDays,
+            entitlementValues: entitlementsArray,
+            customId: customId || undefined,
+            isKotsInstallEnabled: optionalBooleanInput("is-kots-install-enabled"),
+            isDevModeEnabled: optionalBooleanInput("is-dev-mode-enabled"),
+            isAirgapEnabled: optionalBooleanInput("is-airgap-enabled"),
+            isGitopsSupported: optionalBooleanInput("is-gitops-supported"),
+            isSnapshotSupported: optionalBooleanInput("is-snapshot-supported"),
+            isHelmInstallEnabled: optionalBooleanInput("is-helm-install-enabled"),
+            isKurlInstallEnabled: optionalBooleanInput("is-kurl-install-enabled"),
+            isEmbeddedClusterDownloadEnabled: optionalBooleanInput("is-embedded-cluster-download-enabled"),
+            isEmbeddedClusterMultinodeEnabled: optionalBooleanInput("is-embedded-cluster-multinode-enabled"),
+            isGeoaxisSupported: optionalBooleanInput("is-geoaxis-supported"),
+            isIdentityServiceSupported: optionalBooleanInput("is-identity-service-supported"),
+            isInstallerSupportEnabled: optionalBooleanInput("is-installer-support-enabled"),
+            isSupportBundleUploadEnabled: optionalBooleanInput("is-support-bundle-upload-enabled")
+        };
+        const customer = await distExports$1.createCustomer(apiClient, options);
         setOutput("customer-id", customer.customerId);
         setOutput("license-id", customer.licenseId);
         setOutput("license-file", customer.license);
@@ -73023,6 +73074,14 @@ async function actionCreateCustomer() {
     catch (error) {
         setFailed(error.message);
     }
+}
+// Returns undefined when the input isn't set, so the field is omitted from the API request.
+function optionalBooleanInput(name) {
+    const value = getInput(name);
+    if (value === "") {
+        return undefined;
+    }
+    return value === "true";
 }
 function processEntitlements(entitlements) {
     if (entitlements) {
