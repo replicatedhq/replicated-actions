@@ -28,7 +28,8 @@ package-all: package-archive-channel package-archive-customer \
 				 package-promote-release \
 				 package-get-customer-instances \
 				 package-upgrade-cluster \
-				 package-report-compatibility-result
+				 package-report-compatibility-result \
+				 package-create-vm package-remove-vm
 
 .PHONY: package-main
 package-main:
@@ -110,12 +111,23 @@ package-upgrade-cluster: package-main
 	rm -rf ./upgrade-cluster/build ./upgrade-cluster/dist
 	cp -r dist upgrade-cluster/
 
+.PHONY: package-create-vm
+package-create-vm: package-main
+	rm -rf ./create-vm/dist
+	cp -r dist create-vm/
+
+.PHONY: package-remove-vm
+package-remove-vm: package-main
+	rm -rf ./remove-vm/dist
+	cp -r dist remove-vm/
+
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
 			 readme-expose-port readme-create-customer readme-create-release readme-helm-install \
 			 readme-kots-install readme-promote-release readme-remove-cluster readme-prepare-cluster \
 			 readme-get-customer-instances readme-report-compatibility-result \
-			 readme-upgrade-cluster
+			 readme-upgrade-cluster \
+			 readme-create-vm readme-remove-vm
 
 .PHONY: pip-install
 pip-install:
@@ -180,3 +192,11 @@ readme-report-compatibility-result: pip-install
 .PHONY: readme-upgrade-cluster
 readme-upgrade-cluster: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./upgrade-cluster/action.yml > ./upgrade-cluster/README.md
+
+.PHONY: readme-create-vm
+readme-create-vm: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./create-vm/action.yml > ./create-vm/README.md
+
+.PHONY: readme-remove-vm
+readme-remove-vm: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./remove-vm/action.yml > ./remove-vm/README.md

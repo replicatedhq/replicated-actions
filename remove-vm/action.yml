@@ -1,0 +1,12 @@
+name: "Remove VM"
+description: "Remove a VM"
+inputs:
+  api-token:
+    description: "API Token."
+    required: true
+  vm-id:
+    description: "VM id to remove."
+    required: true
+runs:
+  using: "node24"
+  main: "index.js"

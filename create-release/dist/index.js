@@ -64169,6 +64169,126 @@ function requireReleases () {
 	return releases;
 }
 
+var vms = {};
+
+var hasRequiredVms;
+
+function requireVms () {
+	if (hasRequiredVms) return vms;
+	hasRequiredVms = 1;
+	Object.defineProperty(vms, "__esModule", { value: true });
+	vms.VM = void 0;
+	vms.createVM = createVM;
+	vms.pollForVMStatus = pollForVMStatus;
+	vms.removeVM = removeVM;
+	const clusters_1 = requireClusters();
+	class VM {
+	}
+	vms.VM = VM;
+	async function createVM(vendorPortalApi, name, distribution, vmTTL, version, diskGib, instanceType, count, publicKeys, tags) {
+	    const http = await vendorPortalApi.client();
+	    const reqBody = {
+	        name: name,
+	        distribution: distribution,
+	        ttl: vmTTL
+	    };
+	    if (version) {
+	        reqBody["version"] = version;
+	    }
+	    if (diskGib) {
+	        reqBody["disk_gib"] = diskGib;
+	    }
+	    if (instanceType) {
+	        reqBody["instance_type"] = instanceType;
+	    }
+	    if (count) {
+	        reqBody["count"] = count;
+	    }
+	    if (publicKeys && publicKeys.length > 0) {
+	        reqBody["public_keys"] = publicKeys;
+	    }
+	    if (tags) {
+	        reqBody["tags"] = tags;
+	    }
+	    const uri = `${vendorPortalApi.endpoint}/vm`;
+	    const res = await http.post(uri, JSON.stringify(reqBody));
+	    if (res.message.statusCode != 201) {
+	        let body = "";
+	        try {
+	            body = await res.readBody();
+	        }
+	        catch (err) {
+	            // ignore
+	        }
+	        throw new Error(`Failed to queue vm create: Server responded with ${res.message.statusCode}: ${body}`);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    const vmsArray = Array.isArray(body.vms) ? body.vms : body.vm ? [body.vm] : [];
+	    return vmsArray.map(v => ({
+	        name: v.name,
+	        id: v.id,
+	        status: v.status
+	    }));
+	}
+	async function getVMDetails(vendorPortalApi, vmId) {
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/vm/${vmId}`;
+	    const res = await http.get(uri);
+	    if (res.message.statusCode != 200) {
+	        await res.readBody();
+	        throw new clusters_1.StatusError(`Failed to get vm: Server responded with ${res.message.statusCode}`, res.message.statusCode);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    return {
+	        name: body.vm.name,
+	        id: body.vm.id,
+	        status: body.vm.status
+	    };
+	}
+	async function pollForVMStatus(vendorPortalApi, vmId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
+	    await new Promise(f => setTimeout(f, sleeptimeMs));
+	    const iterations = (timeout * 1000) / sleeptimeMs;
+	    for (let i = 0; i < iterations; i++) {
+	        try {
+	            const vmDetails = await getVMDetails(vendorPortalApi, vmId);
+	            if (vmDetails.status === expectedStatus) {
+	                return vmDetails;
+	            }
+	            if (vmDetails.status === "error") {
+	                throw new Error(`VM has entered error state`);
+	            }
+	            console.debug(`VM status is ${vmDetails.status}, sleeping for ${sleeptimeMs / 1000} seconds`);
+	        }
+	        catch (err) {
+	            if (err instanceof clusters_1.StatusError) {
+	                if (err.statusCode >= 500) {
+	                    console.debug(`Got HTTP error with status ${err.statusCode}, sleeping for ${sleeptimeMs / 1000} seconds`);
+	                }
+	                else {
+	                    console.debug(`Got HTTP error with status ${err.statusCode}, exiting`);
+	                    throw err;
+	                }
+	            }
+	            else {
+	                throw err;
+	            }
+	        }
+	        await new Promise(f => setTimeout(f, sleeptimeMs));
+	    }
+	    throw new Error(`VM did not reach state ${expectedStatus} within ${timeout} seconds`);
+	}
+	async function removeVM(vendorPortalApi, vmId) {
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/vm/${vmId}`;
+	    const res = await http.del(uri);
+	    await res.readBody();
+	    if (res.message.statusCode != 200) {
+	        throw new clusters_1.StatusError(`Failed to remove vm: Server responded with ${res.message.statusCode}`, res.message.statusCode);
+	    }
+	}
+	return vms;
+}
+
 var hasRequiredDist$1;
 
 function requireDist$1 () {
@@ -64176,7 +64296,7 @@ function requireDist$1 () {
 	hasRequiredDist$1 = 1;
 	(function (exports$1) {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
-		exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
+		exports$1.removeVM = exports$1.pollForVMStatus = exports$1.createVM = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
 		var configuration_1 = requireConfiguration();
 		Object.defineProperty(exports$1, "VendorPortalApi", { enumerable: true, get: function () { return configuration_1.VendorPortalApi; } });
 		var applications_1 = requireApplications();
@@ -64212,7 +64332,12 @@ function requireDist$1 () {
 		Object.defineProperty(exports$1, "createRelease", { enumerable: true, get: function () { return releases_1.createRelease; } });
 		Object.defineProperty(exports$1, "createReleaseFromChart", { enumerable: true, get: function () { return releases_1.createReleaseFromChart; } });
 		Object.defineProperty(exports$1, "promoteRelease", { enumerable: true, get: function () { return releases_1.promoteRelease; } });
-		Object.defineProperty(exports$1, "reportCompatibilityResult", { enumerable: true, get: function () { return releases_1.reportCompatibilityResult; } }); 
+		Object.defineProperty(exports$1, "reportCompatibilityResult", { enumerable: true, get: function () { return releases_1.reportCompatibilityResult; } });
+		var vms_1 = requireVms();
+		Object.defineProperty(exports$1, "VM", { enumerable: true, get: function () { return vms_1.VM; } });
+		Object.defineProperty(exports$1, "createVM", { enumerable: true, get: function () { return vms_1.createVM; } });
+		Object.defineProperty(exports$1, "pollForVMStatus", { enumerable: true, get: function () { return vms_1.pollForVMStatus; } });
+		Object.defineProperty(exports$1, "removeVM", { enumerable: true, get: function () { return vms_1.removeVM; } }); 
 	} (dist$1));
 	return dist$1;
 }
@@ -72963,7 +73088,7 @@ async function actionCreateCluster() {
         if (apiEndpoint) {
             apiClient.endpoint = apiEndpoint;
         }
-        const tagsArray = processTags(tags);
+        const tagsArray = processTags$1(tags);
         const nodeGroupsArray = processNodeGroups(nodeGroups);
         let cluster = await distExports$1.createClusterWithLicense(apiClient, name, k8sDistribution, k8sVersion, licenseId, k8sTTL, diskGib, nodeCount, minNodeCount, maxNodeCount, instanceType, nodeGroupsArray, tagsArray, ipFamily);
         info(`Created cluster ${cluster.id} - waiting for it to be ready...`);
@@ -73002,7 +73127,7 @@ function writeFile$1(filePath, contents) {
     }
     fs.writeFileSync(filePath, contents);
 }
-function processTags(tags) {
+function processTags$1(tags) {
     if (tags) {
         const tagsYAML = distExports.parse(tags);
         // for each tag in tagsYAML, convert to json and add to array
@@ -73204,6 +73329,75 @@ async function actionCreateRelease() {
     catch (error) {
         setFailed(error.message);
     }
+}
+
+async function actionCreateVM() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const distribution = getInput("distribution", { required: true });
+        const version = getInput("version");
+        const name = getInput("vm-name");
+        const ttl = getInput("ttl");
+        const diskGib = +getInput("disk");
+        const instanceType = getInput("instance-type");
+        const count = +getInput("count");
+        const timeoutMinutes = +(getInput("timeout-minutes") || 20);
+        const publicKeys = getInput("public-keys");
+        const tags = getInput("tags");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const tagsArray = processTags(tags);
+        const publicKeysArray = processPublicKeys(publicKeys);
+        const vms = await distExports$1.createVM(apiClient, name, distribution, ttl, version, diskGib, instanceType, count, publicKeysArray, tagsArray);
+        if (vms.length === 0) {
+            throw new Error("createVM returned no VMs");
+        }
+        const vmIds = vms.map(v => v.id);
+        info(`Created ${vms.length} vm(s): ${vmIds.join(", ")} - waiting for them to be ready...`);
+        setOutput("vm-id", vmIds[0]);
+        setOutput("vm-ids", JSON.stringify(vmIds));
+        let firstStatus = "";
+        for (const vm of vms) {
+            const ready = await distExports$1.pollForVMStatus(apiClient, vm.id, "running", timeoutMinutes * 60);
+            info(`VM ${ready.id} is running.`);
+            if (!firstStatus) {
+                firstStatus = ready.status;
+            }
+        }
+        setOutput("vm-status", firstStatus);
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+function processTags(tags) {
+    if (tags) {
+        const tagsYAML = distExports.parse(tags);
+        const tagsArray = tagsYAML.map((tag) => {
+            return { key: tag.key, value: tag.value };
+        });
+        return tagsArray;
+    }
+    return undefined;
+}
+function processPublicKeys(publicKeys) {
+    if (publicKeys) {
+        const parsed = distExports.parse(publicKeys);
+        if (!Array.isArray(parsed)) {
+            throw new Error("public-keys must be a YAML list of strings");
+        }
+        return parsed.map((k) => String(k));
+    }
+    return undefined;
 }
 
 async function actionExposePort() {
@@ -74779,6 +74973,25 @@ async function actionRemoveCluster() {
         debug(`Removing cluster ${clusterId}...`);
         await distExports$1.removeCluster(apiClient, clusterId);
         info(`Removed cluster ${clusterId}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+
+async function actionRemoveVM() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const vmId = getInput("vm-id", { required: true });
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        debug(`Removing vm ${vmId}...`);
+        await distExports$1.removeVM(apiClient, vmId);
+        info(`Removed vm ${vmId}`);
     }
     catch (error) {
         setFailed(error.message);
@@ -77696,5 +77909,5 @@ async function actionReportCompatibilityResult() {
     }
 }
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionExposePort, actionGetCustomerInstances, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionReportCompatibilityResult, actionUpgradeCluster };
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpgradeCluster };
 //# sourceMappingURL=index.js.map
