@@ -1,0 +1,53 @@
+name: test - remove-vm
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - create-vm/**
+      - remove-vm/**
+      - .github/workflows/test-remove-vm.yml
+
+concurrency:
+  group: test-remove-vm-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-create-vm package-remove-vm
+
+      - name: create vm
+        id: create-vm
+        uses: ./create-vm
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          distribution: ubuntu
+          ttl: 10m
+          timeout-minutes: 10
+
+      - name: test remove-vm
+        uses: ./remove-vm
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          vm-id: ${{ steps.create-vm.outputs.vm-id }}
+
+      - name: remove vm
+        if: always()
+        uses: ./remove-vm
+        continue-on-error: true # It could be that the vm is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          vm-id: ${{ steps.create-vm.outputs.vm-id }}
