@@ -28,6 +28,9 @@ jobs:
       - name: build
         run: make
 
+      - name: audit
+        run: npm audit --audit-level=high
+
       - name: fail if files changed
         run: |
           if ! git diff --quiet --exit-code ; then
