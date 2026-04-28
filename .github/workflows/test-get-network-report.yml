@@ -46,13 +46,13 @@ jobs:
           network-id: ${{ steps.create-cluster.outputs.network-id }}
           collect-report: "true"
 
-      - name: get network report summary (variable)
-        id: summary-var
+      - name: get network report events (variable)
+        id: events-var
         uses: ./get-network-report
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           network-id: ${{ steps.create-cluster.outputs.network-id }}
-          mode: summary
+          mode: events
 
       - name: get network report events (file)
         uses: ./get-network-report
@@ -62,18 +62,31 @@ jobs:
           mode: events
           events-file-path: ./network-events.json
 
-      - name: get network report all (summary variable, events file)
+      - name: remove cluster
+        id: remove-cluster
+        uses: replicatedhq/replicated-actions/remove-cluster@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
+
+      # Summary becomes available only after the network is terminated and events
+      # have been processed. Wait briefly, then attempt the call. Marked
+      # continue-on-error because event processing time is non-deterministic.
+      - name: wait for summary processing
+        run: sleep 60
+
+      - name: get network report summary (variable)
+        continue-on-error: true
         uses: ./get-network-report
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           network-id: ${{ steps.create-cluster.outputs.network-id }}
-          mode: all
-          events-file-path: ./network-events-all.json
+          mode: summary
 
-      - name: remove cluster
-        if: always()
+      - name: cleanup cluster on failure
+        if: failure() && steps.remove-cluster.conclusion != 'success'
         uses: replicatedhq/replicated-actions/remove-cluster@v1
-        continue-on-error: true # It could be that the cluster is already removed
+        continue-on-error: true
         with:
           api-token: ${{ secrets.REPLICATED_API_TOKEN }}
           cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}

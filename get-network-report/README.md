@@ -30,7 +30,7 @@ get_network_report ---> events_file
 | --- | --- | --- | --- |
 | api-token |  | True | API Token. |
 | network-id |  | True | Network id. |
-| mode |  | True | Report mode: `summary`, `events`, or `all`. |
+| mode |  | True | Report mode: `summary`, `events`, or `all`. NOTE: `summary` is only available after the network has been terminated (the cluster removed) and its events have been processed; calling it on a live network returns an error. |
 | summary-file-path |  | False | If specified (and mode includes summary), the summary is written to this file path. Otherwise it is set as the `summary` action output variable. |
 | events-file-path |  | False | If specified (and mode includes events), the events are written to this file path. Otherwise they are set as the `events` action output variable. Variable mode is capped at 1MB; use a file for larger event payloads. |
 

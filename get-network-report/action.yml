@@ -8,7 +8,7 @@ inputs:
     description: "Network id."
     required: true
   mode:
-    description: "Report mode: `summary`, `events`, or `all`."
+    description: "Report mode: `summary`, `events`, or `all`. NOTE: `summary` is only available after the network has been terminated (the cluster removed) and its events have been processed; calling it on a live network returns an error."
     required: true
   summary-file-path:
     description: "If specified (and mode includes summary), the summary is written to this file path. Otherwise it is set as the `summary` action output variable."

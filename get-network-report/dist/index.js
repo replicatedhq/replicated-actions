@@ -78103,7 +78103,16 @@ async function actionGetNetworkReport() {
             apiClient.endpoint = apiEndpoint;
         }
         if (wantSummary) {
-            const summary = await distExports$1.getNetworkReportSummary(apiClient, networkId);
+            let summary;
+            try {
+                summary = await distExports$1.getNetworkReportSummary(apiClient, networkId);
+            }
+            catch (err) {
+                if (err && err.statusCode === 404) {
+                    throw new Error(`Network report summary not found for network ${networkId}: the network must be terminated (the cluster removed) and its events must have been processed before a summary is available.`);
+                }
+                throw err;
+            }
             const json = JSON.stringify(summary);
             if (summaryFilePath) {
                 writeFile(summaryFilePath, json);

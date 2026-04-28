@@ -27,7 +27,15 @@ export async function actionGetNetworkReport() {
     }
 
     if (wantSummary) {
-      const summary = await getNetworkReportSummary(apiClient, networkId);
+      let summary;
+      try {
+        summary = await getNetworkReportSummary(apiClient, networkId);
+      } catch (err) {
+        if (err && (err as { statusCode?: number }).statusCode === 404) {
+          throw new Error(`Network report summary not found for network ${networkId}: the network must be terminated (the cluster removed) and its events must have been processed before a summary is available.`);
+        }
+        throw err;
+      }
       const json = JSON.stringify(summary);
       if (summaryFilePath) {
         writeFile(summaryFilePath, json);
