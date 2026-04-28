@@ -1,0 +1,27 @@
+name: "Update Network"
+description: "Update a network's policy and report collection settings."
+inputs:
+  api-token:
+    description: "API Token."
+    required: true
+  network-id:
+    description: "Network id to update."
+    required: true
+  policy:
+    description: "Network policy to set (e.g., `airgap`). At least one of `policy` or `collect-report` must be provided."
+    required: false
+  collect-report:
+    description: "Whether to collect a network report (true/false). At least one of `policy` or `collect-report` must be provided."
+    required: false
+outputs:
+  network-id: # id of the network
+    description: "Contains the network id."
+  network-status: # status of the network
+    description: "Contains the network status."
+  network-policy: # policy of the network
+    description: "Contains the network policy."
+  collect-report: # collect-report flag
+    description: "Whether the network is collecting a report (true/false)."
+runs:
+  using: "node24"
+  main: "index.js"
