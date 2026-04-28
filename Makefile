@@ -30,7 +30,7 @@ package-all: package-archive-channel package-archive-customer \
 				 package-upgrade-cluster \
 				 package-report-compatibility-result \
 				 package-create-vm package-remove-vm \
-				 package-update-network
+				 package-update-network package-get-network-report
 
 .PHONY: package-main
 package-main:
@@ -127,6 +127,11 @@ package-update-network: package-main
 	rm -rf ./update-network/dist
 	cp -r dist update-network/
 
+.PHONY: package-get-network-report
+package-get-network-report: package-main
+	rm -rf ./get-network-report/dist
+	cp -r dist get-network-report/
+
 .PHONY: readme-all
 readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
 			 readme-expose-port readme-create-customer readme-create-release readme-helm-install \
@@ -134,7 +139,7 @@ readme-all: pip-install readme-archive-channel readme-archive-customer readme-cr
 			 readme-get-customer-instances readme-report-compatibility-result \
 			 readme-upgrade-cluster \
 			 readme-create-vm readme-remove-vm \
-			 readme-update-network
+			 readme-update-network readme-get-network-report
 
 .PHONY: pip-install
 pip-install:
@@ -211,3 +216,7 @@ readme-remove-vm: pip-install
 .PHONY: readme-update-network
 readme-update-network: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./update-network/action.yml > ./update-network/README.md
+
+.PHONY: readme-get-network-report
+readme-get-network-report: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./get-network-report/action.yml > ./get-network-report/README.md

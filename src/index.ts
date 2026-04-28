@@ -15,6 +15,7 @@ import { actionGetCustomerInstances } from "./get-customer-instances";
 import { actionUpgradeCluster } from "./upgrade-cluster";
 import { actionReportCompatibilityResult } from "./report-compatibility-result";
 import { actionUpdateNetwork } from "./update-network";
+import { actionGetNetworkReport } from "./get-network-report";
 
 export {
   actionArchiveChannel,
@@ -33,5 +34,6 @@ export {
   actionGetCustomerInstances,
   actionUpgradeCluster,
   actionReportCompatibilityResult,
-  actionUpdateNetwork
+  actionUpdateNetwork,
+  actionGetNetworkReport
 };

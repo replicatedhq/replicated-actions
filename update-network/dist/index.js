@@ -28723,7 +28723,7 @@ var lib = /*#__PURE__*/Object.freeze({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { access, appendFile, writeFile: writeFile$2 } = promises;
+const { access, appendFile, writeFile: writeFile$3 } = promises;
 
 var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -73222,13 +73222,13 @@ async function actionCreateCluster() {
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
-            writeFile$1(kubeconfigPath, kubeconfig);
+            writeFile$2(kubeconfigPath, kubeconfig);
             info(`Wrote kubeconfig to ${kubeconfigPath}`);
         }
         if (exportKubeconfig) {
             if (!kubeconfigPath) {
                 kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${k8sDistribution}-${k8sVersion}`;
-                writeFile$1(kubeconfigPath, kubeconfig);
+                writeFile$2(kubeconfigPath, kubeconfig);
                 info(`Wrote kubeconfig to ${kubeconfigPath}`);
             }
             exportVariable("KUBECONFIG", kubeconfigPath);
@@ -73244,7 +73244,7 @@ async function actionCreateCluster() {
         setFailed(message);
     }
 }
-function writeFile$1(filePath, contents) {
+function writeFile$2(filePath, contents) {
     const directoryPath = path.dirname(filePath);
     if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
@@ -77971,13 +77971,13 @@ async function actionUpgradeCluster() {
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
-            writeFile(kubeconfigPath, kubeconfig);
+            writeFile$1(kubeconfigPath, kubeconfig);
             info(`Wrote kubeconfig to ${kubeconfigPath}`);
         }
         if (exportKubeconfig) {
             if (!kubeconfigPath) {
                 kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${cluster.id}`;
-                writeFile(kubeconfigPath, kubeconfig);
+                writeFile$1(kubeconfigPath, kubeconfig);
                 info(`Wrote kubeconfig to ${kubeconfigPath}`);
             }
             exportVariable("KUBECONFIG", kubeconfigPath);
@@ -77993,7 +77993,7 @@ async function actionUpgradeCluster() {
         setFailed(message);
     }
 }
-function writeFile(filePath, contents) {
+function writeFile$1(filePath, contents) {
     const directoryPath = path.dirname(filePath);
     if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
@@ -78083,5 +78083,70 @@ async function actionUpdateNetwork() {
     }
 }
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpdateNetwork, actionUpgradeCluster };
+const MAX_VARIABLE_SIZE_BYTES = 1024 * 1024; // GitHub Actions output variable cap
+async function actionGetNetworkReport() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const networkId = getInput("network-id", { required: true });
+        const mode = getInput("mode", { required: true });
+        const summaryFilePath = getInput("summary-file-path");
+        const eventsFilePath = getInput("events-file-path");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        if (mode !== "summary" && mode !== "events" && mode !== "all") {
+            throw new Error(`Invalid mode '${mode}'. Must be 'summary', 'events', or 'all'.`);
+        }
+        const wantSummary = mode === "summary" || mode === "all";
+        const wantEvents = mode === "events" || mode === "all";
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        if (wantSummary) {
+            const summary = await distExports$1.getNetworkReportSummary(apiClient, networkId);
+            const json = JSON.stringify(summary);
+            if (summaryFilePath) {
+                writeFile(summaryFilePath, json);
+                info(`Wrote summary to ${summaryFilePath}`);
+                setOutput("summary-file", summaryFilePath);
+            }
+            else {
+                setOutput("summary", json);
+            }
+        }
+        if (wantEvents) {
+            const report = await distExports$1.getNetworkReport(apiClient, networkId);
+            const json = JSON.stringify(report.events);
+            if (eventsFilePath) {
+                writeFile(eventsFilePath, json);
+                info(`Wrote events to ${eventsFilePath}`);
+                setOutput("events-file", eventsFilePath);
+            }
+            else {
+                const size = Buffer.byteLength(json, "utf8");
+                if (size > MAX_VARIABLE_SIZE_BYTES) {
+                    throw new Error(`Events output size (${size} bytes) exceeds the 1MB limit for action output variables. Use 'events-file-path' to write the events to disk instead.`);
+                }
+                setOutput("events", json);
+            }
+        }
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+function writeFile(filePath, contents) {
+    const directoryPath = path.dirname(filePath);
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+    fs.writeFileSync(filePath, contents);
+}
+
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionGetNetworkReport, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpdateNetwork, actionUpgradeCluster };
 //# sourceMappingURL=index.js.map

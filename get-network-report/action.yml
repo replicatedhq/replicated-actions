@@ -1,0 +1,30 @@
+name: "Get Network Report"
+description: "Get a network report (summary, raw events, or both) for a network."
+inputs:
+  api-token:
+    description: "API Token."
+    required: true
+  network-id:
+    description: "Network id."
+    required: true
+  mode:
+    description: "Report mode: `summary`, `events`, or `all`."
+    required: true
+  summary-file-path:
+    description: "If specified (and mode includes summary), the summary is written to this file path. Otherwise it is set as the `summary` action output variable."
+    required: false
+  events-file-path:
+    description: "If specified (and mode includes events), the events are written to this file path. Otherwise they are set as the `events` action output variable. Variable mode is capped at 1MB; use a file for larger event payloads."
+    required: false
+outputs:
+  summary: # JSON summary
+    description: "Summary of the network report (set when mode includes summary and `summary-file-path` is not provided)."
+  summary-file: # path of summary file
+    description: "Path of the summary file (set when mode includes summary and `summary-file-path` is provided)."
+  events: # JSON events array
+    description: "All the reported events from the network report (set when mode includes events and `events-file-path` is not provided)."
+  events-file: # path of events file
+    description: "Path of the events file (set when mode includes events and `events-file-path` is provided)."
+runs:
+  using: "node24"
+  main: "index.js"

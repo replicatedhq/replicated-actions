@@ -1,0 +1,79 @@
+name: test - get-network-report
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - get-network-report/**
+      - create-cluster/**
+      - update-network/**
+      - remove-cluster/**
+      - .github/workflows/test-get-network-report.yml
+
+concurrency:
+  group: test-get-network-report-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: build
+        run: make package-get-network-report package-create-cluster package-update-network
+
+      - name: create-cluster
+        id: create-cluster
+        uses: ./create-cluster
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          kubernetes-distribution: kind
+          timeout-minutes: 5
+
+      - name: enable report collection
+        uses: ./update-network
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          network-id: ${{ steps.create-cluster.outputs.network-id }}
+          collect-report: "true"
+
+      - name: get network report summary (variable)
+        id: summary-var
+        uses: ./get-network-report
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          network-id: ${{ steps.create-cluster.outputs.network-id }}
+          mode: summary
+
+      - name: get network report events (file)
+        uses: ./get-network-report
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          network-id: ${{ steps.create-cluster.outputs.network-id }}
+          mode: events
+          events-file-path: ./network-events.json
+
+      - name: get network report all (summary variable, events file)
+        uses: ./get-network-report
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          network-id: ${{ steps.create-cluster.outputs.network-id }}
+          mode: all
+          events-file-path: ./network-events-all.json
+
+      - name: remove cluster
+        if: always()
+        uses: replicatedhq/replicated-actions/remove-cluster@v1
+        continue-on-error: true # It could be that the cluster is already removed
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          cluster-id: ${{ steps.create-cluster.outputs.cluster-id }}
