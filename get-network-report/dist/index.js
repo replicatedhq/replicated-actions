@@ -73526,7 +73526,7 @@ function processPublicKeys(publicKeys) {
         if (!Array.isArray(parsed)) {
             throw new Error("public-keys must be a YAML list of strings");
         }
-        return parsed.map((k) => String(k));
+        return parsed.map((k) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
     }
     return undefined;
 }
@@ -74676,6 +74676,7 @@ async function actionHelmInstall() {
     const registryPassword = getInput("registry-password");
     const runPreflights = getBooleanInput("run-preflights");
     const values = getInput("values");
+    const valuesFile = getInput("values-file");
     const repoName = getInput("repo-name");
     const repoUrl = getInput("repo-url");
     const chart = getInput("chart", { required: true });
@@ -74683,12 +74684,21 @@ async function actionHelmInstall() {
     const name = getInput("name", { required: true });
     const wait = getInput("wait") === "true";
     const extraHelmFlags = getInput("extra-helm-flags");
-    // Write the values
+    if (values && valuesFile) {
+        throw new Error("Inputs 'values' and 'values-file' are mutually exclusive; set only one.");
+    }
+    // Resolve the values file path
     let valuesFilePath = "";
     if (values) {
-        const { fd, path: valuesPath, cleanup: cleanupValues } = await tmpPromiseExports.file({ postfix: ".yaml" });
+        const { path: valuesPath } = await tmpPromiseExports.file({ postfix: ".yaml" });
         fs.writeFileSync(valuesPath, values);
         valuesFilePath = valuesPath;
+    }
+    else if (valuesFile) {
+        if (!fs.existsSync(valuesFile)) {
+            throw new Error(`values-file not found: ${valuesFile}`);
+        }
+        valuesFilePath = valuesFile;
     }
     // if there's a repo, this is not a oci or local chart
     if (repoName && repoUrl) {

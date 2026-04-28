@@ -82,7 +82,7 @@ function processPublicKeys(publicKeys: string): string[] | undefined {
     if (!Array.isArray(parsed)) {
       throw new Error("public-keys must be a YAML list of strings");
     }
-    return parsed.map((k: any) => String(k));
+    return parsed.map((k: any) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
   }
   return undefined;
 }

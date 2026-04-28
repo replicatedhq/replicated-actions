@@ -73526,7 +73526,7 @@ function processPublicKeys(publicKeys) {
         if (!Array.isArray(parsed)) {
             throw new Error("public-keys must be a YAML list of strings");
         }
-        return parsed.map((k) => String(k));
+        return parsed.map((k) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
     }
     return undefined;
 }
