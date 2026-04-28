@@ -12,6 +12,7 @@ export async function actionHelmInstall() {
   const registryPassword: string = core.getInput("registry-password");
   const runPreflights: boolean = core.getBooleanInput("run-preflights");
   const values: string = core.getInput("values");
+  const valuesFile: string = core.getInput("values-file");
   const repoName: string = core.getInput("repo-name");
   const repoUrl: string = core.getInput("repo-url");
   const chart: string = core.getInput("chart", { required: true });
@@ -20,12 +21,21 @@ export async function actionHelmInstall() {
   const wait: boolean = core.getInput("wait") === "true";
   const extraHelmFlags: string = core.getInput("extra-helm-flags");
 
-  // Write the values
+  if (values && valuesFile) {
+    throw new Error("Inputs 'values' and 'values-file' are mutually exclusive; set only one.");
+  }
+
+  // Resolve the values file path
   let valuesFilePath = "";
   if (values) {
-    const { fd, path: valuesPath, cleanup: cleanupValues } = await file({ postfix: ".yaml" });
+    const { path: valuesPath } = await file({ postfix: ".yaml" });
     fs.writeFileSync(valuesPath, values);
     valuesFilePath = valuesPath;
+  } else if (valuesFile) {
+    if (!fs.existsSync(valuesFile)) {
+      throw new Error(`values-file not found: ${valuesFile}`);
+    }
+    valuesFilePath = valuesFile;
   }
 
   // if there's a repo, this is not a oci or local chart

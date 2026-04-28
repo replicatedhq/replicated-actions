@@ -32,7 +32,11 @@ inputs:
     description: "The namespace to install the application to"
     required: true
   values:
-    description: "A values.yaml file to use"
+    description: "Inline YAML content to use as Helm values. Mutually exclusive with values-file."
+    required: false
+  values-file:
+    description: "Path to a values.yaml file to use. Mutually exclusive with values."
+    required: false
   wait:
     description: "Wait until resources are ready (passes --wait to helm install, waits up to --timeout which defaults to 5m)"
     required: false
