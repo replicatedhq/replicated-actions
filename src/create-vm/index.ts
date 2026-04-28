@@ -39,15 +39,22 @@ export async function actionCreateVM() {
     core.setOutput("vm-ids", JSON.stringify(vmIds));
 
     let firstStatus = "";
+    let firstNetworkId = "";
     for (const vm of vms) {
       const ready = await pollForVMStatus(apiClient, vm.id, "running", timeoutMinutes * 60);
       core.info(`VM ${ready.id} is running.`);
       if (!firstStatus) {
         firstStatus = ready.status;
       }
+      if (!firstNetworkId && ready.network_id) {
+        firstNetworkId = ready.network_id;
+      }
     }
 
     core.setOutput("vm-status", firstStatus);
+    if (firstNetworkId) {
+      core.setOutput("network-id", firstNetworkId);
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     core.error(message);
@@ -75,7 +82,7 @@ function processPublicKeys(publicKeys: string): string[] | undefined {
     if (!Array.isArray(parsed)) {
       throw new Error("public-keys must be a YAML list of strings");
     }
-    return parsed.map((k: any) => String(k));
+    return parsed.map((k: any) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
   }
   return undefined;
 }

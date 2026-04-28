@@ -43,6 +43,9 @@ export async function actionCreateCluster() {
 
     cluster = await pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
     core.info(`Cluster ${cluster.id} is running.`);
+    if (cluster.network_id) {
+      core.setOutput("network-id", cluster.network_id);
+    }
     const kubeconfig = await getKubeconfig(apiClient, cluster.id);
     core.setOutput("cluster-kubeconfig", kubeconfig);
 

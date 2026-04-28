@@ -14,6 +14,8 @@ import { actionRemoveVM } from "./remove-vm";
 import { actionGetCustomerInstances } from "./get-customer-instances";
 import { actionUpgradeCluster } from "./upgrade-cluster";
 import { actionReportCompatibilityResult } from "./report-compatibility-result";
+import { actionUpdateNetwork } from "./update-network";
+import { actionGetNetworkReport } from "./get-network-report";
 
 export {
   actionArchiveChannel,
@@ -31,5 +33,7 @@ export {
   actionRemoveVM,
   actionGetCustomerInstances,
   actionUpgradeCluster,
-  actionReportCompatibilityResult
+  actionReportCompatibilityResult,
+  actionUpdateNetwork,
+  actionGetNetworkReport
 };

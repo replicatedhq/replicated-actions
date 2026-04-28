@@ -51,6 +51,8 @@ outputs:
     description: "JSON array of all created VM ids."
   vm-status: # first VM's final status
     description: "Final status of the first VM after polling."
+  network-id: # network id of the first VM
+    description: "Contains the network id associated with the first VM."
 runs:
   using: "node24"
   main: "index.js"

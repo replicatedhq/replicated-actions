@@ -28723,7 +28723,7 @@ var lib = /*#__PURE__*/Object.freeze({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { access, appendFile, writeFile: writeFile$2 } = promises;
+const { access, appendFile, writeFile: writeFile$3 } = promises;
 
 var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30124,7 +30124,8 @@ function requireClusters () {
 	    return {
 	        name: body.cluster.name,
 	        id: body.cluster.id,
-	        status: body.cluster.status
+	        status: body.cluster.status,
+	        network_id: body.cluster.network_id
 	    };
 	}
 	async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
@@ -30179,7 +30180,8 @@ function requireClusters () {
 	        name: body.cluster.name,
 	        id: body.cluster.id,
 	        status: body.cluster.status,
-	        last_scheduling_status: body.cluster.last_scheduling_status
+	        last_scheduling_status: body.cluster.last_scheduling_status,
+	        network_id: body.cluster.network_id
 	    };
 	}
 	async function getKubeconfig(vendorPortalApi, clusterId) {
@@ -64227,7 +64229,8 @@ function requireVms () {
 	    return vmsArray.map(v => ({
 	        name: v.name,
 	        id: v.id,
-	        status: v.status
+	        status: v.status,
+	        network_id: v.network_id
 	    }));
 	}
 	async function getVMDetails(vendorPortalApi, vmId) {
@@ -64242,7 +64245,8 @@ function requireVms () {
 	    return {
 	        name: body.vm.name,
 	        id: body.vm.id,
-	        status: body.vm.status
+	        status: body.vm.status,
+	        network_id: body.vm.network_id
 	    };
 	}
 	async function pollForVMStatus(vendorPortalApi, vmId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
@@ -64289,6 +64293,112 @@ function requireVms () {
 	return vms;
 }
 
+var networks = {};
+
+var hasRequiredNetworks;
+
+function requireNetworks () {
+	if (hasRequiredNetworks) return networks;
+	hasRequiredNetworks = 1;
+	Object.defineProperty(networks, "__esModule", { value: true });
+	networks.NetworkReportSummary = networks.NetworkReportSummaryDomain = networks.NetworkReportSummaryDestination = networks.NetworkReportSummarySource = networks.NetworkReport = networks.NetworkEventData = networks.Network = void 0;
+	networks.updateNetwork = updateNetwork;
+	networks.getNetworkReport = getNetworkReport;
+	networks.getNetworkReportSummary = getNetworkReportSummary;
+	const clusters_1 = requireClusters();
+	class Network {
+	}
+	networks.Network = Network;
+	class NetworkEventData {
+	}
+	networks.NetworkEventData = NetworkEventData;
+	class NetworkReport {
+	}
+	networks.NetworkReport = NetworkReport;
+	class NetworkReportSummarySource {
+	}
+	networks.NetworkReportSummarySource = NetworkReportSummarySource;
+	class NetworkReportSummaryDestination {
+	}
+	networks.NetworkReportSummaryDestination = NetworkReportSummaryDestination;
+	class NetworkReportSummaryDomain {
+	}
+	networks.NetworkReportSummaryDomain = NetworkReportSummaryDomain;
+	class NetworkReportSummary {
+	}
+	networks.NetworkReportSummary = NetworkReportSummary;
+	async function updateNetwork(vendorPortalApi, networkId, options) {
+	    var _a;
+	    const http = await vendorPortalApi.client();
+	    const reqBody = {
+	        policy: (_a = options.policy) !== null && _a !== void 0 ? _a : ""
+	    };
+	    if (options.collectReport !== undefined) {
+	        reqBody["collect_report"] = options.collectReport;
+	    }
+	    const uri = `${vendorPortalApi.endpoint}/network/${networkId}/update`;
+	    const res = await http.put(uri, JSON.stringify(reqBody));
+	    if (res.message.statusCode != 200) {
+	        let body = "";
+	        try {
+	            body = await res.readBody();
+	        }
+	        catch (err) {
+	            // ignore
+	        }
+	        throw new clusters_1.StatusError(`Failed to update network: Server responded with ${res.message.statusCode}: ${body}`, res.message.statusCode);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    return {
+	        id: body.network.id,
+	        name: body.network.name,
+	        status: body.network.status,
+	        policy: body.network.policy,
+	        collect_report: body.network.collect_report
+	    };
+	}
+	async function getNetworkReport(vendorPortalApi, networkId, after) {
+	    const http = await vendorPortalApi.client();
+	    let uri = `${vendorPortalApi.endpoint}/network/${networkId}/report`;
+	    if (after) {
+	        uri = `${uri}?after=${encodeURIComponent(after.toISOString())}`;
+	    }
+	    const res = await http.get(uri);
+	    if (res.message.statusCode != 200) {
+	        await res.readBody();
+	        throw new clusters_1.StatusError(`Failed to get network report: Server responded with ${res.message.statusCode}`, res.message.statusCode);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    return {
+	        events: Array.isArray(body.events) ? body.events : []
+	    };
+	}
+	async function getNetworkReportSummary(vendorPortalApi, networkId) {
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/network/${networkId}/report/summary`;
+	    const res = await http.get(uri);
+	    if (res.message.statusCode != 200) {
+	        await res.readBody();
+	        throw new clusters_1.StatusError(`Failed to get network report summary: Server responded with ${res.message.statusCode}`, res.message.statusCode);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    if (body.error) {
+	        throw new Error(`Failed to get network report summary: ${body.error}`);
+	    }
+	    return {
+	        id: body.id,
+	        network_id: body.network_id,
+	        total_events: body.total_events,
+	        time_range_start: body.time_range_start,
+	        time_range_end: body.time_range_end,
+	        created_at: body.created_at,
+	        domains: body.domains,
+	        destinations: body.destinations
+	    };
+	}
+	return networks;
+}
+
 var hasRequiredDist$1;
 
 function requireDist$1 () {
@@ -64296,7 +64406,7 @@ function requireDist$1 () {
 	hasRequiredDist$1 = 1;
 	(function (exports$1) {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
-		exports$1.removeVM = exports$1.pollForVMStatus = exports$1.createVM = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
+		exports$1.getNetworkReportSummary = exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.createVM = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
 		var configuration_1 = requireConfiguration();
 		Object.defineProperty(exports$1, "VendorPortalApi", { enumerable: true, get: function () { return configuration_1.VendorPortalApi; } });
 		var applications_1 = requireApplications();
@@ -64337,7 +64447,18 @@ function requireDist$1 () {
 		Object.defineProperty(exports$1, "VM", { enumerable: true, get: function () { return vms_1.VM; } });
 		Object.defineProperty(exports$1, "createVM", { enumerable: true, get: function () { return vms_1.createVM; } });
 		Object.defineProperty(exports$1, "pollForVMStatus", { enumerable: true, get: function () { return vms_1.pollForVMStatus; } });
-		Object.defineProperty(exports$1, "removeVM", { enumerable: true, get: function () { return vms_1.removeVM; } }); 
+		Object.defineProperty(exports$1, "removeVM", { enumerable: true, get: function () { return vms_1.removeVM; } });
+		var networks_1 = requireNetworks();
+		Object.defineProperty(exports$1, "Network", { enumerable: true, get: function () { return networks_1.Network; } });
+		Object.defineProperty(exports$1, "NetworkReport", { enumerable: true, get: function () { return networks_1.NetworkReport; } });
+		Object.defineProperty(exports$1, "NetworkEventData", { enumerable: true, get: function () { return networks_1.NetworkEventData; } });
+		Object.defineProperty(exports$1, "NetworkReportSummary", { enumerable: true, get: function () { return networks_1.NetworkReportSummary; } });
+		Object.defineProperty(exports$1, "NetworkReportSummaryDomain", { enumerable: true, get: function () { return networks_1.NetworkReportSummaryDomain; } });
+		Object.defineProperty(exports$1, "NetworkReportSummaryDestination", { enumerable: true, get: function () { return networks_1.NetworkReportSummaryDestination; } });
+		Object.defineProperty(exports$1, "NetworkReportSummarySource", { enumerable: true, get: function () { return networks_1.NetworkReportSummarySource; } });
+		Object.defineProperty(exports$1, "updateNetwork", { enumerable: true, get: function () { return networks_1.updateNetwork; } });
+		Object.defineProperty(exports$1, "getNetworkReport", { enumerable: true, get: function () { return networks_1.getNetworkReport; } });
+		Object.defineProperty(exports$1, "getNetworkReportSummary", { enumerable: true, get: function () { return networks_1.getNetworkReportSummary; } }); 
 	} (dist$1));
 	return dist$1;
 }
@@ -73095,16 +73216,19 @@ async function actionCreateCluster() {
         setOutput("cluster-id", cluster.id);
         cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
         info(`Cluster ${cluster.id} is running.`);
+        if (cluster.network_id) {
+            setOutput("network-id", cluster.network_id);
+        }
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
-            writeFile$1(kubeconfigPath, kubeconfig);
+            writeFile$2(kubeconfigPath, kubeconfig);
             info(`Wrote kubeconfig to ${kubeconfigPath}`);
         }
         if (exportKubeconfig) {
             if (!kubeconfigPath) {
                 kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${k8sDistribution}-${k8sVersion}`;
-                writeFile$1(kubeconfigPath, kubeconfig);
+                writeFile$2(kubeconfigPath, kubeconfig);
                 info(`Wrote kubeconfig to ${kubeconfigPath}`);
             }
             exportVariable("KUBECONFIG", kubeconfigPath);
@@ -73120,7 +73244,7 @@ async function actionCreateCluster() {
         setFailed(message);
     }
 }
-function writeFile$1(filePath, contents) {
+function writeFile$2(filePath, contents) {
     const directoryPath = path.dirname(filePath);
     if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
@@ -73361,14 +73485,21 @@ async function actionCreateVM() {
         setOutput("vm-id", vmIds[0]);
         setOutput("vm-ids", JSON.stringify(vmIds));
         let firstStatus = "";
+        let firstNetworkId = "";
         for (const vm of vms) {
             const ready = await distExports$1.pollForVMStatus(apiClient, vm.id, "running", timeoutMinutes * 60);
             info(`VM ${ready.id} is running.`);
             if (!firstStatus) {
                 firstStatus = ready.status;
             }
+            if (!firstNetworkId && ready.network_id) {
+                firstNetworkId = ready.network_id;
+            }
         }
         setOutput("vm-status", firstStatus);
+        if (firstNetworkId) {
+            setOutput("network-id", firstNetworkId);
+        }
     }
     catch (error$1) {
         const message = error$1 instanceof Error ? error$1.message : String(error$1);
@@ -73395,7 +73526,7 @@ function processPublicKeys(publicKeys) {
         if (!Array.isArray(parsed)) {
             throw new Error("public-keys must be a YAML list of strings");
         }
-        return parsed.map((k) => String(k));
+        return parsed.map((k) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
     }
     return undefined;
 }
@@ -77850,13 +77981,13 @@ async function actionUpgradeCluster() {
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
-            writeFile(kubeconfigPath, kubeconfig);
+            writeFile$1(kubeconfigPath, kubeconfig);
             info(`Wrote kubeconfig to ${kubeconfigPath}`);
         }
         if (exportKubeconfig) {
             if (!kubeconfigPath) {
                 kubeconfigPath = `${os.homedir()}/.kube/kubeconfig-${cluster.id}`;
-                writeFile(kubeconfigPath, kubeconfig);
+                writeFile$1(kubeconfigPath, kubeconfig);
                 info(`Wrote kubeconfig to ${kubeconfigPath}`);
             }
             exportVariable("KUBECONFIG", kubeconfigPath);
@@ -77872,7 +78003,7 @@ async function actionUpgradeCluster() {
         setFailed(message);
     }
 }
-function writeFile(filePath, contents) {
+function writeFile$1(filePath, contents) {
     const directoryPath = path.dirname(filePath);
     if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
@@ -77919,5 +78050,122 @@ async function actionReportCompatibilityResult() {
     }
 }
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpgradeCluster };
+async function actionUpdateNetwork() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const networkId = getInput("network-id", { required: true });
+        const policy = getInput("policy");
+        const collectReportInput = getInput("collect-report");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        if (!policy && !collectReportInput) {
+            throw new Error("At least one of `policy` or `collect-report` must be provided.");
+        }
+        const options = {};
+        if (policy) {
+            options.policy = policy;
+        }
+        if (collectReportInput) {
+            options.collectReport = getBooleanInput("collect-report");
+        }
+        const network = await distExports$1.updateNetwork(apiClient, networkId, options);
+        info(`Updated network ${network.id}`);
+        setOutput("network-id", network.id);
+        setOutput("network-status", network.status);
+        if (network.policy !== undefined) {
+            setOutput("network-policy", network.policy);
+        }
+        if (network.collect_report !== undefined) {
+            setOutput("collect-report", String(network.collect_report));
+        }
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+
+const MAX_VARIABLE_SIZE_BYTES = 1024 * 1024; // GitHub Actions output variable cap
+async function actionGetNetworkReport() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const networkId = getInput("network-id", { required: true });
+        const mode = getInput("mode", { required: true });
+        const summaryFilePath = getInput("summary-file-path");
+        const eventsFilePath = getInput("events-file-path");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        if (mode !== "summary" && mode !== "events" && mode !== "all") {
+            throw new Error(`Invalid mode '${mode}'. Must be 'summary', 'events', or 'all'.`);
+        }
+        const wantSummary = mode === "summary" || mode === "all";
+        const wantEvents = mode === "events" || mode === "all";
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        if (wantSummary) {
+            let summary;
+            try {
+                summary = await distExports$1.getNetworkReportSummary(apiClient, networkId);
+            }
+            catch (err) {
+                if (err && err.statusCode === 404) {
+                    throw new Error(`Network report summary not found for network ${networkId}: the network must be terminated (the cluster removed) and its events must have been processed before a summary is available.`);
+                }
+                throw err;
+            }
+            const json = JSON.stringify(summary);
+            if (summaryFilePath) {
+                writeFile(summaryFilePath, json);
+                info(`Wrote summary to ${summaryFilePath}`);
+                setOutput("summary-file", summaryFilePath);
+            }
+            else {
+                setOutput("summary", json);
+            }
+        }
+        if (wantEvents) {
+            const report = await distExports$1.getNetworkReport(apiClient, networkId);
+            const json = JSON.stringify(report.events);
+            if (eventsFilePath) {
+                writeFile(eventsFilePath, json);
+                info(`Wrote events to ${eventsFilePath}`);
+                setOutput("events-file", eventsFilePath);
+            }
+            else {
+                const size = Buffer.byteLength(json, "utf8");
+                if (size > MAX_VARIABLE_SIZE_BYTES) {
+                    throw new Error(`Events output size (${size} bytes) exceeds the 1MB limit for action output variables. Use 'events-file-path' to write the events to disk instead.`);
+                }
+                setOutput("events", json);
+            }
+        }
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+function writeFile(filePath, contents) {
+    const directoryPath = path.dirname(filePath);
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+    fs.writeFileSync(filePath, contents);
+}
+
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionGetNetworkReport, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpdateNetwork, actionUpgradeCluster };
 //# sourceMappingURL=index.js.map

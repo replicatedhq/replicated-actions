@@ -25,6 +25,7 @@ kubeconfig_path["kubeconfig-path"]
 export_kubeconfig["export-kubeconfig"]
 cluster_id["cluster-id"]
 cluster_kubeconfig["cluster-kubeconfig"]
+network_id["network-id"]
 api_token ---> create_cluster
 kubernetes_distribution ---> create_cluster
 kubernetes_version ---> create_cluster
@@ -44,6 +45,7 @@ kubeconfig_path ---> create_cluster
 export_kubeconfig ---> create_cluster
 create_cluster ---> cluster_id
 create_cluster ---> cluster_kubeconfig
+create_cluster ---> network_id
 ```
 ## Inputs
 | Name | Default | Required | Description |
@@ -71,4 +73,5 @@ create_cluster ---> cluster_kubeconfig
 | --- | --- |
 | cluster-id | Contains the cluster id. |
 | cluster-kubeconfig | Contains the kubeconfig to connect with the cluster. |
+| network-id | Contains the network id associated with the cluster. |
 

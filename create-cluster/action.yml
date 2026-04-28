@@ -71,6 +71,8 @@ outputs:
     description: "Contains the cluster id."
   cluster-kubeconfig: # kubeconfig of the cluster
     description: "Contains the kubeconfig to connect with the cluster."
+  network-id: # id of the network
+    description: "Contains the network id associated with the cluster."
 runs:
   using: "node24"
   main: "index.js"
