@@ -17,6 +17,7 @@ version["version"]
 name["name"]
 namespace["namespace"]
 values["values"]
+values_file["values-file"]
 wait["wait"]
 extra_helm_flags["extra-helm-flags"]
 run_preflights["run-preflights"]
@@ -31,6 +32,7 @@ version ---> install_a_helm_chart_to_a_cluster
 name ---> install_a_helm_chart_to_a_cluster
 namespace ---> install_a_helm_chart_to_a_cluster
 values ---> install_a_helm_chart_to_a_cluster
+values_file ---> install_a_helm_chart_to_a_cluster
 wait ---> install_a_helm_chart_to_a_cluster
 extra_helm_flags ---> install_a_helm_chart_to_a_cluster
 run_preflights ---> install_a_helm_chart_to_a_cluster
@@ -48,7 +50,8 @@ run_preflights ---> install_a_helm_chart_to_a_cluster
 | version |  | False | The version of the chart to install |
 | name |  | True | The name of release to install |
 | namespace |  | True | The namespace to install the application to |
-| values |  | True | A values.yaml file to use |
+| values |  | False | Inline YAML content to use as Helm values. Mutually exclusive with values-file. |
+| values-file |  | False | Path to a values.yaml file to use. Mutually exclusive with values. |
 | wait | false | False | Wait until resources are ready (passes --wait to helm install, waits up to --timeout which defaults to 5m) |
 | extra-helm-flags |  | False | Additional flags to pass to helm install (e.g. '--timeout 10m0s --debug') |
 | run-preflights | false | False | Run preflight checks (true/false) |
