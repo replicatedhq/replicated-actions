@@ -40,18 +40,14 @@ beforeEach(() => {
 describe("actionHelmInstall values handling", () => {
   it("rejects when both values and values-file are set", async () => {
     setInputs({ ...baseInputs, values: "key: value", "values-file": "/tmp/anywhere.yaml" });
-    await expect(actionHelmInstall()).rejects.toThrow(
-      /mutually exclusive/
-    );
+    await expect(actionHelmInstall()).rejects.toThrow(/mutually exclusive/);
     expect(execMock).not.toHaveBeenCalled();
   });
 
   it("rejects when values-file points to a missing file", async () => {
     const missing = path.join(os.tmpdir(), "definitely-missing-values-12345.yaml");
     setInputs({ ...baseInputs, "values-file": missing });
-    await expect(actionHelmInstall()).rejects.toThrow(
-      `values-file not found: ${missing}`
-    );
+    await expect(actionHelmInstall()).rejects.toThrow(`values-file not found: ${missing}`);
     expect(execMock).not.toHaveBeenCalled();
   });
 
@@ -61,9 +57,7 @@ describe("actionHelmInstall values handling", () => {
     try {
       setInputs({ ...baseInputs, "values-file": tmp });
       await actionHelmInstall();
-      const installCall = execMock.mock.calls.find(
-        (call) => Array.isArray(call[1]) && (call[1] as string[])[0] === "upgrade"
-      );
+      const installCall = execMock.mock.calls.find(call => Array.isArray(call[1]) && (call[1] as string[])[0] === "upgrade");
       expect(installCall).toBeDefined();
       const params = installCall![1] as string[];
       const idx = params.indexOf("--values");
@@ -77,9 +71,7 @@ describe("actionHelmInstall values handling", () => {
   it("writes inline values content to a temp file and passes it to helm --values", async () => {
     setInputs({ ...baseInputs, values: "key: inline-value\n" });
     await actionHelmInstall();
-    const installCall = execMock.mock.calls.find(
-      (call) => Array.isArray(call[1]) && (call[1] as string[])[0] === "upgrade"
-    );
+    const installCall = execMock.mock.calls.find(call => Array.isArray(call[1]) && (call[1] as string[])[0] === "upgrade");
     expect(installCall).toBeDefined();
     const params = installCall![1] as string[];
     const idx = params.indexOf("--values");
@@ -91,9 +83,7 @@ describe("actionHelmInstall values handling", () => {
   it("does not pass --values when neither values nor values-file is set", async () => {
     setInputs(baseInputs);
     await actionHelmInstall();
-    const installCall = execMock.mock.calls.find(
-      (call) => Array.isArray(call[1]) && (call[1] as string[])[0] === "upgrade"
-    );
+    const installCall = execMock.mock.calls.find(call => Array.isArray(call[1]) && (call[1] as string[])[0] === "upgrade");
     expect(installCall).toBeDefined();
     const params = installCall![1] as string[];
     expect(params).not.toContain("--values");
