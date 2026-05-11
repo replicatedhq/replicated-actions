@@ -2,16 +2,16 @@ name: "Replicated create release"
 description: "Create a Replicated release on a channel"
 inputs:
   app-slug:
-    description: "App Slug."
-    required: true
+    description: "App Slug. Required unless .replicated config file specifies appSlug."
+    required: false
   api-token:
     description: "API Token."
     required: true
   chart:
-    description: "Path to the helm chart (One of `chart` or `yaml-dir` is required)."
+    description: "Path to the helm chart. One of chart or yaml-dir is required, unless a .replicated config file is present."
     required: false
   yaml-dir:
-    description: "The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required)."
+    description: "Directory containing multiple yamls. One of chart or yaml-dir is required, unless a .replicated config file is present."
     required: false
   promote-channel:
     description: "Channel name or id to promote this release to. If not specified, the release will not be promoted."

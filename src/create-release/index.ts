@@ -1,13 +1,17 @@
 import * as core from "@actions/core";
-import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease, pollForAirgapReleaseStatus, getDownloadUrlAirgapBuildRelease, getApplicationDetails } from "replicated-lib";
+import * as exec from "@actions/exec";
+import * as fs from "fs";
+import * as path from "path";
+import * as tmpPromise from "tmp-promise";
+import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease, pollForAirgapReleaseStatus, getDownloadUrlAirgapBuildRelease, getApplicationDetails, findAndParseConfig, ReplicatedConfig } from "replicated-lib";
 
 export async function actionCreateRelease() {
   try {
     const apiToken = core.getInput("api-token", { required: true });
-    const appSlug = core.getInput("app-slug", { required: true });
+    let appSlug = core.getInput("app-slug");
     const chart = core.getInput("chart");
-    const yamlDir = core.getInput("yaml-dir");
-    const promoteChannel = core.getInput("promote-channel");
+    let yamlDir = core.getInput("yaml-dir");
+    let promoteChannel = core.getInput("promote-channel");
     const releaseVersion = core.getInput("version");
     const releaseNotes = core.getInput("release-notes");
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
@@ -19,19 +23,60 @@ export async function actionCreateRelease() {
     }
     const timeoutMinutes = parsedTimeout;
 
+    if (chart && yamlDir) {
+      core.setFailed("You must provide either a chart or a YAML directory, not both");
+      return;
+    }
+
+    // Discovery mode: neither chart nor yaml-dir provided
+    if (!chart && !yamlDir) {
+      const config = findAndParseConfig(process.cwd());
+      if (config) {
+        if (!appSlug) {
+          appSlug = config.appSlug || "";
+        }
+        if (!promoteChannel && config.promoteToChannelNames && config.promoteToChannelNames.length > 0) {
+          promoteChannel = config.promoteToChannelNames[0];
+        }
+
+        const stagingDir = await tmpPromise.dir({ unsafeCleanup: true });
+
+        // Package charts
+        if (config.charts) {
+          for (const chartConfig of config.charts) {
+            await exec.exec("helm", ["dependency", "update"], { cwd: chartConfig.path });
+            await exec.exec("helm", ["package", ".", "-d", stagingDir.path], { cwd: chartConfig.path });
+          }
+        }
+
+        // Resolve and copy manifests
+        if (config.manifests) {
+          for (const pattern of config.manifests) {
+            const files = await Array.fromAsync(fs.promises.glob(pattern));
+            for (const file of files) {
+              const dest = path.join(stagingDir.path, path.basename(file));
+              fs.copyFileSync(file, dest);
+            }
+          }
+        }
+
+        yamlDir = stagingDir.path;
+      } else {
+        core.setFailed("You must provide either a chart or a YAML directory, or a .replicated config file");
+        return;
+      }
+    }
+
+    if (!appSlug) {
+      core.setFailed("app-slug is required when no .replicated config is found");
+      return;
+    }
+
     const apiClient = new VendorPortalApi();
     apiClient.apiToken = apiToken;
 
     if (apiEndpoint) {
       apiClient.endpoint = apiEndpoint;
-    }
-
-    if (chart && yamlDir) {
-      core.setFailed("You must provide either a chart or a YAML directory, not both");
-    }
-
-    if (chart === "" && yamlDir === "") {
-      core.setFailed("You must provide either a chart or a YAML directory");
     }
 
     let release: Release;
