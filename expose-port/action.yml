@@ -6,7 +6,10 @@ inputs:
     required: true
   cluster-id:
     description: "Cluster id to expose port for"
-    required: true
+    required: false
+  vm-id:
+    description: "VM id to expose port for"
+    required: false
   port:
     description: "Cluster Port to expose."
     required: true
