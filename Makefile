@@ -21,7 +21,7 @@ prettier-check: deps
 
 .PHONY: package-all
 package-all: package-archive-channel package-archive-customer \
-				 package-create-customer package-create-release \
+				 package-create-channel package-create-customer package-create-release \
 				 package-helm-install package-kots-install \
 				 package-create-cluster package-remove-cluster package-prepare-cluster \
 				 package-create-object-store package-expose-port \
@@ -30,6 +30,7 @@ package-all: package-archive-channel package-archive-customer \
 				 package-upgrade-cluster \
 				 package-report-compatibility-result \
 				 package-create-vm package-remove-vm \
+				 package-get-vm-ssh-endpoint \
 				 package-update-network package-get-network-report
 
 .PHONY: package-main
@@ -46,6 +47,11 @@ package-prepare-cluster: package-main
 package-archive-channel: package-main
 	rm -rf ./archive-channel/dist
 	cp -r dist archive-channel/
+
+.PHONY: package-create-channel
+package-create-channel: package-main
+	rm -rf ./create-channel/dist
+	cp -r dist create-channel/
 
 .PHONY: package-archive-customer
 package-archive-customer: package-main
@@ -132,13 +138,19 @@ package-get-network-report: package-main
 	rm -rf ./get-network-report/dist
 	cp -r dist get-network-report/
 
+.PHONY: package-get-vm-ssh-endpoint
+package-get-vm-ssh-endpoint: package-main
+	rm -rf ./get-vm-ssh-endpoint/dist
+	cp -r dist get-vm-ssh-endpoint/
+
 .PHONY: readme-all
-readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-cluster readme-create-object-store \
+readme-all: pip-install readme-archive-channel readme-archive-customer readme-create-channel readme-create-cluster readme-create-object-store \
 			 readme-expose-port readme-create-customer readme-create-release readme-helm-install \
 			 readme-kots-install readme-promote-release readme-remove-cluster readme-prepare-cluster \
 			 readme-get-customer-instances readme-report-compatibility-result \
 			 readme-upgrade-cluster \
 			 readme-create-vm readme-remove-vm \
+			 readme-get-vm-ssh-endpoint \
 			 readme-update-network readme-get-network-report
 
 .PHONY: pip-install
@@ -152,6 +164,10 @@ readme-archive-channel: pip-install
 .PHONY: readme-archive-customer
 readme-archive-customer: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./archive-customer/action.yml > ./archive-customer/README.md
+
+.PHONY: readme-create-channel
+readme-create-channel: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./create-channel/action.yml > ./create-channel/README.md
 
 .PHONY: readme-create-cluster
 readme-create-cluster: pip-install
@@ -212,6 +228,10 @@ readme-create-vm: pip-install
 .PHONY: readme-remove-vm
 readme-remove-vm: pip-install
 	python3 docs/generate-readme/action-to-mermaid.py ./remove-vm/action.yml > ./remove-vm/README.md
+
+.PHONY: readme-get-vm-ssh-endpoint
+readme-get-vm-ssh-endpoint: pip-install
+	python3 docs/generate-readme/action-to-mermaid.py ./get-vm-ssh-endpoint/action.yml > ./get-vm-ssh-endpoint/README.md
 
 .PHONY: readme-update-network
 readme-update-network: pip-install

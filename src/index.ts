@@ -1,11 +1,13 @@
 import { actionArchiveChannel } from "./archive-channel";
 import { actionArchiveCustomer } from "./archive-customer";
+import { actionCreateChannel } from "./create-channel";
 import { actionCreateCluster } from "./create-cluster";
 import { actionCreateCustomer } from "./create-customer";
 import { actionCreateObjectStore } from "./create-object-store";
 import { actionCreateRelease } from "./create-release";
 import { actionCreateVM } from "./create-vm";
 import { actionExposePort } from "./expose-port";
+import { actionGetVMSSHEndpoint } from "./get-vm-ssh-endpoint";
 import { actionHelmInstall } from "./helm-install";
 import { actionKotsInstall } from "./kots-install";
 import { actionPromoteRelease } from "./promote-release";
@@ -20,12 +22,14 @@ import { actionGetNetworkReport } from "./get-network-report";
 export {
   actionArchiveChannel,
   actionArchiveCustomer,
+  actionCreateChannel,
   actionCreateCluster,
   actionCreateCustomer,
   actionCreateObjectStore,
   actionCreateRelease,
   actionCreateVM,
   actionExposePort,
+  actionGetVMSSHEndpoint,
   actionHelmInstall,
   actionKotsInstall,
   actionPromoteRelease,

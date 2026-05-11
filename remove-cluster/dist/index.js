@@ -29879,7 +29879,7 @@ function requireChannels () {
 	    getChannelByApplicationId,
 	    findChannelDetailsInOutput
 	};
-	async function createChannel(vendorPortalApi, appSlug, channelName) {
+	async function createChannel(vendorPortalApi, appSlug, channelName, buildAirgapAutomatically) {
 	    const http = await vendorPortalApi.client();
 	    // 1. get the app id from the app slug
 	    const app = await (0, applications_1.getApplicationDetails)(vendorPortalApi, appSlug);
@@ -29888,6 +29888,9 @@ function requireChannels () {
 	    const reqBody = {
 	        name: channelName
 	    };
+	    if (typeof buildAirgapAutomatically !== "undefined") {
+	        reqBody.buildAirgapAutomatically = buildAirgapAutomatically;
+	    }
 	    const createChannelUri = `${vendorPortalApi.endpoint}/app/${app.id}/channel`;
 	    const createChannelRes = await http.post(createChannelUri, JSON.stringify(reqBody));
 	    if (createChannelRes.message.statusCode != 201) {
@@ -29897,7 +29900,7 @@ function requireChannels () {
 	    }
 	    const createChannelBody = JSON.parse(await createChannelRes.readBody());
 	    console.log(`Created channel with id ${createChannelBody.channel.id}`);
-	    return { name: createChannelBody.channel.name, id: createChannelBody.channel.id, slug: createChannelBody.channel.channelSlug };
+	    return { name: createChannelBody.channel.name, id: createChannelBody.channel.id, slug: createChannelBody.channel.channelSlug, buildAirgapAutomatically: createChannelBody.channel.buildAirgapAutomatically };
 	}
 	async function getChannelDetails(vendorPortalApi, appSlug, { slug, name }) {
 	    await vendorPortalApi.client();
@@ -64179,14 +64182,22 @@ function requireVms () {
 	if (hasRequiredVms) return vms;
 	hasRequiredVms = 1;
 	Object.defineProperty(vms, "__esModule", { value: true });
-	vms.VM = void 0;
+	vms.VMExposedPort = vms.VMPort = vms.VM = void 0;
 	vms.createVM = createVM;
+	vms.getVMDetails = getVMDetails;
 	vms.pollForVMStatus = pollForVMStatus;
 	vms.removeVM = removeVM;
+	vms.exposeVMPort = exposeVMPort;
 	const clusters_1 = requireClusters();
 	class VM {
 	}
 	vms.VM = VM;
+	class VMPort {
+	}
+	vms.VMPort = VMPort;
+	class VMExposedPort {
+	}
+	vms.VMExposedPort = VMExposedPort;
 	async function createVM(vendorPortalApi, name, distribution, vmTTL, version, diskGib, instanceType, count, publicKeys, tags) {
 	    const http = await vendorPortalApi.client();
 	    const reqBody = {
@@ -64230,7 +64241,9 @@ function requireVms () {
 	        name: v.name,
 	        id: v.id,
 	        status: v.status,
-	        network_id: v.network_id
+	        network_id: v.network_id,
+	        sshEndpoint: v.direct_ssh_endpoint,
+	        sshPort: v.direct_ssh_port
 	    }));
 	}
 	async function getVMDetails(vendorPortalApi, vmId) {
@@ -64246,7 +64259,9 @@ function requireVms () {
 	        name: body.vm.name,
 	        id: body.vm.id,
 	        status: body.vm.status,
-	        network_id: body.vm.network_id
+	        network_id: body.vm.network_id,
+	        sshEndpoint: body.vm.direct_ssh_endpoint,
+	        sshPort: body.vm.direct_ssh_port
 	    };
 	}
 	async function pollForVMStatus(vendorPortalApi, vmId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
@@ -64289,6 +64304,47 @@ function requireVms () {
 	    if (res.message.statusCode != 200) {
 	        throw new clusters_1.StatusError(`Failed to remove vm: Server responded with ${res.message.statusCode}`, res.message.statusCode);
 	    }
+	}
+	async function exposeVMPort(vendorPortalApi, vmId, port, protocols, isWildcard) {
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/vm/${vmId}/port`;
+	    const reqBody = {
+	        port: port,
+	        protocols: protocols
+	    };
+	    if (typeof isWildcard !== "undefined") {
+	        reqBody.is_wildcard = isWildcard;
+	    }
+	    const res = await http.post(uri, JSON.stringify(reqBody));
+	    if (res.message.statusCode != 201) {
+	        let body = "";
+	        try {
+	            body = await res.readBody();
+	        }
+	        catch (err) {
+	            // ignore
+	        }
+	        throw new Error(`Failed to expose vm port: Server responded with ${res.message.statusCode}: ${body}`);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    var exposedPorts = [];
+	    for (const exposed_port of body.port.exposed_ports) {
+	        const exposedPort = {
+	            protocol: exposed_port.protocol,
+	            exposed_port: exposed_port.exposed_port
+	        };
+	        exposedPorts.push(exposedPort);
+	    }
+	    var portObj = {
+	        vm_id: body.port.vm_id,
+	        addon_id: body.port.addon_id,
+	        upstream_port: body.port.upstream_port,
+	        hostname: body.port.hostname,
+	        port_name: body.port.port_name,
+	        state: body.port.state,
+	        exposed_ports: exposedPorts
+	    };
+	    return portObj;
 	}
 	return vms;
 }
@@ -64406,7 +64462,7 @@ function requireDist$1 () {
 	hasRequiredDist$1 = 1;
 	(function (exports$1) {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
-		exports$1.getNetworkReportSummary = exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.createVM = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
+		exports$1.getNetworkReportSummary = exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.exposeVMPort = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.getVMDetails = exports$1.createVM = exports$1.VMExposedPort = exports$1.VMPort = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
 		var configuration_1 = requireConfiguration();
 		Object.defineProperty(exports$1, "VendorPortalApi", { enumerable: true, get: function () { return configuration_1.VendorPortalApi; } });
 		var applications_1 = requireApplications();
@@ -64445,9 +64501,13 @@ function requireDist$1 () {
 		Object.defineProperty(exports$1, "reportCompatibilityResult", { enumerable: true, get: function () { return releases_1.reportCompatibilityResult; } });
 		var vms_1 = requireVms();
 		Object.defineProperty(exports$1, "VM", { enumerable: true, get: function () { return vms_1.VM; } });
+		Object.defineProperty(exports$1, "VMPort", { enumerable: true, get: function () { return vms_1.VMPort; } });
+		Object.defineProperty(exports$1, "VMExposedPort", { enumerable: true, get: function () { return vms_1.VMExposedPort; } });
 		Object.defineProperty(exports$1, "createVM", { enumerable: true, get: function () { return vms_1.createVM; } });
+		Object.defineProperty(exports$1, "getVMDetails", { enumerable: true, get: function () { return vms_1.getVMDetails; } });
 		Object.defineProperty(exports$1, "pollForVMStatus", { enumerable: true, get: function () { return vms_1.pollForVMStatus; } });
 		Object.defineProperty(exports$1, "removeVM", { enumerable: true, get: function () { return vms_1.removeVM; } });
+		Object.defineProperty(exports$1, "exposeVMPort", { enumerable: true, get: function () { return vms_1.exposeVMPort; } });
 		var networks_1 = requireNetworks();
 		Object.defineProperty(exports$1, "Network", { enumerable: true, get: function () { return networks_1.Network; } });
 		Object.defineProperty(exports$1, "NetworkReport", { enumerable: true, get: function () { return networks_1.NetworkReport; } });
@@ -64533,6 +64593,33 @@ async function actionArchiveCustomer() {
     }
     catch (error) {
         setFailed(error.message);
+    }
+}
+
+async function actionCreateChannel() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const channelName = getInput("channel-name", { required: true });
+        const buildAirgapAutomatically = getBooleanInput("build-airgap-automatically");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const channel = await distExports$1.createChannel(apiClient, appSlug, channelName, buildAirgapAutomatically);
+        info(`Created channel ${channel.name} (${channel.slug}) for app ${appSlug}`);
+        setOutput("channel-id", channel.id);
+        setOutput("channel-slug", channel.slug);
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
     }
 }
 
@@ -73534,28 +73621,90 @@ function processPublicKeys(publicKeys) {
 async function actionExposePort() {
     try {
         const apiToken = getInput("api-token", { required: true });
-        const clusterId = getInput("cluster-id", { required: true });
+        const clusterId = getInput("cluster-id");
+        const vmId = getInput("vm-id");
         const port = getInput("port");
         const protocols = (getInput("protocols") || "https").split(",");
         const isWildcard = getBooleanInput("wildcard");
         const timeoutMinutes = +(getInput("timeout-minutes") || 5);
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        if (clusterId && vmId) {
+            throw new Error("Only one of cluster-id or vm-id can be specified");
+        }
+        if (!clusterId && !vmId) {
+            throw new Error("One of cluster-id or vm-id must be specified");
+        }
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        let exposedPort;
+        if (vmId) {
+            exposedPort = await distExports$1.exposeVMPort(apiClient, vmId, Number(port), protocols, isWildcard);
+        }
+        else {
+            exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
+        }
+        if (exposedPort.addon_id) {
+            info(`Exposed port ${port} - waiting for it to be ready...`);
+            setOutput("addon-id", exposedPort.addon_id);
+            if (vmId) {
+                info(`VM port exposed with state: ${exposedPort.state}`);
+            }
+            else {
+                await distExports$1.pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
+            }
+        }
+        info(`Exposed Port on ${exposedPort.hostname}`);
+        setOutput("hostname", exposedPort.hostname);
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+
+async function actionGetVMSSHEndpoint() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const vmId = getInput("vm-id", { required: true });
+        const username = getInput("username");
         const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
         const apiClient = new distExports$1.VendorPortalApi();
         apiClient.apiToken = apiToken;
         if (apiEndpoint) {
             apiClient.endpoint = apiEndpoint;
         }
-        let exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
-        if (exposedPort.addon_id) {
-            info(`Exposed port ${port} - waiting for it to be ready...`);
-            setOutput("addon-id", exposedPort.addon_id);
-            await distExports$1.pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
+        const vm = await distExports$1.getVMDetails(apiClient, vmId);
+        let sshEndpoint = "";
+        if (vm.sshEndpoint) {
+            const host = vm.sshEndpoint;
+            const port = vm.sshPort || 22;
+            if (username) {
+                sshEndpoint = `ssh -p ${port} ${username}@${host}`;
+            }
+            else {
+                sshEndpoint = `ssh -p ${port} ${host}`;
+            }
         }
-        info(`Exposed Port on ${exposedPort.hostname}`);
-        setOutput("hostname", exposedPort.hostname);
+        else {
+            throw new Error(`VM ${vmId} does not have an SSH endpoint`);
+        }
+        info(`VM ${vmId} SSH endpoint: ${sshEndpoint}`);
+        setOutput("ssh-endpoint", sshEndpoint);
     }
-    catch (error) {
-        setFailed(error.message);
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
     }
 }
 
@@ -78167,5 +78316,5 @@ function writeFile(filePath, contents) {
     fs.writeFileSync(filePath, contents);
 }
 
-export { actionArchiveChannel, actionArchiveCustomer, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionGetNetworkReport, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpdateNetwork, actionUpgradeCluster };
+export { actionArchiveChannel, actionArchiveCustomer, actionCreateChannel, actionCreateCluster, actionCreateCustomer, actionCreateObjectStore, actionCreateRelease, actionCreateVM, actionExposePort, actionGetCustomerInstances, actionGetNetworkReport, actionGetVMSSHEndpoint, actionHelmInstall, actionKotsInstall, actionPromoteRelease, actionRemoveCluster, actionRemoveVM, actionReportCompatibilityResult, actionUpdateNetwork, actionUpgradeCluster };
 //# sourceMappingURL=index.js.map
