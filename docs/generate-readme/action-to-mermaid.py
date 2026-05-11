@@ -79,6 +79,8 @@ def generate_outputs(action_yaml_file):
     return outputs
 
 if __name__ == "__main__":
+    with open(sys.argv[1], 'r') as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
     mermaid = generate_mermaid(sys.argv[1])
     inputsTable = generate_inputs(sys.argv[1])
     outputsTable = generate_outputs(sys.argv[1])
@@ -90,3 +92,5 @@ if __name__ == "__main__":
     print(inputsTable)
     print("## Outputs")
     print(outputsTable)
+    if 'documentation' in data:
+        print(data['documentation'])

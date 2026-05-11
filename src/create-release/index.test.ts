@@ -4,13 +4,13 @@ import * as exec from "@actions/exec";
 const mockTmpDir = jest.fn();
 
 jest.mock("tmp-promise", () => ({
-  dir: mockTmpDir,
+  dir: mockTmpDir
 }));
 
 jest.mock("replicated-lib", () => ({
   VendorPortalApi: jest.fn().mockImplementation(() => ({
     apiToken: "",
-    endpoint: undefined,
+    endpoint: undefined
   })),
   findAndParseConfig: jest.fn(),
   createRelease: jest.fn().mockResolvedValue({ sequence: "1" }),
@@ -19,21 +19,16 @@ jest.mock("replicated-lib", () => ({
     id: "chan-1",
     name: "Unstable",
     slug: "unstable",
-    buildAirgapAutomatically: false,
+    buildAirgapAutomatically: false
   }),
   createChannel: jest.fn(),
   promoteRelease: jest.fn(),
   getApplicationDetails: jest.fn().mockResolvedValue({ id: "app-id-1" }),
   pollForAirgapReleaseStatus: jest.fn(),
-  getDownloadUrlAirgapBuildRelease: jest.fn(),
+  getDownloadUrlAirgapBuildRelease: jest.fn()
 }));
 
-import {
-  findAndParseConfig,
-  createRelease,
-  createReleaseFromChart,
-  getChannelDetails,
-} from "replicated-lib";
+import { findAndParseConfig, createRelease, createReleaseFromChart, getChannelDetails } from "replicated-lib";
 import { actionCreateRelease } from "./index";
 
 const getInputMock = core.getInput as jest.MockedFunction<typeof core.getInput>;
@@ -71,17 +66,13 @@ describe("actionCreateRelease explicit inputs", () => {
       "app-slug": "my-app",
       chart: "./my-chart",
       "yaml-dir": "",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     await actionCreateRelease();
 
     expect(findAndParseConfigMock).not.toHaveBeenCalled();
-    expect(createReleaseFromChartMock).toHaveBeenCalledWith(
-      expect.any(Object),
-      "my-app",
-      "./my-chart"
-    );
+    expect(createReleaseFromChartMock).toHaveBeenCalledWith(expect.any(Object), "my-app", "./my-chart");
     expect(createReleaseMock).not.toHaveBeenCalled();
   });
 
@@ -91,17 +82,13 @@ describe("actionCreateRelease explicit inputs", () => {
       "app-slug": "my-app",
       chart: "",
       "yaml-dir": "./manifests",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     await actionCreateRelease();
 
     expect(findAndParseConfigMock).not.toHaveBeenCalled();
-    expect(createReleaseMock).toHaveBeenCalledWith(
-      expect.any(Object),
-      "my-app",
-      "./manifests"
-    );
+    expect(createReleaseMock).toHaveBeenCalledWith(expect.any(Object), "my-app", "./manifests");
     expect(createReleaseFromChartMock).not.toHaveBeenCalled();
   });
 });
@@ -113,37 +100,29 @@ describe("actionCreateRelease .replicated config discovery", () => {
       "app-slug": "",
       chart: "",
       "yaml-dir": "",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     findAndParseConfigMock.mockReturnValue({
       appSlug: "config-app",
       charts: [{ path: "./chart" }],
       manifests: ["./manifests/*.yaml"],
-      promoteToChannelNames: ["Unstable"],
+      promoteToChannelNames: ["Unstable"]
     });
 
     mockTmpDir.mockResolvedValue({
       path: "/tmp/staging-123",
-      cleanup: jest.fn(),
+      cleanup: jest.fn()
     });
 
     await actionCreateRelease();
 
     expect(findAndParseConfigMock).toHaveBeenCalledWith(process.cwd());
     expect(execMock).toHaveBeenCalledWith("helm", ["dependency", "update"], {
-      cwd: "./chart",
+      cwd: "./chart"
     });
-    expect(execMock).toHaveBeenCalledWith(
-      "helm",
-      ["package", ".", "-d", "/tmp/staging-123"],
-      { cwd: "./chart" }
-    );
-    expect(createReleaseMock).toHaveBeenCalledWith(
-      expect.any(Object),
-      "config-app",
-      "/tmp/staging-123"
-    );
+    expect(execMock).toHaveBeenCalledWith("helm", ["package", ".", "-d", "/tmp/staging-123"], { cwd: "./chart" });
+    expect(createReleaseMock).toHaveBeenCalledWith(expect.any(Object), "config-app", "/tmp/staging-123");
     expect(createReleaseFromChartMock).not.toHaveBeenCalled();
   });
 
@@ -153,27 +132,23 @@ describe("actionCreateRelease .replicated config discovery", () => {
       "app-slug": "explicit-app",
       chart: "",
       "yaml-dir": "",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     findAndParseConfigMock.mockReturnValue({
       appSlug: "config-app",
       charts: [],
-      manifests: [],
+      manifests: []
     });
 
     mockTmpDir.mockResolvedValue({
       path: "/tmp/staging-456",
-      cleanup: jest.fn(),
+      cleanup: jest.fn()
     });
 
     await actionCreateRelease();
 
-    expect(createReleaseMock).toHaveBeenCalledWith(
-      expect.any(Object),
-      "explicit-app",
-      "/tmp/staging-456"
-    );
+    expect(createReleaseMock).toHaveBeenCalledWith(expect.any(Object), "explicit-app", "/tmp/staging-456");
   });
 
   it("uses promoteToChannelNames from config when no explicit promote-channel", async () => {
@@ -182,28 +157,24 @@ describe("actionCreateRelease .replicated config discovery", () => {
       "app-slug": "my-app",
       chart: "",
       "yaml-dir": "",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     findAndParseConfigMock.mockReturnValue({
       appSlug: "my-app",
       charts: [],
       manifests: [],
-      promoteToChannelNames: ["Beta"],
+      promoteToChannelNames: ["Beta"]
     });
 
     mockTmpDir.mockResolvedValue({
       path: "/tmp/staging-789",
-      cleanup: jest.fn(),
+      cleanup: jest.fn()
     });
 
     await actionCreateRelease();
 
-    expect(getChannelDetailsMock).toHaveBeenCalledWith(
-      expect.any(Object),
-      "my-app",
-      { name: "Beta" }
-    );
+    expect(getChannelDetailsMock).toHaveBeenCalledWith(expect.any(Object), "my-app", { name: "Beta" });
   });
 
   it("fails when no inputs and no .replicated config found", async () => {
@@ -212,16 +183,14 @@ describe("actionCreateRelease .replicated config discovery", () => {
       "app-slug": "",
       chart: "",
       "yaml-dir": "",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     findAndParseConfigMock.mockReturnValue(null);
 
     await actionCreateRelease();
 
-    expect(setFailedMock).toHaveBeenCalledWith(
-      "You must provide either a chart or a YAML directory, or a .replicated config file"
-    );
+    expect(setFailedMock).toHaveBeenCalledWith("You must provide either a chart or a YAML directory, or a .replicated config file");
     expect(createReleaseMock).not.toHaveBeenCalled();
     expect(createReleaseFromChartMock).not.toHaveBeenCalled();
   });
@@ -232,24 +201,22 @@ describe("actionCreateRelease .replicated config discovery", () => {
       "app-slug": "",
       chart: "",
       "yaml-dir": "",
-      "promote-channel": "",
+      "promote-channel": ""
     });
 
     findAndParseConfigMock.mockReturnValue({
       charts: [],
-      manifests: [],
+      manifests: []
     });
 
     mockTmpDir.mockResolvedValue({
       path: "/tmp/staging-000",
-      cleanup: jest.fn(),
+      cleanup: jest.fn()
     });
 
     await actionCreateRelease();
 
-    expect(setFailedMock).toHaveBeenCalledWith(
-      "app-slug is required when no .replicated config is found"
-    );
+    expect(setFailedMock).toHaveBeenCalledWith("app-slug is required when no .replicated config is found");
     expect(createReleaseMock).not.toHaveBeenCalled();
   });
 });

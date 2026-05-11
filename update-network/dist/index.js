@@ -64455,173 +64455,7 @@ function requireNetworks () {
 	return networks;
 }
 
-var hasRequiredDist$1;
-
-function requireDist$1 () {
-	if (hasRequiredDist$1) return dist$1;
-	hasRequiredDist$1 = 1;
-	(function (exports$1) {
-		Object.defineProperty(exports$1, "__esModule", { value: true });
-		exports$1.getNetworkReportSummary = exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.exposeVMPort = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.getVMDetails = exports$1.createVM = exports$1.VMExposedPort = exports$1.VMPort = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
-		var configuration_1 = requireConfiguration();
-		Object.defineProperty(exports$1, "VendorPortalApi", { enumerable: true, get: function () { return configuration_1.VendorPortalApi; } });
-		var applications_1 = requireApplications();
-		Object.defineProperty(exports$1, "getApplicationDetails", { enumerable: true, get: function () { return applications_1.getApplicationDetails; } });
-		var channels_1 = requireChannels();
-		Object.defineProperty(exports$1, "Channel", { enumerable: true, get: function () { return channels_1.Channel; } });
-		Object.defineProperty(exports$1, "createChannel", { enumerable: true, get: function () { return channels_1.createChannel; } });
-		Object.defineProperty(exports$1, "getChannelDetails", { enumerable: true, get: function () { return channels_1.getChannelDetails; } });
-		Object.defineProperty(exports$1, "archiveChannel", { enumerable: true, get: function () { return channels_1.archiveChannel; } });
-		Object.defineProperty(exports$1, "pollForAirgapReleaseStatus", { enumerable: true, get: function () { return channels_1.pollForAirgapReleaseStatus; } });
-		Object.defineProperty(exports$1, "getDownloadUrlAirgapBuildRelease", { enumerable: true, get: function () { return channels_1.getDownloadUrlAirgapBuildRelease; } });
-		var clusters_1 = requireClusters();
-		Object.defineProperty(exports$1, "ClusterVersion", { enumerable: true, get: function () { return clusters_1.ClusterVersion; } });
-		Object.defineProperty(exports$1, "createCluster", { enumerable: true, get: function () { return clusters_1.createCluster; } });
-		Object.defineProperty(exports$1, "createClusterWithLicense", { enumerable: true, get: function () { return clusters_1.createClusterWithLicense; } });
-		Object.defineProperty(exports$1, "pollForStatus", { enumerable: true, get: function () { return clusters_1.pollForStatus; } });
-		Object.defineProperty(exports$1, "getKubeconfig", { enumerable: true, get: function () { return clusters_1.getKubeconfig; } });
-		Object.defineProperty(exports$1, "removeCluster", { enumerable: true, get: function () { return clusters_1.removeCluster; } });
-		Object.defineProperty(exports$1, "upgradeCluster", { enumerable: true, get: function () { return clusters_1.upgradeCluster; } });
-		Object.defineProperty(exports$1, "getClusterVersions", { enumerable: true, get: function () { return clusters_1.getClusterVersions; } });
-		Object.defineProperty(exports$1, "createAddonObjectStore", { enumerable: true, get: function () { return clusters_1.createAddonObjectStore; } });
-		Object.defineProperty(exports$1, "pollForAddonStatus", { enumerable: true, get: function () { return clusters_1.pollForAddonStatus; } });
-		Object.defineProperty(exports$1, "exposeClusterPort", { enumerable: true, get: function () { return clusters_1.exposeClusterPort; } });
-		var customers_1 = requireCustomers();
-		Object.defineProperty(exports$1, "KubernetesDistribution", { enumerable: true, get: function () { return customers_1.KubernetesDistribution; } });
-		Object.defineProperty(exports$1, "CustomerSummary", { enumerable: true, get: function () { return customers_1.CustomerSummary; } });
-		Object.defineProperty(exports$1, "archiveCustomer", { enumerable: true, get: function () { return customers_1.archiveCustomer; } });
-		Object.defineProperty(exports$1, "createCustomer", { enumerable: true, get: function () { return customers_1.createCustomer; } });
-		Object.defineProperty(exports$1, "getUsedKubernetesDistributions", { enumerable: true, get: function () { return customers_1.getUsedKubernetesDistributions; } });
-		Object.defineProperty(exports$1, "listCustomersByName", { enumerable: true, get: function () { return customers_1.listCustomersByName; } });
-		Object.defineProperty(exports$1, "listCustomersByEmail", { enumerable: true, get: function () { return customers_1.listCustomersByEmail; } });
-		var releases_1 = requireReleases();
-		Object.defineProperty(exports$1, "createRelease", { enumerable: true, get: function () { return releases_1.createRelease; } });
-		Object.defineProperty(exports$1, "createReleaseFromChart", { enumerable: true, get: function () { return releases_1.createReleaseFromChart; } });
-		Object.defineProperty(exports$1, "promoteRelease", { enumerable: true, get: function () { return releases_1.promoteRelease; } });
-		Object.defineProperty(exports$1, "reportCompatibilityResult", { enumerable: true, get: function () { return releases_1.reportCompatibilityResult; } });
-		var vms_1 = requireVms();
-		Object.defineProperty(exports$1, "VM", { enumerable: true, get: function () { return vms_1.VM; } });
-		Object.defineProperty(exports$1, "VMPort", { enumerable: true, get: function () { return vms_1.VMPort; } });
-		Object.defineProperty(exports$1, "VMExposedPort", { enumerable: true, get: function () { return vms_1.VMExposedPort; } });
-		Object.defineProperty(exports$1, "createVM", { enumerable: true, get: function () { return vms_1.createVM; } });
-		Object.defineProperty(exports$1, "getVMDetails", { enumerable: true, get: function () { return vms_1.getVMDetails; } });
-		Object.defineProperty(exports$1, "pollForVMStatus", { enumerable: true, get: function () { return vms_1.pollForVMStatus; } });
-		Object.defineProperty(exports$1, "removeVM", { enumerable: true, get: function () { return vms_1.removeVM; } });
-		Object.defineProperty(exports$1, "exposeVMPort", { enumerable: true, get: function () { return vms_1.exposeVMPort; } });
-		var networks_1 = requireNetworks();
-		Object.defineProperty(exports$1, "Network", { enumerable: true, get: function () { return networks_1.Network; } });
-		Object.defineProperty(exports$1, "NetworkReport", { enumerable: true, get: function () { return networks_1.NetworkReport; } });
-		Object.defineProperty(exports$1, "NetworkEventData", { enumerable: true, get: function () { return networks_1.NetworkEventData; } });
-		Object.defineProperty(exports$1, "NetworkReportSummary", { enumerable: true, get: function () { return networks_1.NetworkReportSummary; } });
-		Object.defineProperty(exports$1, "NetworkReportSummaryDomain", { enumerable: true, get: function () { return networks_1.NetworkReportSummaryDomain; } });
-		Object.defineProperty(exports$1, "NetworkReportSummaryDestination", { enumerable: true, get: function () { return networks_1.NetworkReportSummaryDestination; } });
-		Object.defineProperty(exports$1, "NetworkReportSummarySource", { enumerable: true, get: function () { return networks_1.NetworkReportSummarySource; } });
-		Object.defineProperty(exports$1, "updateNetwork", { enumerable: true, get: function () { return networks_1.updateNetwork; } });
-		Object.defineProperty(exports$1, "getNetworkReport", { enumerable: true, get: function () { return networks_1.getNetworkReport; } });
-		Object.defineProperty(exports$1, "getNetworkReportSummary", { enumerable: true, get: function () { return networks_1.getNetworkReportSummary; } }); 
-	} (dist$1));
-	return dist$1;
-}
-
-var distExports$1 = requireDist$1();
-
-async function actionArchiveChannel() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const appSlug = getInput("app-slug", { required: true });
-        const channelSlug = getInput("channel-slug", { required: true });
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        await distExports$1.archiveChannel(apiClient, appSlug, channelSlug);
-        info(`Archived channel ${channelSlug} for app ${appSlug}`);
-    }
-    catch (error) {
-        setFailed(error.message);
-    }
-}
-
-async function actionArchiveCustomer() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const customerId = getInput("customer-id");
-        const customerName = getInput("customer-name");
-        const appSlug = getInput("app-slug");
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        // Fail if neither customer-id nor customer-name are provided
-        if (!customerId && !customerName) {
-            throw new Error("Either customer-id or customer-name must be provided");
-        }
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        // If customer-id is not provided, look it up by name
-        let resolvedCustomerId = customerId;
-        if (!resolvedCustomerId && customerName) {
-            // Retry lookup with exponential backoff to handle indexing delays
-            const maxRetries = 5;
-            const initialDelayMs = 1000; // Start with 1 second
-            let customers = [];
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-                customers = await distExports$1.listCustomersByName(apiClient, appSlug || undefined, customerName);
-                if (customers.length > 0) {
-                    break; // Found at least one customer, exit retry loop
-                }
-                if (attempt < maxRetries - 1) {
-                    // Wait before retrying (exponential backoff: 1s, 2s, 4s, 8s)
-                    const delayMs = initialDelayMs * Math.pow(2, attempt);
-                    info(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Retrying in ${delayMs}ms... (attempt ${attempt + 1}/${maxRetries})`);
-                    await new Promise(resolve => setTimeout(resolve, delayMs));
-                }
-            }
-            if (customers.length === 0) {
-                throw new Error(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""} after ${maxRetries} attempts. The customer may not exist or may not be searchable yet.`);
-            }
-            if (customers.length > 1) {
-                throw new Error(`Multiple customers found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Please provide customer-id or app-slug to narrow down the search.`);
-            }
-            resolvedCustomerId = customers[0].customerId;
-            info(`Found customer "${customerName}" with id ${resolvedCustomerId}`);
-        }
-        await distExports$1.archiveCustomer(apiClient, resolvedCustomerId);
-        info(`Archived customer ${resolvedCustomerId}`);
-    }
-    catch (error) {
-        setFailed(error.message);
-    }
-}
-
-async function actionCreateChannel() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const appSlug = getInput("app-slug", { required: true });
-        const channelName = getInput("channel-name", { required: true });
-        const buildAirgapAutomatically = getBooleanInput("build-airgap-automatically");
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        const channel = await distExports$1.createChannel(apiClient, appSlug, channelName, buildAirgapAutomatically);
-        info(`Created channel ${channel.name} (${channel.slug}) for app ${appSlug}`);
-        setOutput("channel-id", channel.id);
-        setOutput("channel-slug", channel.slug);
-    }
-    catch (error$1) {
-        const message = error$1 instanceof Error ? error$1.message : String(error$1);
-        error(message);
-        if (error$1 instanceof Error && error$1.stack) {
-            debug(error$1.stack);
-        }
-        setFailed(message);
-    }
-}
+var config = {};
 
 var dist = {};
 
@@ -73212,11 +73046,11 @@ function requirePublicApi () {
 	return publicApi;
 }
 
-var hasRequiredDist;
+var hasRequiredDist$1;
 
-function requireDist () {
-	if (hasRequiredDist) return dist;
-	hasRequiredDist = 1;
+function requireDist$1 () {
+	if (hasRequiredDist$1) return dist;
+	hasRequiredDist$1 = 1;
 
 	var composer = requireComposer();
 	var Document = requireDocument();
@@ -73269,7 +73103,443 @@ function requireDist () {
 	return dist;
 }
 
-var distExports = requireDist();
+var hasRequiredConfig;
+
+function requireConfig () {
+	if (hasRequiredConfig) return config;
+	hasRequiredConfig = 1;
+	var __createBinding = (config && config.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    var desc = Object.getOwnPropertyDescriptor(m, k);
+	    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+	      desc = { enumerable: true, get: function() { return m[k]; } };
+	    }
+	    Object.defineProperty(o, k2, desc);
+	}) : (function(o, m, k, k2) {
+	    if (k2 === undefined) k2 = k;
+	    o[k2] = m[k];
+	}));
+	var __setModuleDefault = (config && config.__setModuleDefault) || (Object.create ? (function(o, v) {
+	    Object.defineProperty(o, "default", { enumerable: true, value: v });
+	}) : function(o, v) {
+	    o["default"] = v;
+	});
+	var __importStar = (config && config.__importStar) || (function () {
+	    var ownKeys = function(o) {
+	        ownKeys = Object.getOwnPropertyNames || function (o) {
+	            var ar = [];
+	            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+	            return ar;
+	        };
+	        return ownKeys(o);
+	    };
+	    return function (mod) {
+	        if (mod && mod.__esModule) return mod;
+	        var result = {};
+	        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+	        __setModuleDefault(result, mod);
+	        return result;
+	    };
+	})();
+	Object.defineProperty(config, "__esModule", { value: true });
+	config.findAndParseConfig = findAndParseConfig;
+	config.parseConfigFile = parseConfigFile;
+	const fs = __importStar(fs__default);
+	const path = __importStar(path__default);
+	const yaml = __importStar(requireDist$1());
+	function findAndParseConfig(startPath) {
+	    const absPath = path.resolve(startPath);
+	    const stats = fs.statSync(absPath);
+	    if (stats.isFile()) {
+	        return parseConfigFile(absPath);
+	    }
+	    const configs = [];
+	    let currentDir = absPath;
+	    while (true) {
+	        const candidates = [path.join(currentDir, ".replicated"), path.join(currentDir, ".replicated.yaml")];
+	        for (const candidate of candidates) {
+	            if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+	                configs.push(parseConfigFile(candidate));
+	                break;
+	            }
+	        }
+	        const parentDir = path.dirname(currentDir);
+	        if (parentDir === currentDir) {
+	            break;
+	        }
+	        currentDir = parentDir;
+	    }
+	    if (configs.length === 0) {
+	        return null;
+	    }
+	    const rootToLeaf = [...configs].reverse();
+	    let merged = {};
+	    for (const config of rootToLeaf) {
+	        merged = mergeConfigs(merged, config);
+	    }
+	    return merged;
+	}
+	function parseConfigFile(filePath) {
+	    const content = fs.readFileSync(filePath, "utf-8");
+	    let parsed;
+	    try {
+	        parsed = yaml.parse(content);
+	    }
+	    catch (err) {
+	        throw new Error(`Failed to parse config file ${filePath}: ${err.message}`);
+	    }
+	    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+	        throw new Error(`Invalid config file ${filePath}: expected YAML object`);
+	    }
+	    const config = {
+	        appId: parsed.appId,
+	        appSlug: parsed.appSlug,
+	        releaseLabel: parsed.releaseLabel,
+	        charts: parsed.charts,
+	        manifests: parsed.manifests,
+	        preflights: parsed.preflights,
+	        promoteToChannelIds: parsed.promoteToChannelIds,
+	        promoteToChannelNames: parsed.promoteToChannelNames,
+	        replLint: parsed["repl-lint"] || parsed.replLint
+	    };
+	    validateConfig(config);
+	    resolvePaths(config, filePath);
+	    return config;
+	}
+	function validateConfig(config) {
+	    if (config.charts) {
+	        if (!Array.isArray(config.charts)) {
+	            throw new Error("Invalid config: charts must be an array");
+	        }
+	        for (let i = 0; i < config.charts.length; i++) {
+	            if (!config.charts[i] || typeof config.charts[i] !== "object") {
+	                throw new Error(`Invalid config: chart[${i}] must be an object`);
+	            }
+	            if (!config.charts[i].path || typeof config.charts[i].path !== "string" || config.charts[i].path.trim() === "") {
+	                throw new Error(`chart[${i}]: path is required`);
+	            }
+	        }
+	    }
+	    if (config.preflights) {
+	        if (!Array.isArray(config.preflights)) {
+	            throw new Error("Invalid config: preflights must be an array");
+	        }
+	        for (let i = 0; i < config.preflights.length; i++) {
+	            if (!config.preflights[i] || typeof config.preflights[i] !== "object") {
+	                throw new Error(`Invalid config: preflight[${i}] must be an object`);
+	            }
+	            if (!config.preflights[i].path || typeof config.preflights[i].path !== "string" || config.preflights[i].path.trim() === "") {
+	                throw new Error(`preflight[${i}]: path is required`);
+	            }
+	            if (config.preflights[i].chartName && !config.preflights[i].chartVersion) {
+	                throw new Error(`preflight[${i}]: chartVersion is required when chartName is specified`);
+	            }
+	            if (config.preflights[i].chartVersion && !config.preflights[i].chartName) {
+	                throw new Error(`preflight[${i}]: chartName is required when chartVersion is specified`);
+	            }
+	        }
+	    }
+	    if (config.manifests) {
+	        if (!Array.isArray(config.manifests)) {
+	            throw new Error("Invalid config: manifests must be an array");
+	        }
+	        for (let i = 0; i < config.manifests.length; i++) {
+	            if (config.manifests[i] === "") {
+	                throw new Error(`manifest[${i}]: path cannot be empty string`);
+	            }
+	            if (typeof config.manifests[i] !== "string") {
+	                throw new Error(`manifest[${i}]: must be a string`);
+	            }
+	        }
+	    }
+	    if (config.promoteToChannelIds && !Array.isArray(config.promoteToChannelIds)) {
+	        throw new Error("Invalid config: promoteToChannelIds must be an array");
+	    }
+	    if (config.promoteToChannelNames && !Array.isArray(config.promoteToChannelNames)) {
+	        throw new Error("Invalid config: promoteToChannelNames must be an array");
+	    }
+	    validateGlobPatterns(config);
+	}
+	function validateGlobPatterns(config) {
+	    const paths = [];
+	    if (config.charts) {
+	        paths.push(...config.charts.map(c => c.path));
+	    }
+	    if (config.preflights) {
+	        paths.push(...config.preflights.map(p => p.path));
+	    }
+	    if (config.manifests) {
+	        paths.push(...config.manifests);
+	    }
+	    for (const p of paths) {
+	        if (/[*?[{]/.test(p)) {
+	            if (!isValidGlob(p)) {
+	                throw new Error(`invalid glob pattern: ${p}`);
+	            }
+	        }
+	    }
+	}
+	function isValidGlob(pattern) {
+	    let braceDepth = 0;
+	    for (const char of pattern) {
+	        if (char === "{")
+	            braceDepth++;
+	        if (char === "}")
+	            braceDepth--;
+	        if (braceDepth < 0)
+	            return false;
+	    }
+	    if (braceDepth !== 0)
+	        return false;
+	    if (pattern.includes("{}"))
+	        return false;
+	    return true;
+	}
+	function resolvePaths(config, configFilePath) {
+	    const configDir = path.dirname(configFilePath);
+	    if (config.charts) {
+	        for (let i = 0; i < config.charts.length; i++) {
+	            if (!path.isAbsolute(config.charts[i].path)) {
+	                config.charts[i].path = path.resolve(configDir, config.charts[i].path);
+	            }
+	        }
+	    }
+	    if (config.preflights) {
+	        for (let i = 0; i < config.preflights.length; i++) {
+	            if (config.preflights[i].path && !path.isAbsolute(config.preflights[i].path)) {
+	                config.preflights[i].path = path.resolve(configDir, config.preflights[i].path);
+	            }
+	        }
+	    }
+	    if (config.manifests) {
+	        for (let i = 0; i < config.manifests.length; i++) {
+	            if (!path.isAbsolute(config.manifests[i])) {
+	                config.manifests[i] = path.resolve(configDir, config.manifests[i]);
+	            }
+	        }
+	    }
+	}
+	function mergeConfigs(parent, child) {
+	    const merged = Object.assign({}, parent);
+	    if (child.appId !== undefined)
+	        merged.appId = child.appId;
+	    if (child.appSlug !== undefined)
+	        merged.appSlug = child.appSlug;
+	    if (child.releaseLabel !== undefined)
+	        merged.releaseLabel = child.releaseLabel;
+	    if (child.replLint !== undefined)
+	        merged.replLint = child.replLint;
+	    if (child.promoteToChannelIds !== undefined)
+	        merged.promoteToChannelIds = child.promoteToChannelIds;
+	    if (child.promoteToChannelNames !== undefined)
+	        merged.promoteToChannelNames = child.promoteToChannelNames;
+	    if (child.charts !== undefined) {
+	        merged.charts = [...(merged.charts || []), ...child.charts];
+	        const seen = new Set();
+	        merged.charts = merged.charts.filter(chart => {
+	            if (seen.has(chart.path))
+	                return false;
+	            seen.add(chart.path);
+	            return true;
+	        });
+	    }
+	    if (child.manifests !== undefined) {
+	        merged.manifests = [...(merged.manifests || []), ...child.manifests];
+	        const seen = new Set();
+	        merged.manifests = merged.manifests.filter(m => {
+	            if (seen.has(m))
+	                return false;
+	            seen.add(m);
+	            return true;
+	        });
+	    }
+	    if (child.preflights !== undefined) {
+	        merged.preflights = [...(merged.preflights || []), ...child.preflights];
+	        const seen = new Set();
+	        merged.preflights = merged.preflights.filter(p => {
+	            if (seen.has(p.path))
+	                return false;
+	            seen.add(p.path);
+	            return true;
+	        });
+	    }
+	    return merged;
+	}
+	return config;
+}
+
+var hasRequiredDist;
+
+function requireDist () {
+	if (hasRequiredDist) return dist$1;
+	hasRequiredDist = 1;
+	(function (exports$1) {
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.parseConfigFile = exports$1.findAndParseConfig = exports$1.getNetworkReportSummary = exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.exposeVMPort = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.getVMDetails = exports$1.createVM = exports$1.VMExposedPort = exports$1.VMPort = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
+		var configuration_1 = requireConfiguration();
+		Object.defineProperty(exports$1, "VendorPortalApi", { enumerable: true, get: function () { return configuration_1.VendorPortalApi; } });
+		var applications_1 = requireApplications();
+		Object.defineProperty(exports$1, "getApplicationDetails", { enumerable: true, get: function () { return applications_1.getApplicationDetails; } });
+		var channels_1 = requireChannels();
+		Object.defineProperty(exports$1, "Channel", { enumerable: true, get: function () { return channels_1.Channel; } });
+		Object.defineProperty(exports$1, "createChannel", { enumerable: true, get: function () { return channels_1.createChannel; } });
+		Object.defineProperty(exports$1, "getChannelDetails", { enumerable: true, get: function () { return channels_1.getChannelDetails; } });
+		Object.defineProperty(exports$1, "archiveChannel", { enumerable: true, get: function () { return channels_1.archiveChannel; } });
+		Object.defineProperty(exports$1, "pollForAirgapReleaseStatus", { enumerable: true, get: function () { return channels_1.pollForAirgapReleaseStatus; } });
+		Object.defineProperty(exports$1, "getDownloadUrlAirgapBuildRelease", { enumerable: true, get: function () { return channels_1.getDownloadUrlAirgapBuildRelease; } });
+		var clusters_1 = requireClusters();
+		Object.defineProperty(exports$1, "ClusterVersion", { enumerable: true, get: function () { return clusters_1.ClusterVersion; } });
+		Object.defineProperty(exports$1, "createCluster", { enumerable: true, get: function () { return clusters_1.createCluster; } });
+		Object.defineProperty(exports$1, "createClusterWithLicense", { enumerable: true, get: function () { return clusters_1.createClusterWithLicense; } });
+		Object.defineProperty(exports$1, "pollForStatus", { enumerable: true, get: function () { return clusters_1.pollForStatus; } });
+		Object.defineProperty(exports$1, "getKubeconfig", { enumerable: true, get: function () { return clusters_1.getKubeconfig; } });
+		Object.defineProperty(exports$1, "removeCluster", { enumerable: true, get: function () { return clusters_1.removeCluster; } });
+		Object.defineProperty(exports$1, "upgradeCluster", { enumerable: true, get: function () { return clusters_1.upgradeCluster; } });
+		Object.defineProperty(exports$1, "getClusterVersions", { enumerable: true, get: function () { return clusters_1.getClusterVersions; } });
+		Object.defineProperty(exports$1, "createAddonObjectStore", { enumerable: true, get: function () { return clusters_1.createAddonObjectStore; } });
+		Object.defineProperty(exports$1, "pollForAddonStatus", { enumerable: true, get: function () { return clusters_1.pollForAddonStatus; } });
+		Object.defineProperty(exports$1, "exposeClusterPort", { enumerable: true, get: function () { return clusters_1.exposeClusterPort; } });
+		var customers_1 = requireCustomers();
+		Object.defineProperty(exports$1, "KubernetesDistribution", { enumerable: true, get: function () { return customers_1.KubernetesDistribution; } });
+		Object.defineProperty(exports$1, "CustomerSummary", { enumerable: true, get: function () { return customers_1.CustomerSummary; } });
+		Object.defineProperty(exports$1, "archiveCustomer", { enumerable: true, get: function () { return customers_1.archiveCustomer; } });
+		Object.defineProperty(exports$1, "createCustomer", { enumerable: true, get: function () { return customers_1.createCustomer; } });
+		Object.defineProperty(exports$1, "getUsedKubernetesDistributions", { enumerable: true, get: function () { return customers_1.getUsedKubernetesDistributions; } });
+		Object.defineProperty(exports$1, "listCustomersByName", { enumerable: true, get: function () { return customers_1.listCustomersByName; } });
+		Object.defineProperty(exports$1, "listCustomersByEmail", { enumerable: true, get: function () { return customers_1.listCustomersByEmail; } });
+		var releases_1 = requireReleases();
+		Object.defineProperty(exports$1, "createRelease", { enumerable: true, get: function () { return releases_1.createRelease; } });
+		Object.defineProperty(exports$1, "createReleaseFromChart", { enumerable: true, get: function () { return releases_1.createReleaseFromChart; } });
+		Object.defineProperty(exports$1, "promoteRelease", { enumerable: true, get: function () { return releases_1.promoteRelease; } });
+		Object.defineProperty(exports$1, "reportCompatibilityResult", { enumerable: true, get: function () { return releases_1.reportCompatibilityResult; } });
+		var vms_1 = requireVms();
+		Object.defineProperty(exports$1, "VM", { enumerable: true, get: function () { return vms_1.VM; } });
+		Object.defineProperty(exports$1, "VMPort", { enumerable: true, get: function () { return vms_1.VMPort; } });
+		Object.defineProperty(exports$1, "VMExposedPort", { enumerable: true, get: function () { return vms_1.VMExposedPort; } });
+		Object.defineProperty(exports$1, "createVM", { enumerable: true, get: function () { return vms_1.createVM; } });
+		Object.defineProperty(exports$1, "getVMDetails", { enumerable: true, get: function () { return vms_1.getVMDetails; } });
+		Object.defineProperty(exports$1, "pollForVMStatus", { enumerable: true, get: function () { return vms_1.pollForVMStatus; } });
+		Object.defineProperty(exports$1, "removeVM", { enumerable: true, get: function () { return vms_1.removeVM; } });
+		Object.defineProperty(exports$1, "exposeVMPort", { enumerable: true, get: function () { return vms_1.exposeVMPort; } });
+		var networks_1 = requireNetworks();
+		Object.defineProperty(exports$1, "Network", { enumerable: true, get: function () { return networks_1.Network; } });
+		Object.defineProperty(exports$1, "NetworkReport", { enumerable: true, get: function () { return networks_1.NetworkReport; } });
+		Object.defineProperty(exports$1, "NetworkEventData", { enumerable: true, get: function () { return networks_1.NetworkEventData; } });
+		Object.defineProperty(exports$1, "NetworkReportSummary", { enumerable: true, get: function () { return networks_1.NetworkReportSummary; } });
+		Object.defineProperty(exports$1, "NetworkReportSummaryDomain", { enumerable: true, get: function () { return networks_1.NetworkReportSummaryDomain; } });
+		Object.defineProperty(exports$1, "NetworkReportSummaryDestination", { enumerable: true, get: function () { return networks_1.NetworkReportSummaryDestination; } });
+		Object.defineProperty(exports$1, "NetworkReportSummarySource", { enumerable: true, get: function () { return networks_1.NetworkReportSummarySource; } });
+		Object.defineProperty(exports$1, "updateNetwork", { enumerable: true, get: function () { return networks_1.updateNetwork; } });
+		Object.defineProperty(exports$1, "getNetworkReport", { enumerable: true, get: function () { return networks_1.getNetworkReport; } });
+		Object.defineProperty(exports$1, "getNetworkReportSummary", { enumerable: true, get: function () { return networks_1.getNetworkReportSummary; } });
+		var config_1 = requireConfig();
+		Object.defineProperty(exports$1, "findAndParseConfig", { enumerable: true, get: function () { return config_1.findAndParseConfig; } });
+		Object.defineProperty(exports$1, "parseConfigFile", { enumerable: true, get: function () { return config_1.parseConfigFile; } }); 
+	} (dist$1));
+	return dist$1;
+}
+
+var distExports$1 = requireDist();
+
+async function actionArchiveChannel() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const channelSlug = getInput("channel-slug", { required: true });
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        await distExports$1.archiveChannel(apiClient, appSlug, channelSlug);
+        info(`Archived channel ${channelSlug} for app ${appSlug}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+
+async function actionArchiveCustomer() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const customerId = getInput("customer-id");
+        const customerName = getInput("customer-name");
+        const appSlug = getInput("app-slug");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        // Fail if neither customer-id nor customer-name are provided
+        if (!customerId && !customerName) {
+            throw new Error("Either customer-id or customer-name must be provided");
+        }
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        // If customer-id is not provided, look it up by name
+        let resolvedCustomerId = customerId;
+        if (!resolvedCustomerId && customerName) {
+            // Retry lookup with exponential backoff to handle indexing delays
+            const maxRetries = 5;
+            const initialDelayMs = 1000; // Start with 1 second
+            let customers = [];
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                customers = await distExports$1.listCustomersByName(apiClient, appSlug || undefined, customerName);
+                if (customers.length > 0) {
+                    break; // Found at least one customer, exit retry loop
+                }
+                if (attempt < maxRetries - 1) {
+                    // Wait before retrying (exponential backoff: 1s, 2s, 4s, 8s)
+                    const delayMs = initialDelayMs * Math.pow(2, attempt);
+                    info(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Retrying in ${delayMs}ms... (attempt ${attempt + 1}/${maxRetries})`);
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                }
+            }
+            if (customers.length === 0) {
+                throw new Error(`No customer found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""} after ${maxRetries} attempts. The customer may not exist or may not be searchable yet.`);
+            }
+            if (customers.length > 1) {
+                throw new Error(`Multiple customers found with name "${customerName}"${appSlug ? ` and app-slug "${appSlug}"` : ""}. Please provide customer-id or app-slug to narrow down the search.`);
+            }
+            resolvedCustomerId = customers[0].customerId;
+            info(`Found customer "${customerName}" with id ${resolvedCustomerId}`);
+        }
+        await distExports$1.archiveCustomer(apiClient, resolvedCustomerId);
+        info(`Archived customer ${resolvedCustomerId}`);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+
+async function actionCreateChannel() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const appSlug = getInput("app-slug", { required: true });
+        const channelName = getInput("channel-name", { required: true });
+        const buildAirgapAutomatically = getBooleanInput("build-airgap-automatically");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const channel = await distExports$1.createChannel(apiClient, appSlug, channelName, buildAirgapAutomatically);
+        info(`Created channel ${channel.name} (${channel.slug}) for app ${appSlug}`);
+        setOutput("channel-id", channel.id);
+        setOutput("channel-slug", channel.slug);
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+
+var distExports = requireDist$1();
 
 async function actionCreateCluster() {
     try {
@@ -73456,255 +73726,6 @@ async function actionCreateObjectStore() {
     }
     catch (error) {
         setFailed(error.message);
-    }
-}
-
-async function actionCreateRelease() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const appSlug = getInput("app-slug", { required: true });
-        const chart = getInput("chart");
-        const yamlDir = getInput("yaml-dir");
-        const promoteChannel = getInput("promote-channel");
-        const releaseVersion = getInput("version");
-        const releaseNotes = getInput("release-notes");
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        const waitForAirgapBuild = getInput("wait-for-airgap-build") || "false";
-        const parsedTimeout = parseInt(getInput("timeout-minutes") || "20");
-        if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
-            setFailed("timeout-minutes must be a positive number");
-            return;
-        }
-        const timeoutMinutes = parsedTimeout;
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        if (chart && yamlDir) {
-            setFailed("You must provide either a chart or a YAML directory, not both");
-        }
-        if (chart === "" && yamlDir === "") {
-            setFailed("You must provide either a chart or a YAML directory");
-        }
-        let release;
-        if (chart) {
-            release = await distExports$1.createReleaseFromChart(apiClient, appSlug, chart);
-        }
-        else {
-            release = await distExports$1.createRelease(apiClient, appSlug, yamlDir);
-        }
-        // If promote channel is specified, promote release
-        if (promoteChannel) {
-            const channel = distExports$1.getChannelDetails(apiClient, appSlug, { name: promoteChannel });
-            let resolvedChannel;
-            await channel.then(channel => {
-                console.log(channel.name);
-                resolvedChannel = channel;
-            }, reason => {
-                if (reason.channel === null) {
-                    console.error(reason.reason);
-                }
-            });
-            if (!resolvedChannel) {
-                resolvedChannel = await distExports$1.createChannel(apiClient, appSlug, promoteChannel);
-            }
-            await distExports$1.promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
-            if (waitForAirgapBuild == "true") {
-                if (resolvedChannel.buildAirgapAutomatically) {
-                    try {
-                        const app = await distExports$1.getApplicationDetails(apiClient, appSlug);
-                        const status = await distExports$1.pollForAirgapReleaseStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
-                        if (status === "built") {
-                            const downloadUrl = await distExports$1.getDownloadUrlAirgapBuildRelease(apiClient, app.id, resolvedChannel.id, +release.sequence);
-                            setOutput("airgap-status", status);
-                            setOutput("airgap-url", downloadUrl);
-                        }
-                        else {
-                            setOutput("airgap-status", status);
-                        }
-                    }
-                    catch (error) {
-                        setOutput("airgap-status", "failed");
-                        console.warn("Failed to get airgap build status or download URL:", error.message);
-                    }
-                }
-                else {
-                    setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
-                }
-            }
-            setOutput("channel-slug", resolvedChannel.slug);
-        }
-        setOutput("release-sequence", release.sequence);
-    }
-    catch (error) {
-        setFailed(error.message);
-    }
-}
-
-async function actionCreateVM() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const distribution = getInput("distribution", { required: true });
-        const version = getInput("version");
-        const name = getInput("vm-name");
-        const ttl = getInput("ttl");
-        const diskGib = +getInput("disk");
-        const instanceType = getInput("instance-type");
-        const count = +getInput("count");
-        const timeoutMinutes = +(getInput("timeout-minutes") || 20);
-        const publicKeys = getInput("public-keys");
-        const tags = getInput("tags");
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        const tagsArray = processTags(tags);
-        const publicKeysArray = processPublicKeys(publicKeys);
-        const vms = await distExports$1.createVM(apiClient, name, distribution, ttl, version, diskGib, instanceType, count, publicKeysArray, tagsArray);
-        if (vms.length === 0) {
-            throw new Error("createVM returned no VMs");
-        }
-        const vmIds = vms.map(v => v.id);
-        info(`Created ${vms.length} vm(s): ${vmIds.join(", ")} - waiting for them to be ready...`);
-        setOutput("vm-id", vmIds[0]);
-        setOutput("vm-ids", JSON.stringify(vmIds));
-        let firstStatus = "";
-        let firstNetworkId = "";
-        for (const vm of vms) {
-            const ready = await distExports$1.pollForVMStatus(apiClient, vm.id, "running", timeoutMinutes * 60);
-            info(`VM ${ready.id} is running.`);
-            if (!firstStatus) {
-                firstStatus = ready.status;
-            }
-            if (!firstNetworkId && ready.network_id) {
-                firstNetworkId = ready.network_id;
-            }
-        }
-        setOutput("vm-status", firstStatus);
-        if (firstNetworkId) {
-            setOutput("network-id", firstNetworkId);
-        }
-    }
-    catch (error$1) {
-        const message = error$1 instanceof Error ? error$1.message : String(error$1);
-        error(message);
-        if (error$1 instanceof Error && error$1.stack) {
-            debug(error$1.stack);
-        }
-        setFailed(message);
-    }
-}
-function processTags(tags) {
-    if (tags) {
-        const tagsYAML = distExports.parse(tags);
-        const tagsArray = tagsYAML.map((tag) => {
-            return { key: tag.key, value: tag.value };
-        });
-        return tagsArray;
-    }
-    return undefined;
-}
-function processPublicKeys(publicKeys) {
-    if (publicKeys) {
-        const parsed = distExports.parse(publicKeys);
-        if (!Array.isArray(parsed)) {
-            throw new Error("public-keys must be a YAML list of strings");
-        }
-        return parsed.map((k) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
-    }
-    return undefined;
-}
-
-async function actionExposePort() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const clusterId = getInput("cluster-id");
-        const vmId = getInput("vm-id");
-        const port = getInput("port");
-        const protocols = (getInput("protocols") || "https").split(",");
-        const isWildcard = getBooleanInput("wildcard");
-        const timeoutMinutes = +(getInput("timeout-minutes") || 5);
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        if (clusterId && vmId) {
-            throw new Error("Only one of cluster-id or vm-id can be specified");
-        }
-        if (!clusterId && !vmId) {
-            throw new Error("One of cluster-id or vm-id must be specified");
-        }
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        let exposedPort;
-        if (vmId) {
-            exposedPort = await distExports$1.exposeVMPort(apiClient, vmId, Number(port), protocols, isWildcard);
-        }
-        else {
-            exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
-        }
-        if (exposedPort.addon_id) {
-            info(`Exposed port ${port} - waiting for it to be ready...`);
-            setOutput("addon-id", exposedPort.addon_id);
-            if (vmId) {
-                info(`VM port exposed with state: ${exposedPort.state}`);
-            }
-            else {
-                await distExports$1.pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
-            }
-        }
-        info(`Exposed Port on ${exposedPort.hostname}`);
-        setOutput("hostname", exposedPort.hostname);
-    }
-    catch (error$1) {
-        const message = error$1 instanceof Error ? error$1.message : String(error$1);
-        error(message);
-        if (error$1 instanceof Error && error$1.stack) {
-            debug(error$1.stack);
-        }
-        setFailed(message);
-    }
-}
-
-async function actionGetVMSSHEndpoint() {
-    try {
-        const apiToken = getInput("api-token", { required: true });
-        const vmId = getInput("vm-id", { required: true });
-        const username = getInput("username");
-        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
-        const apiClient = new distExports$1.VendorPortalApi();
-        apiClient.apiToken = apiToken;
-        if (apiEndpoint) {
-            apiClient.endpoint = apiEndpoint;
-        }
-        const vm = await distExports$1.getVMDetails(apiClient, vmId);
-        let sshEndpoint = "";
-        if (vm.sshEndpoint) {
-            const host = vm.sshEndpoint;
-            const port = vm.sshPort || 22;
-            if (username) {
-                sshEndpoint = `ssh -p ${port} ${username}@${host}`;
-            }
-            else {
-                sshEndpoint = `ssh -p ${port} ${host}`;
-            }
-        }
-        else {
-            throw new Error(`VM ${vmId} does not have an SSH endpoint`);
-        }
-        info(`VM ${vmId} SSH endpoint: ${sshEndpoint}`);
-        setOutput("ssh-endpoint", sshEndpoint);
-    }
-    catch (error$1) {
-        const message = error$1 instanceof Error ? error$1.message : String(error$1);
-        error(message);
-        if (error$1 instanceof Error && error$1.stack) {
-            debug(error$1.stack);
-        }
-        setFailed(message);
     }
 }
 
@@ -74624,6 +74645,292 @@ function requireTmpPromise () {
 }
 
 var tmpPromiseExports = requireTmpPromise();
+
+async function actionCreateRelease() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        let appSlug = getInput("app-slug");
+        const chart = getInput("chart");
+        let yamlDir = getInput("yaml-dir");
+        let promoteChannel = getInput("promote-channel");
+        const releaseVersion = getInput("version");
+        const releaseNotes = getInput("release-notes");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const waitForAirgapBuild = getInput("wait-for-airgap-build") || "false";
+        const parsedTimeout = parseInt(getInput("timeout-minutes") || "20");
+        if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
+            setFailed("timeout-minutes must be a positive number");
+            return;
+        }
+        const timeoutMinutes = parsedTimeout;
+        if (chart && yamlDir) {
+            setFailed("You must provide either a chart or a YAML directory, not both");
+            return;
+        }
+        // Discovery mode: neither chart nor yaml-dir provided
+        if (!chart && !yamlDir) {
+            const config = distExports$1.findAndParseConfig(process.cwd());
+            if (config) {
+                if (!appSlug) {
+                    appSlug = config.appSlug || "";
+                }
+                if (!promoteChannel && config.promoteToChannelNames && config.promoteToChannelNames.length > 0) {
+                    promoteChannel = config.promoteToChannelNames[0];
+                }
+                const stagingDir = await tmpPromiseExports.dir({ unsafeCleanup: true });
+                // Package charts
+                if (config.charts) {
+                    for (const chartConfig of config.charts) {
+                        await exec("helm", ["dependency", "update"], { cwd: chartConfig.path });
+                        await exec("helm", ["package", ".", "-d", stagingDir.path], { cwd: chartConfig.path });
+                    }
+                }
+                // Resolve and copy manifests
+                if (config.manifests) {
+                    for (const pattern of config.manifests) {
+                        const files = await Array.fromAsync(fs.promises.glob(pattern));
+                        for (const file of files) {
+                            const dest = path.join(stagingDir.path, path.basename(file));
+                            fs.copyFileSync(file, dest);
+                        }
+                    }
+                }
+                yamlDir = stagingDir.path;
+            }
+            else {
+                setFailed("You must provide either a chart or a YAML directory, or a .replicated config file");
+                return;
+            }
+        }
+        if (!appSlug) {
+            setFailed("app-slug is required when no .replicated config is found");
+            return;
+        }
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        let release;
+        if (chart) {
+            release = await distExports$1.createReleaseFromChart(apiClient, appSlug, chart);
+        }
+        else {
+            release = await distExports$1.createRelease(apiClient, appSlug, yamlDir);
+        }
+        // If promote channel is specified, promote release
+        if (promoteChannel) {
+            const channel = distExports$1.getChannelDetails(apiClient, appSlug, { name: promoteChannel });
+            let resolvedChannel;
+            await channel.then(channel => {
+                console.log(channel.name);
+                resolvedChannel = channel;
+            }, reason => {
+                if (reason.channel === null) {
+                    console.error(reason.reason);
+                }
+            });
+            if (!resolvedChannel) {
+                resolvedChannel = await distExports$1.createChannel(apiClient, appSlug, promoteChannel);
+            }
+            await distExports$1.promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+            if (waitForAirgapBuild == "true") {
+                if (resolvedChannel.buildAirgapAutomatically) {
+                    try {
+                        const app = await distExports$1.getApplicationDetails(apiClient, appSlug);
+                        const status = await distExports$1.pollForAirgapReleaseStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
+                        if (status === "built") {
+                            const downloadUrl = await distExports$1.getDownloadUrlAirgapBuildRelease(apiClient, app.id, resolvedChannel.id, +release.sequence);
+                            setOutput("airgap-status", status);
+                            setOutput("airgap-url", downloadUrl);
+                        }
+                        else {
+                            setOutput("airgap-status", status);
+                        }
+                    }
+                    catch (error) {
+                        setOutput("airgap-status", "failed");
+                        console.warn("Failed to get airgap build status or download URL:", error.message);
+                    }
+                }
+                else {
+                    setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
+                }
+            }
+            setOutput("channel-slug", resolvedChannel.slug);
+        }
+        setOutput("release-sequence", release.sequence);
+    }
+    catch (error) {
+        setFailed(error.message);
+    }
+}
+
+async function actionCreateVM() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const distribution = getInput("distribution", { required: true });
+        const version = getInput("version");
+        const name = getInput("vm-name");
+        const ttl = getInput("ttl");
+        const diskGib = +getInput("disk");
+        const instanceType = getInput("instance-type");
+        const count = +getInput("count");
+        const timeoutMinutes = +(getInput("timeout-minutes") || 20);
+        const publicKeys = getInput("public-keys");
+        const tags = getInput("tags");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const tagsArray = processTags(tags);
+        const publicKeysArray = processPublicKeys(publicKeys);
+        const vms = await distExports$1.createVM(apiClient, name, distribution, ttl, version, diskGib, instanceType, count, publicKeysArray, tagsArray);
+        if (vms.length === 0) {
+            throw new Error("createVM returned no VMs");
+        }
+        const vmIds = vms.map(v => v.id);
+        info(`Created ${vms.length} vm(s): ${vmIds.join(", ")} - waiting for them to be ready...`);
+        setOutput("vm-id", vmIds[0]);
+        setOutput("vm-ids", JSON.stringify(vmIds));
+        let firstStatus = "";
+        let firstNetworkId = "";
+        for (const vm of vms) {
+            const ready = await distExports$1.pollForVMStatus(apiClient, vm.id, "running", timeoutMinutes * 60);
+            info(`VM ${ready.id} is running.`);
+            if (!firstStatus) {
+                firstStatus = ready.status;
+            }
+            if (!firstNetworkId && ready.network_id) {
+                firstNetworkId = ready.network_id;
+            }
+        }
+        setOutput("vm-status", firstStatus);
+        if (firstNetworkId) {
+            setOutput("network-id", firstNetworkId);
+        }
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+function processTags(tags) {
+    if (tags) {
+        const tagsYAML = distExports.parse(tags);
+        const tagsArray = tagsYAML.map((tag) => {
+            return { key: tag.key, value: tag.value };
+        });
+        return tagsArray;
+    }
+    return undefined;
+}
+function processPublicKeys(publicKeys) {
+    if (publicKeys) {
+        const parsed = distExports.parse(publicKeys);
+        if (!Array.isArray(parsed)) {
+            throw new Error("public-keys must be a YAML list of strings");
+        }
+        return parsed.map((k) => Buffer.from(String(k).trim(), "utf8").toString("base64"));
+    }
+    return undefined;
+}
+
+async function actionExposePort() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const clusterId = getInput("cluster-id");
+        const vmId = getInput("vm-id");
+        const port = getInput("port");
+        const protocols = (getInput("protocols") || "https").split(",");
+        const isWildcard = getBooleanInput("wildcard");
+        const timeoutMinutes = +(getInput("timeout-minutes") || 5);
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        if (clusterId && vmId) {
+            throw new Error("Only one of cluster-id or vm-id can be specified");
+        }
+        if (!clusterId && !vmId) {
+            throw new Error("One of cluster-id or vm-id must be specified");
+        }
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        let exposedPort;
+        if (vmId) {
+            exposedPort = await distExports$1.exposeVMPort(apiClient, vmId, Number(port), protocols, isWildcard);
+        }
+        else {
+            exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
+        }
+        if (exposedPort.addon_id) {
+            info(`Exposed port ${port} - waiting for it to be ready...`);
+            setOutput("addon-id", exposedPort.addon_id);
+            if (vmId) {
+                info(`VM port exposed with state: ${exposedPort.state}`);
+            }
+            else {
+                await distExports$1.pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
+            }
+        }
+        info(`Exposed Port on ${exposedPort.hostname}`);
+        setOutput("hostname", exposedPort.hostname);
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
+
+async function actionGetVMSSHEndpoint() {
+    try {
+        const apiToken = getInput("api-token", { required: true });
+        const vmId = getInput("vm-id", { required: true });
+        const username = getInput("username");
+        const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
+        const apiClient = new distExports$1.VendorPortalApi();
+        apiClient.apiToken = apiToken;
+        if (apiEndpoint) {
+            apiClient.endpoint = apiEndpoint;
+        }
+        const vm = await distExports$1.getVMDetails(apiClient, vmId);
+        let sshEndpoint = "";
+        if (vm.sshEndpoint) {
+            const host = vm.sshEndpoint;
+            const port = vm.sshPort || 22;
+            if (username) {
+                sshEndpoint = `ssh -p ${port} ${username}@${host}`;
+            }
+            else {
+                sshEndpoint = `ssh -p ${port} ${host}`;
+            }
+        }
+        else {
+            throw new Error(`VM ${vmId} does not have an SSH endpoint`);
+        }
+        info(`VM ${vmId} SSH endpoint: ${sshEndpoint}`);
+        setOutput("ssh-endpoint", sshEndpoint);
+    }
+    catch (error$1) {
+        const message = error$1 instanceof Error ? error$1.message : String(error$1);
+        error(message);
+        if (error$1 instanceof Error && error$1.stack) {
+            debug(error$1.stack);
+        }
+        setFailed(message);
+    }
+}
 
 /**
  * Splits a string of helm flags into an array of arguments,
