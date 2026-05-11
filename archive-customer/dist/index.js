@@ -73639,25 +73639,25 @@ async function actionExposePort() {
         if (apiEndpoint) {
             apiClient.endpoint = apiEndpoint;
         }
-        let hostname = "";
-        let addonId = "";
+        let exposedPort;
         if (vmId) {
-            const exposedPort = await distExports$1.exposeVMPort(apiClient, vmId, Number(port), protocols, isWildcard);
-            hostname = exposedPort.hostname;
-            addonId = exposedPort.addon_id;
+            exposedPort = await distExports$1.exposeVMPort(apiClient, vmId, Number(port), protocols, isWildcard);
         }
         else {
-            const exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
-            hostname = exposedPort.hostname;
-            addonId = exposedPort.addon_id;
+            exposedPort = await distExports$1.exposeClusterPort(apiClient, clusterId, Number(port), protocols, isWildcard);
         }
-        if (addonId) {
+        if (exposedPort.addon_id) {
             info(`Exposed port ${port} - waiting for it to be ready...`);
-            setOutput("addon-id", addonId);
-            await distExports$1.pollForAddonStatus(apiClient, clusterId || vmId, addonId, "ready", timeoutMinutes * 60);
+            setOutput("addon-id", exposedPort.addon_id);
+            if (vmId) {
+                info(`VM port exposed with state: ${exposedPort.state}`);
+            }
+            else {
+                await distExports$1.pollForAddonStatus(apiClient, clusterId, exposedPort.addon_id, "ready", timeoutMinutes * 60);
+            }
         }
-        info(`Exposed Port on ${hostname}`);
-        setOutput("hostname", hostname);
+        info(`Exposed Port on ${exposedPort.hostname}`);
+        setOutput("hostname", exposedPort.hostname);
     }
     catch (error$1) {
         const message = error$1 instanceof Error ? error$1.message : String(error$1);
