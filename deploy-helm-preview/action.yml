@@ -1,0 +1,314 @@
+name: "Deploy Helm Preview"
+description: "Deploy (or tear down) a Helm chart to a Replicated CMX cluster for pull request preview environments"
+inputs:
+  replicated-api-token:
+    description: "Replicated API token for CMX cluster management."
+    required: true
+  chart:
+    description: "Helm OCI chart URL (e.g. oci://registry.replicated.com/myapp/stable/myapp)."
+    required: true
+  chart-version:
+    description: "Version of the Helm chart to install."
+    required: true
+  release-name:
+    description: "Helm release name."
+    required: true
+  namespace:
+    description: "Kubernetes namespace to install the chart into."
+    required: false
+    default: "default"
+  values:
+    description: "Inline YAML values to pass to Helm. Mutually exclusive with values-file."
+    required: false
+  values-file:
+    description: "Path to a values.yaml file. Mutually exclusive with values."
+    required: false
+  cluster-name:
+    description: "CMX cluster name (e.g. pr-123). Used to detect and reuse existing clusters."
+    required: true
+  cluster-distribution:
+    description: "Kubernetes distribution for the CMX cluster."
+    required: false
+    default: "k3s"
+  cluster-version:
+    description: "Kubernetes version for the CMX cluster."
+    required: false
+    default: "1.32"
+  cluster-ttl:
+    description: "CMX cluster TTL (Go duration, max 48h)."
+    required: false
+    default: "24h"
+  port:
+    description: "Port to expose on the cluster for the ingress hostname."
+    required: false
+    default: "443"
+  github-token:
+    description: "GitHub token used for sticky PR comments and GitHub deployment status updates."
+    required: true
+  pr-number:
+    description: "Pull request number (used for sticky comments and deployment environment name)."
+    required: true
+  environment-prefix:
+    description: "Prefix for the GitHub deployment environment name (e.g. 'pr' → environment 'pr-123')."
+    required: false
+    default: "pr"
+  teardown:
+    description: "Set to 'true' to tear down the cluster instead of deploying."
+    required: false
+    default: "false"
+  cluster-id:
+    description: "Cluster ID to remove. Required when teardown=true."
+    required: false
+outputs:
+  cluster-id:
+    description: "The CMX cluster ID."
+    value: ${{ steps.create-cluster.outputs.cluster-id || steps.find-cluster.outputs.cluster-id }}
+  cluster-hostname:
+    description: "The ingress hostname exposed for the deployment."
+    value: ${{ steps.expose-port.outputs.hostname }}
+runs:
+  using: composite
+  steps:
+
+  # ── Teardown path ──────────────────────────────────────────────────────────
+
+  - name: "Teardown: update sticky comment — tearing down"
+    if: ${{ inputs.teardown == 'true' }}
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      header: cmx-helm-preview
+      number: ${{ inputs.pr-number }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      message: |
+        ⬛ **Helm Preview** — tearing down cluster `${{ inputs.cluster-name }}`…
+
+  - name: "Teardown: remove CMX cluster"
+    if: ${{ inputs.teardown == 'true' }}
+    uses: replicatedhq/replicated-actions/remove-cluster@v1
+    with:
+      api-token: ${{ inputs.replicated-api-token }}
+      cluster-id: ${{ inputs.cluster-id }}
+
+  - name: "Teardown: update sticky comment — torn down"
+    if: ${{ inputs.teardown == 'true' }}
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      header: cmx-helm-preview
+      number: ${{ inputs.pr-number }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      message: |
+        ⬛ **Helm Preview** — cluster `${{ inputs.cluster-name }}` has been torn down.
+
+  # ── Deploy path ────────────────────────────────────────────────────────────
+
+  - name: "Deploy: post sticky comment — deploying"
+    if: ${{ inputs.teardown != 'true' }}
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      header: cmx-helm-preview
+      number: ${{ inputs.pr-number }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      message: |
+        🟡 **Helm Preview** — deploying `${{ inputs.release-name }}` to cluster `${{ inputs.cluster-name }}`…
+
+  - name: "Deploy: create GitHub deployment"
+    if: ${{ inputs.teardown != 'true' }}
+    id: gh-deployment
+    shell: bash
+    env:
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      PR_NUMBER: ${{ inputs.pr-number }}
+      ENVIRONMENT_PREFIX: ${{ inputs.environment-prefix }}
+    run: |
+      ENVIRONMENT="${ENVIRONMENT_PREFIX}-${PR_NUMBER}"
+      DEPLOYMENT_ID=$(gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        repos/${{ github.repository }}/deployments \
+        -f ref="${{ github.sha }}" \
+        -f environment="${ENVIRONMENT}" \
+        -f description="Helm preview for PR #${PR_NUMBER}" \
+        -F auto_merge=false \
+        -F required_contexts='[]' \
+        --jq '.id')
+      echo "deployment-id=${DEPLOYMENT_ID}" >> "$GITHUB_OUTPUT"
+      echo "environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+
+      gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        repos/${{ github.repository }}/deployments/${DEPLOYMENT_ID}/statuses \
+        -f state="in_progress" \
+        -f description="Deploying Helm preview…"
+
+  - name: "Deploy: check for existing CMX cluster"
+    if: ${{ inputs.teardown != 'true' }}
+    id: find-cluster
+    shell: bash
+    env:
+      REPLICATED_API_TOKEN: ${{ inputs.replicated-api-token }}
+    run: |
+      CLUSTER_NAME="${{ inputs.cluster-name }}"
+      EXISTING=$(replicated cluster ls --output json 2>/dev/null \
+        | jq -r --arg name "$CLUSTER_NAME" \
+          '.[] | select(.name == $name and .status == "running") | .id' \
+        | head -n1)
+
+      if [ -n "$EXISTING" ]; then
+        echo "cluster-id=${EXISTING}" >> "$GITHUB_OUTPUT"
+        echo "cluster-exists=true" >> "$GITHUB_OUTPUT"
+        echo "Found existing running cluster: ${EXISTING}"
+      else
+        echo "cluster-id=" >> "$GITHUB_OUTPUT"
+        echo "cluster-exists=false" >> "$GITHUB_OUTPUT"
+        echo "No existing running cluster found for name: ${CLUSTER_NAME}"
+      fi
+
+  - name: "Deploy: extend TTL of existing cluster"
+    if: ${{ inputs.teardown != 'true' && steps.find-cluster.outputs.cluster-exists == 'true' }}
+    shell: bash
+    env:
+      REPLICATED_API_TOKEN: ${{ inputs.replicated-api-token }}
+    run: |
+      replicated cluster update ttl \
+        --id "${{ steps.find-cluster.outputs.cluster-id }}" \
+        --ttl "${{ inputs.cluster-ttl }}"
+
+  - name: "Deploy: create CMX cluster"
+    if: ${{ inputs.teardown != 'true' && steps.find-cluster.outputs.cluster-exists == 'false' }}
+    id: create-cluster
+    uses: replicatedhq/replicated-actions/create-cluster@v1
+    with:
+      api-token: ${{ inputs.replicated-api-token }}
+      kubernetes-distribution: ${{ inputs.cluster-distribution }}
+      kubernetes-version: ${{ inputs.cluster-version }}
+      cluster-name: ${{ inputs.cluster-name }}
+      ttl: ${{ inputs.cluster-ttl }}
+      timeout-minutes: "20"
+      export-kubeconfig: "false"
+
+  - name: "Deploy: expose port on cluster"
+    if: ${{ inputs.teardown != 'true' }}
+    id: expose-port
+    uses: replicatedhq/replicated-actions/expose-port@v1
+    with:
+      api-token: ${{ inputs.replicated-api-token }}
+      cluster-id: ${{ steps.create-cluster.outputs.cluster-id || steps.find-cluster.outputs.cluster-id }}
+      port: ${{ inputs.port }}
+      protocols: "https"
+
+  - name: "Deploy: fetch kubeconfig"
+    if: ${{ inputs.teardown != 'true' }}
+    id: kubeconfig
+    shell: bash
+    env:
+      REPLICATED_API_TOKEN: ${{ inputs.replicated-api-token }}
+    run: |
+      CLUSTER_ID="${{ steps.create-cluster.outputs.cluster-id || steps.find-cluster.outputs.cluster-id }}"
+      KUBECONFIG_CONTENT=$(replicated cluster kubeconfig "${CLUSTER_ID}")
+      # Mask the kubeconfig in logs
+      echo "::add-mask::${KUBECONFIG_CONTENT}"
+      echo "kubeconfig<<EOF" >> "$GITHUB_OUTPUT"
+      echo "${KUBECONFIG_CONTENT}" >> "$GITHUB_OUTPUT"
+      echo "EOF" >> "$GITHUB_OUTPUT"
+
+  - name: "Deploy: write values file"
+    if: ${{ inputs.teardown != 'true' && inputs.values != '' }}
+    id: write-values
+    shell: bash
+    run: |
+      VALUES_FILE="$(mktemp /tmp/helm-values-XXXXXX.yaml)"
+      cat > "${VALUES_FILE}" << 'HELM_VALUES_EOF'
+      ${{ inputs.values }}
+      HELM_VALUES_EOF
+      echo "values-file=${VALUES_FILE}" >> "$GITHUB_OUTPUT"
+
+  - name: "Deploy: helm upgrade --install"
+    if: ${{ inputs.teardown != 'true' }}
+    id: helm-install
+    shell: bash
+    env:
+      KUBECONFIG_CONTENT: ${{ steps.kubeconfig.outputs.kubeconfig }}
+    run: |
+      # Write kubeconfig to a temp file
+      KUBECONFIG_FILE="$(mktemp /tmp/kubeconfig-XXXXXX.yaml)"
+      echo "${KUBECONFIG_CONTENT}" > "${KUBECONFIG_FILE}"
+      chmod 600 "${KUBECONFIG_FILE}"
+
+      # Build values flags
+      VALUES_FLAGS=""
+      if [ -n "${{ inputs.values-file }}" ]; then
+        VALUES_FLAGS="-f ${{ inputs.values-file }}"
+      elif [ -n "${{ steps.write-values.outputs.values-file }}" ]; then
+        VALUES_FLAGS="-f ${{ steps.write-values.outputs.values-file }}"
+      fi
+
+      KUBECONFIG="${KUBECONFIG_FILE}" helm upgrade --install \
+        "${{ inputs.release-name }}" \
+        "${{ inputs.chart }}" \
+        --version "${{ inputs.chart-version }}" \
+        --namespace "${{ inputs.namespace }}" \
+        --create-namespace \
+        --wait \
+        --timeout 10m \
+        ${VALUES_FLAGS}
+
+      rm -f "${KUBECONFIG_FILE}"
+      [ -n "${{ steps.write-values.outputs.values-file }}" ] && rm -f "${{ steps.write-values.outputs.values-file }}" || true
+
+  - name: "Deploy: update sticky comment — success"
+    if: ${{ inputs.teardown != 'true' && success() }}
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      header: cmx-helm-preview
+      number: ${{ inputs.pr-number }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      message: |
+        🟢 **Helm Preview** — deployed successfully!
+
+        | | |
+        |---|---|
+        | **Release** | `${{ inputs.release-name }}` |
+        | **Chart** | `${{ inputs.chart }}@${{ inputs.chart-version }}` |
+        | **URL** | https://${{ steps.expose-port.outputs.hostname }} |
+        | **Cluster** | `${{ inputs.cluster-name }}` (`${{ steps.create-cluster.outputs.cluster-id || steps.find-cluster.outputs.cluster-id }}`) |
+        | **Namespace** | `${{ inputs.namespace }}` |
+
+  - name: "Deploy: update sticky comment — failure"
+    if: ${{ inputs.teardown != 'true' && failure() }}
+    uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      header: cmx-helm-preview
+      number: ${{ inputs.pr-number }}
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+      message: |
+        🔴 **Helm Preview** — deployment failed for `${{ inputs.release-name }}`.
+
+        Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
+
+  - name: "Deploy: update GitHub deployment status — success"
+    if: ${{ inputs.teardown != 'true' && success() && steps.gh-deployment.outputs.deployment-id != '' }}
+    shell: bash
+    env:
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+    run: |
+      gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        repos/${{ github.repository }}/deployments/${{ steps.gh-deployment.outputs.deployment-id }}/statuses \
+        -f state="success" \
+        -f environment_url="https://${{ steps.expose-port.outputs.hostname }}" \
+        -f description="Helm preview deployed successfully"
+
+  - name: "Deploy: update GitHub deployment status — failure"
+    if: ${{ inputs.teardown != 'true' && failure() && steps.gh-deployment.outputs.deployment-id != '' }}
+    shell: bash
+    env:
+      GITHUB_TOKEN: ${{ inputs.github-token }}
+    run: |
+      gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        repos/${{ github.repository }}/deployments/${{ steps.gh-deployment.outputs.deployment-id }}/statuses \
+        -f state="failure" \
+        -f description="Helm preview deployment failed"
