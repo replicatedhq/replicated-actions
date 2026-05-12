@@ -36,10 +36,10 @@ replicated_create_release ---> airgap_status
 ## Inputs
 | Name | Default | Required | Description |
 | --- | --- | --- | --- |
-| app-slug |  | True | App Slug. |
+| app-slug |  | False | App Slug. Required unless .replicated config file specifies appSlug. |
 | api-token |  | True | API Token. |
-| chart |  | False | Path to the helm chart (One of `chart` or `yaml-dir` is required). |
-| yaml-dir |  | False | The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required). |
+| chart |  | False | Path to the helm chart. One of chart or yaml-dir is required, unless a .replicated config file is present. |
+| yaml-dir |  | False | Directory containing multiple yamls. One of chart or yaml-dir is required, unless a .replicated config file is present. |
 | promote-channel |  | False | Channel name or id to promote this release to. If not specified, the release will not be promoted. |
 | version |  | False | Release version. This will be ignored if `promote-channel` is not specified. |
 | release-notes |  | False | Release notes. This will be ignored if `promote-channel` is not specified. |
@@ -53,4 +53,29 @@ replicated_create_release ---> airgap_status
 | release-sequence | Sequence number of the release. |
 | airgap-url | Contains the download url of the airgap build, if promote-channel is enabled auto airgap builds. |
 | airgap-status | Current build status of the airgap bundle, if promote-channel is enabled auto airgap builds. |
+
+## .replicated config file auto-discovery
+
+If neither `chart` nor `yaml-dir` is provided, the action automatically searches for a `.replicated` or `.replicated.yaml` config file starting from the current working directory and walking upward (matching the behavior of the Replicated CLI).
+
+When a config file is found, the action:
+- Derives `app-slug` from the config if not explicitly provided.
+- Derives `promote-channel` from `promoteToChannelNames[0]` if not explicitly provided.
+- Runs `helm dependency update` and `helm package . -d <staging>` for each chart in `config.charts`.
+- Resolves manifest glob patterns and copies matching files into a temporary staging directory.
+- Creates the release from the staged directory.
+
+This requires `helm` to be available on the runner.
+
+### Example `.replicated` file
+
+```yaml
+appSlug: my-app
+charts:
+  - path: ./chart
+manifests:
+  - ./manifests/*.yaml
+promoteToChannelNames:
+  - Unstable
+```
 

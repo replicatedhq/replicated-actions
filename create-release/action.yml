@@ -2,16 +2,16 @@ name: "Replicated create release"
 description: "Create a Replicated release on a channel"
 inputs:
   app-slug:
-    description: "App Slug."
-    required: true
+    description: "App Slug. Required unless .replicated config file specifies appSlug."
+    required: false
   api-token:
     description: "API Token."
     required: true
   chart:
-    description: "Path to the helm chart (One of `chart` or `yaml-dir` is required)."
+    description: "Path to the helm chart. One of chart or yaml-dir is required, unless a .replicated config file is present."
     required: false
   yaml-dir:
-    description: "The directory containing multiple yamls for a Replicated release (One of `chart` or `yaml-dir` is required)."
+    description: "Directory containing multiple yamls. One of chart or yaml-dir is required, unless a .replicated config file is present."
     required: false
   promote-channel:
     description: "Channel name or id to promote this release to. If not specified, the release will not be promoted."
@@ -37,6 +37,31 @@ outputs:
     description: "Contains the download url of the airgap build, if promote-channel is enabled auto airgap builds."
   airgap-status:
     description: "Current build status of the airgap bundle, if promote-channel is enabled auto airgap builds."
+documentation: |
+  ## .replicated config file auto-discovery
+
+  If neither `chart` nor `yaml-dir` is provided, the action automatically searches for a `.replicated` or `.replicated.yaml` config file starting from the current working directory and walking upward (matching the behavior of the Replicated CLI).
+
+  When a config file is found, the action:
+  - Derives `app-slug` from the config if not explicitly provided.
+  - Derives `promote-channel` from `promoteToChannelNames[0]` if not explicitly provided.
+  - Runs `helm dependency update` and `helm package . -d <staging>` for each chart in `config.charts`.
+  - Resolves manifest glob patterns and copies matching files into a temporary staging directory.
+  - Creates the release from the staged directory.
+
+  This requires `helm` to be available on the runner.
+
+  ### Example `.replicated` file
+
+  ```yaml
+  appSlug: my-app
+  charts:
+    - path: ./chart
+  manifests:
+    - ./manifests/*.yaml
+  promoteToChannelNames:
+    - Unstable
+  ```
 runs:
   using: "node24"
   main: "index.js"
