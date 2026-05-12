@@ -55,7 +55,7 @@ inputs:
   teardown:
     description: "Set to 'true' to tear down the cluster instead of deploying."
     required: false
-    default: "false"
+    default: "true"
   cluster-id:
     description: "Cluster ID to remove. Required when teardown=true."
     required: false
