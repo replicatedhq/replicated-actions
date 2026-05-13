@@ -74648,10 +74648,14 @@ var tmpPromiseExports = requireTmpPromise();
 
 // Terminal failure states per PRD
 const terminalFailureStates = new Set(["failed", "failed_with_metadata", "cancelled"]);
-// Terminal success states (including warn which is soft-warning, bundle exists)
-const terminalSuccessStates = new Set(["built", "warn"]);
-// In-flight states that require continued polling
-const inFlightStates = new Set(["pending", "building", "building_bundle", "metadata", "unknown"]);
+// Terminal success states. "built" produces a full airgap bundle (download URL
+// available). "metadata" is what the airgap-builder writes when a channel does
+// NOT have auto-build enabled — it generates metadata only, no bundle, but
+// the build is still complete (see airgap-builder/pkg/builder/builder.go:95).
+// "warn" means the bundle exists with soft warnings about unresolvable images.
+const terminalSuccessStates = new Set(["built", "metadata", "warn"]);
+// In-flight states that require continued polling.
+const inFlightStates = new Set(["pending", "building", "building_bundle", "unknown"]);
 async function getAirgapStatusFromChannelReleases(api, appId, channelId, releaseSequence) {
     const http = await api.client();
     const uri = `${api.endpoint}/app/${appId}/channel/${channelId}/releases`;
@@ -74664,10 +74668,15 @@ async function getAirgapStatusFromChannelReleases(api, appId, channelId, release
     if (!body.releases || !Array.isArray(body.releases)) {
         return null;
     }
-    const release = body.releases.find((r) => r.sequence === releaseSequence);
-    if (!release) {
+    // A release can be promoted to the same channel multiple times — each
+    // promote produces a distinct channelSequence with its own airgap build.
+    // We want the most recent one (highest channelSequence) since the action
+    // just promoted, so its airgap build is the one we should follow.
+    const matching = body.releases.filter((r) => r.sequence === releaseSequence);
+    if (matching.length === 0) {
         return null;
     }
+    const release = matching.reduce((latest, r) => ((r.channelSequence ?? 0) > (latest.channelSequence ?? 0) ? r : latest));
     return {
         status: release.airgapBuildStatus || "",
         error: release.airgapBuildError || "",
@@ -74838,6 +74847,13 @@ async function actionCreateRelease() {
                                 const body = JSON.parse(await res.readBody());
                                 setOutput("airgap-url", body.url);
                             }
+                            writeAirgapSummary(resolvedChannel.name, result.status, result.error);
+                        }
+                        else if (result.status === "metadata") {
+                            // Metadata-only success: the channel doesn't have auto-build
+                            // enabled, so the worker only generated metadata and didn't
+                            // produce a bundle. No airgap-url to publish, but it's a
+                            // successful completion — don't fail the workflow.
                             writeAirgapSummary(resolvedChannel.name, result.status, result.error);
                         }
                         else if (result.status === "warn") {

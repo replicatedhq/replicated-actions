@@ -42,9 +42,7 @@ export async function getAirgapStatusFromChannelReleases(api: VendorPortalApi, a
   if (matching.length === 0) {
     return null;
   }
-  const release = matching.reduce((latest: any, r: any) =>
-    (r.channelSequence ?? 0) > (latest.channelSequence ?? 0) ? r : latest
-  );
+  const release = matching.reduce((latest: any, r: any) => ((r.channelSequence ?? 0) > (latest.channelSequence ?? 0) ? r : latest));
   return {
     status: release.airgapBuildStatus || "",
     error: release.airgapBuildError || "",
