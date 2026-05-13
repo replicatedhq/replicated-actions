@@ -2,15 +2,30 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
 const mockTmpDir = jest.fn();
+const appendFileSyncMock = jest.fn();
+
+jest.mock("fs", () => ({
+  ...jest.requireActual("fs"),
+  appendFileSync: appendFileSyncMock,
+  copyFileSync: jest.fn(),
+  promises: {
+    glob: jest.fn().mockResolvedValue([])
+  }
+}));
 
 jest.mock("tmp-promise", () => ({
   dir: mockTmpDir
 }));
 
+let mockHttpGet: jest.Mock;
+
 jest.mock("replicated-lib", () => ({
   VendorPortalApi: jest.fn().mockImplementation(() => ({
-    apiToken: "",
-    endpoint: undefined
+    apiToken: "test-token",
+    endpoint: "https://api.replicated.com/vendor/v3",
+    client: jest.fn().mockImplementation(() => ({
+      get: (...args: any[]) => mockHttpGet(...args)
+    }))
   })),
   findAndParseConfig: jest.fn(),
   createRelease: jest.fn().mockResolvedValue({ sequence: "1" }),
@@ -29,10 +44,12 @@ jest.mock("replicated-lib", () => ({
 }));
 
 import { findAndParseConfig, createRelease, createReleaseFromChart, getChannelDetails } from "replicated-lib";
-import { actionCreateRelease } from "./index";
+import { actionCreateRelease, pollAirgapBuildStatus } from "./index";
 
 const getInputMock = core.getInput as jest.MockedFunction<typeof core.getInput>;
 const setFailedMock = core.setFailed as jest.MockedFunction<typeof core.setFailed>;
+const setOutputMock = core.setOutput as jest.MockedFunction<typeof core.setOutput>;
+const infoMock = core.info as jest.MockedFunction<typeof core.info>;
 const execMock = exec.exec as jest.MockedFunction<typeof exec.exec>;
 
 const findAndParseConfigMock = findAndParseConfig as jest.MockedFunction<typeof findAndParseConfig>;
@@ -44,15 +61,28 @@ function setInputs(inputs: Record<string, string>) {
   getInputMock.mockImplementation((name: string) => inputs[name] ?? "");
 }
 
+function createMockHttpResponse(statusCode: number, body: any) {
+  return {
+    message: { statusCode },
+    readBody: jest.fn().mockResolvedValue(JSON.stringify(body))
+  };
+}
+
 beforeEach(() => {
   getInputMock.mockReset();
   setFailedMock.mockReset();
+  setOutputMock.mockReset();
+  infoMock.mockReset();
   execMock.mockReset();
   execMock.mockResolvedValue(0);
   findAndParseConfigMock.mockReset();
   createReleaseMock.mockClear();
   createReleaseFromChartMock.mockClear();
   getChannelDetailsMock.mockClear();
+  mockHttpGet = jest.fn();
+  appendFileSyncMock.mockClear();
+  delete process.env.GITHUB_STEP_SUMMARY;
+  process.env.REPLICATED_AIRGAP_POLL_MS = "10";
 });
 
 afterEach(() => {
@@ -218,5 +248,294 @@ describe("actionCreateRelease .replicated config discovery", () => {
 
     expect(setFailedMock).toHaveBeenCalledWith("app-slug is required when no .replicated config is found");
     expect(createReleaseMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("actionCreateRelease airgap build handling", () => {
+  it("prints warning when wait-for-airgap-build is false and auto-build is enabled", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "false"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: true
+    });
+
+    await actionCreateRelease();
+
+    expect(infoMock).toHaveBeenCalledWith(expect.stringContaining("::warning::Airgap bundles are building asynchronously"));
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "promoted-channel-building-async");
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+
+  it("succeeds when airgap build reaches 'built' status", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "true",
+      "timeout-minutes": "1"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: true
+    });
+
+    process.env.GITHUB_STEP_SUMMARY = "/tmp/summary.md";
+
+    // First call: channel releases (in-flight)
+    mockHttpGet.mockResolvedValueOnce(
+      createMockHttpResponse(200, {
+        releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "building", airgapBuildError: "" }]
+      })
+    );
+
+    // Second call: dedicated airgap status endpoint (built)
+    mockHttpGet.mockResolvedValueOnce(
+      createMockHttpResponse(200, {
+        airgapBuildStatus: "built",
+        airgapBuildError: ""
+      })
+    );
+
+    // Third call: download URL
+    mockHttpGet.mockResolvedValueOnce(createMockHttpResponse(200, { url: "https://example.com/airgap.bundle" }));
+
+    await actionCreateRelease();
+
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "built");
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-url", "https://example.com/airgap.bundle");
+    expect(setFailedMock).not.toHaveBeenCalled();
+    expect(appendFileSyncMock).toHaveBeenCalled();
+  });
+
+  it("warns but does not fail when airgap build reaches 'warn' status", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "true",
+      "timeout-minutes": "1"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: true
+    });
+
+    process.env.GITHUB_STEP_SUMMARY = "/tmp/summary.md";
+
+    mockHttpGet.mockResolvedValueOnce(
+      createMockHttpResponse(200, {
+        releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "warn", airgapBuildError: "some images not found" }]
+      })
+    );
+
+    await actionCreateRelease();
+
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "warn");
+    expect(infoMock).toHaveBeenCalledWith(expect.stringContaining("::warning::Airgap build completed with warnings"));
+    expect(setFailedMock).not.toHaveBeenCalled();
+    expect(appendFileSyncMock).toHaveBeenCalled();
+  });
+
+  it("fails when airgap build reaches 'failed' status", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "true",
+      "timeout-minutes": "1"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: true
+    });
+
+    process.env.GITHUB_STEP_SUMMARY = "/tmp/summary.md";
+
+    mockHttpGet.mockResolvedValueOnce(
+      createMockHttpResponse(200, {
+        releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "failed", airgapBuildError: "unauthorized to pull image" }]
+      })
+    );
+
+    await actionCreateRelease();
+
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "failed");
+    expect(setFailedMock).toHaveBeenCalledWith(expect.stringContaining("Airgap build failed"));
+    expect(appendFileSyncMock).toHaveBeenCalled();
+  });
+
+  it("fails when airgap build reaches 'cancelled' status", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "true",
+      "timeout-minutes": "1"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: true
+    });
+
+    mockHttpGet.mockResolvedValueOnce(
+      createMockHttpResponse(200, {
+        releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "cancelled", airgapBuildError: "build cancelled by user" }]
+      })
+    );
+
+    await actionCreateRelease();
+
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "cancelled");
+    expect(setFailedMock).toHaveBeenCalledWith(expect.stringContaining("Airgap build failed"));
+  });
+
+  it("continues polling through in-flight states and eventually succeeds", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "true",
+      "timeout-minutes": "1"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: true
+    });
+
+    process.env.GITHUB_STEP_SUMMARY = "/tmp/summary.md";
+
+    // First call: channel releases (pending)
+    mockHttpGet
+      .mockResolvedValueOnce(
+        createMockHttpResponse(200, {
+          releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "pending", airgapBuildError: "" }]
+        })
+      )
+      .mockResolvedValueOnce(
+        createMockHttpResponse(200, {
+          airgapBuildStatus: "building",
+          airgapBuildError: ""
+        })
+      )
+      .mockResolvedValueOnce(
+        createMockHttpResponse(200, {
+          airgapBuildStatus: "built",
+          airgapBuildError: ""
+        })
+      );
+
+    // download URL
+    mockHttpGet.mockResolvedValueOnce(createMockHttpResponse(200, { url: "https://example.com/airgap.bundle" }));
+
+    await actionCreateRelease();
+
+    expect(mockHttpGet).toHaveBeenCalledTimes(4);
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "built");
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+
+  it("does not print warning when buildAirgapAutomatically is false", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "wait-for-airgap-build": "false"
+    });
+
+    getChannelDetailsMock.mockResolvedValue({
+      id: "chan-1",
+      name: "Unstable",
+      slug: "unstable",
+      buildAirgapAutomatically: false
+    });
+
+    await actionCreateRelease();
+
+    expect(infoMock).not.toHaveBeenCalledWith(expect.stringContaining("::warning::"));
+    expect(setOutputMock).toHaveBeenCalledWith("airgap-status", "promoted-channel-not-airgap-enabled");
+  });
+});
+
+describe("pollAirgapBuildStatus", () => {
+  it("continues polling through in-flight states and eventually succeeds", async () => {
+    const api = new (jest.requireMock("replicated-lib").VendorPortalApi)();
+
+    mockHttpGet
+      .mockResolvedValueOnce(
+        createMockHttpResponse(200, {
+          releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "pending", airgapBuildError: "" }]
+        })
+      )
+      .mockResolvedValueOnce(
+        createMockHttpResponse(200, {
+          airgapBuildStatus: "building",
+          airgapBuildError: ""
+        })
+      )
+      .mockResolvedValueOnce(
+        createMockHttpResponse(200, {
+          airgapBuildStatus: "built",
+          airgapBuildError: ""
+        })
+      );
+
+    const result = await pollAirgapBuildStatus(api, "app-id", "chan-1", 1, 1, 10);
+    expect(result.status).toBe("built");
+    expect(mockHttpGet).toHaveBeenCalledTimes(3);
+  });
+
+  it("fails on timeout when build never reaches terminal state", async () => {
+    const api = new (jest.requireMock("replicated-lib").VendorPortalApi)();
+    mockHttpGet.mockResolvedValue(
+      createMockHttpResponse(200, {
+        releases: [{ sequence: 1, channelSequence: 5, airgapBuildStatus: "building", airgapBuildError: "" }]
+      })
+    );
+
+    await expect(pollAirgapBuildStatus(api, "app-id", "chan-1", 1, 0.05, 10)).rejects.toThrow("did not reach a terminal state");
+  });
+
+  it("throws when release is not found in channel", async () => {
+    const api = new (jest.requireMock("replicated-lib").VendorPortalApi)();
+    mockHttpGet.mockResolvedValue(createMockHttpResponse(200, { releases: [] }));
+
+    await expect(pollAirgapBuildStatus(api, "app-id", "chan-1", 99, 1, 10)).rejects.toThrow("not found");
   });
 });
