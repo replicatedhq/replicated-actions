@@ -29864,6 +29864,9 @@ function requireChannels () {
 	channels.archiveChannel = archiveChannel;
 	channels.pollForAirgapReleaseStatus = pollForAirgapReleaseStatus;
 	channels.getDownloadUrlAirgapBuildRelease = getDownloadUrlAirgapBuildRelease;
+	channels.getAirgapBuildStatus = getAirgapBuildStatus;
+	channels.getLatestAirgapStatusForRelease = getLatestAirgapStatusForRelease;
+	channels.getAirgapBundleDownloadURL = getAirgapBundleDownloadURL;
 	const applications_1 = requireApplications();
 	class Channel {
 	}
@@ -30022,6 +30025,86 @@ function requireChannels () {
 	        channelSequence: release.channelSequence,
 	        airgapBuildStatus: release.airgapBuildStatus
 	    };
+	}
+	// getAirgapBuildStatus reads the airgap-build status for a single channel-
+	// release using the dedicated GET /v3/app/{appId}/channel/{channelId}/release/
+	// {channelSequence}/airgap/status endpoint (vendor-api PR
+	// replicatedhq/vandoor#9761). This is the canonical polling entry point for
+	// "I just promoted, give me a real-time view of the build" use cases — it
+	// returns "pending" (synthesized) when no kots_airgap_build_status row exists
+	// yet, building / built / failed / failed_with_metadata / cancelled / warn /
+	// metadata once the worker has written one. Returns null on 404.
+	async function getAirgapBuildStatus(vendorPortalApi, appId, channelId, channelSequence) {
+	    var _a;
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/release/${channelSequence}/airgap/status`;
+	    const res = await http.get(uri);
+	    if (res.message.statusCode === 404) {
+	        await res.readBody();
+	        return null;
+	    }
+	    if (res.message.statusCode !== 200) {
+	        await res.readBody();
+	        throw new Error(`Failed to get airgap build status: Server responded with ${res.message.statusCode}`);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    return {
+	        channelId: body.channelId || channelId,
+	        channelSequence: (_a = body.channelSequence) !== null && _a !== void 0 ? _a : channelSequence,
+	        channelName: body.channelName || "",
+	        airgapBuildStatus: body.airgapBuildStatus || "",
+	        airgapBuildError: body.airgapBuildError || "",
+	        fullAirgapBuild: body.fullAirgapBuild
+	    };
+	}
+	// getLatestAirgapStatusForRelease finds the most recent channel-release for
+	// the given (channel, release) pair and returns its airgap-build status.
+	// A release can be promoted to the same channel multiple times — each promote
+	// produces a distinct channelSequence with its own airgap build — and the
+	// caller almost always wants the latest one (their freshly-promoted build).
+	//
+	// Returns null if no channel-release matches the release sequence.
+	async function getLatestAirgapStatusForRelease(vendorPortalApi, appId, channelId, releaseSequence) {
+	    var _a;
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/releases`;
+	    const res = await http.get(uri);
+	    if (res.message.statusCode !== 200) {
+	        await res.readBody();
+	        throw new Error(`Failed to get channel releases: Server responded with ${res.message.statusCode}`);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    if (!body.releases || !Array.isArray(body.releases)) {
+	        return null;
+	    }
+	    const matching = body.releases.filter((r) => r.sequence === releaseSequence);
+	    if (matching.length === 0) {
+	        return null;
+	    }
+	    const release = matching.reduce((latest, r) => { var _a, _b; return (((_a = r.channelSequence) !== null && _a !== void 0 ? _a : 0) > ((_b = latest.channelSequence) !== null && _b !== void 0 ? _b : 0) ? r : latest); });
+	    return {
+	        channelId: channelId,
+	        channelSequence: (_a = release.channelSequence) !== null && _a !== void 0 ? _a : 0,
+	        channelName: release.channelName || "",
+	        airgapBuildStatus: release.airgapBuildStatus || "",
+	        airgapBuildError: release.airgapBuildError || "",
+	        fullAirgapBuild: release.fullAirgapBuild
+	    };
+	}
+	// getAirgapBundleDownloadURL is a variant of getDownloadUrlAirgapBuildRelease
+	// that takes a pre-known channelSequence directly. Use this when the caller
+	// already has the channelSequence from a promote response or status poll —
+	// it skips the redundant /releases scrape that the older function performs.
+	async function getAirgapBundleDownloadURL(vendorPortalApi, appId, channelId, channelSequence) {
+	    const http = await vendorPortalApi.client();
+	    const uri = `${vendorPortalApi.endpoint}/app/${appId}/channel/${channelId}/airgap/download-url?channelSequence=${channelSequence}`;
+	    const res = await http.get(uri);
+	    if (res.message.statusCode !== 200) {
+	        await res.readBody();
+	        throw new Error(`Failed to get airgap bundle download URL: Server responded with ${res.message.statusCode}`);
+	    }
+	    const body = JSON.parse(await res.readBody());
+	    return body.url;
 	}
 	return channels;
 }
@@ -73375,7 +73458,8 @@ function requireDist () {
 	hasRequiredDist = 1;
 	(function (exports$1) {
 		Object.defineProperty(exports$1, "__esModule", { value: true });
-		exports$1.parseConfigFile = exports$1.findAndParseConfig = exports$1.getNetworkReportSummary = exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.exposeVMPort = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.getVMDetails = exports$1.createVM = exports$1.VMExposedPort = exports$1.VMPort = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
+		exports$1.getNetworkReport = exports$1.updateNetwork = exports$1.NetworkReportSummarySource = exports$1.NetworkReportSummaryDestination = exports$1.NetworkReportSummaryDomain = exports$1.NetworkReportSummary = exports$1.NetworkEventData = exports$1.NetworkReport = exports$1.Network = exports$1.exposeVMPort = exports$1.removeVM = exports$1.pollForVMStatus = exports$1.getVMDetails = exports$1.createVM = exports$1.VMExposedPort = exports$1.VMPort = exports$1.VM = exports$1.reportCompatibilityResult = exports$1.promoteRelease = exports$1.createReleaseFromChart = exports$1.createRelease = exports$1.listCustomersByEmail = exports$1.listCustomersByName = exports$1.getUsedKubernetesDistributions = exports$1.createCustomer = exports$1.archiveCustomer = exports$1.CustomerSummary = exports$1.KubernetesDistribution = exports$1.exposeClusterPort = exports$1.pollForAddonStatus = exports$1.createAddonObjectStore = exports$1.getClusterVersions = exports$1.upgradeCluster = exports$1.removeCluster = exports$1.getKubeconfig = exports$1.pollForStatus = exports$1.createClusterWithLicense = exports$1.createCluster = exports$1.ClusterVersion = exports$1.getAirgapBundleDownloadURL = exports$1.getLatestAirgapStatusForRelease = exports$1.getAirgapBuildStatus = exports$1.getDownloadUrlAirgapBuildRelease = exports$1.pollForAirgapReleaseStatus = exports$1.archiveChannel = exports$1.getChannelDetails = exports$1.createChannel = exports$1.Channel = exports$1.getApplicationDetails = exports$1.VendorPortalApi = void 0;
+		exports$1.parseConfigFile = exports$1.findAndParseConfig = exports$1.getNetworkReportSummary = void 0;
 		var configuration_1 = requireConfiguration();
 		Object.defineProperty(exports$1, "VendorPortalApi", { enumerable: true, get: function () { return configuration_1.VendorPortalApi; } });
 		var applications_1 = requireApplications();
@@ -73387,6 +73471,9 @@ function requireDist () {
 		Object.defineProperty(exports$1, "archiveChannel", { enumerable: true, get: function () { return channels_1.archiveChannel; } });
 		Object.defineProperty(exports$1, "pollForAirgapReleaseStatus", { enumerable: true, get: function () { return channels_1.pollForAirgapReleaseStatus; } });
 		Object.defineProperty(exports$1, "getDownloadUrlAirgapBuildRelease", { enumerable: true, get: function () { return channels_1.getDownloadUrlAirgapBuildRelease; } });
+		Object.defineProperty(exports$1, "getAirgapBuildStatus", { enumerable: true, get: function () { return channels_1.getAirgapBuildStatus; } });
+		Object.defineProperty(exports$1, "getLatestAirgapStatusForRelease", { enumerable: true, get: function () { return channels_1.getLatestAirgapStatusForRelease; } });
+		Object.defineProperty(exports$1, "getAirgapBundleDownloadURL", { enumerable: true, get: function () { return channels_1.getAirgapBundleDownloadURL; } });
 		var clusters_1 = requireClusters();
 		Object.defineProperty(exports$1, "ClusterVersion", { enumerable: true, get: function () { return clusters_1.ClusterVersion; } });
 		Object.defineProperty(exports$1, "createCluster", { enumerable: true, get: function () { return clusters_1.createCluster; } });
@@ -74646,6 +74733,56 @@ function requireTmpPromise () {
 
 var tmpPromiseExports = requireTmpPromise();
 
+// Terminal failure states per PRD
+const terminalFailureStates = new Set(["failed", "failed_with_metadata", "cancelled"]);
+// Terminal success states. "built" produces a full airgap bundle (download URL
+// available). "metadata" is what the airgap-builder writes when a channel does
+// NOT have auto-build enabled — it generates metadata only, no bundle, but
+// the build is still complete (see airgap-builder/pkg/builder/builder.go:95).
+// "warn" means the bundle exists with soft warnings about unresolvable images.
+const terminalSuccessStates = new Set(["built", "metadata", "warn"]);
+// In-flight states that require continued polling.
+const inFlightStates = new Set(["pending", "building", "building_bundle", "unknown"]);
+async function pollAirgapBuildStatus(api, appId, channelId, releaseSequence, timeoutSeconds, sleepMs) {
+    const intervalMs = parseInt(process.env.REPLICATED_AIRGAP_POLL_MS || "") || 5000;
+    const deadline = Date.now() + timeoutSeconds * 1000;
+    // Resolve channelSequence once from the channel releases list, then switch to
+    // the cheaper dedicated endpoint for the rest of the poll.
+    const initialResult = await distExports$1.getLatestAirgapStatusForRelease(api, appId, channelId, releaseSequence);
+    if (!initialResult) {
+        throw new Error(`Release ${releaseSequence} not found in channel ${channelId}`);
+    }
+    const channelSequence = initialResult.channelSequence;
+    if (terminalSuccessStates.has(initialResult.airgapBuildStatus) || terminalFailureStates.has(initialResult.airgapBuildStatus)) {
+        return initialResult;
+    }
+    while (Date.now() < deadline) {
+        const result = await distExports$1.getAirgapBuildStatus(api, appId, channelId, channelSequence);
+        if (!result) {
+            throw new Error(`Airgap build status endpoint returned 404 for channel sequence ${channelSequence}`);
+        }
+        if (terminalSuccessStates.has(result.airgapBuildStatus) || terminalFailureStates.has(result.airgapBuildStatus)) {
+            return result;
+        }
+        if (inFlightStates.has(result.airgapBuildStatus)) {
+            console.log(`Airgap build status: ${result.airgapBuildStatus}. Waiting ${intervalMs / 1000}s...`);
+        }
+        else {
+            console.log(`Airgap build status: ${result.airgapBuildStatus} (unexpected). Waiting ${intervalMs / 1000}s...`);
+        }
+        await new Promise(f => setTimeout(f, intervalMs));
+    }
+    throw new Error(`Airgap build for release ${releaseSequence} did not reach a terminal state within ${timeoutSeconds} seconds`);
+}
+function writeAirgapSummary(channelName, status, error) {
+    const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+    if (!summaryFile) {
+        return;
+    }
+    const errorCell = error ? error : "-";
+    const markdown = `\n## Airgap Build Status\n| Channel | Status | Error |\n| --- | --- | --- |\n| ${channelName} | ${status} | ${errorCell} |\n`;
+    fs.appendFileSync(summaryFile, markdown);
+}
 async function actionCreateRelease() {
     try {
         const apiToken = getInput("api-token", { required: true });
@@ -74734,28 +74871,51 @@ async function actionCreateRelease() {
                 resolvedChannel = await distExports$1.createChannel(apiClient, appSlug, promoteChannel);
             }
             await distExports$1.promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
-            if (waitForAirgapBuild == "true") {
-                if (resolvedChannel.buildAirgapAutomatically) {
+            if (resolvedChannel.buildAirgapAutomatically) {
+                if (waitForAirgapBuild === "true") {
                     try {
                         const app = await distExports$1.getApplicationDetails(apiClient, appSlug);
-                        const status = await distExports$1.pollForAirgapReleaseStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, "built", timeoutMinutes * 60);
-                        if (status === "built") {
-                            const downloadUrl = await distExports$1.getDownloadUrlAirgapBuildRelease(apiClient, app.id, resolvedChannel.id, +release.sequence);
-                            setOutput("airgap-status", status);
-                            setOutput("airgap-url", downloadUrl);
+                        const result = await pollAirgapBuildStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, timeoutMinutes * 60);
+                        setOutput("airgap-status", result.airgapBuildStatus);
+                        if (result.airgapBuildStatus === "built") {
+                            const url = await distExports$1.getAirgapBundleDownloadURL(apiClient, app.id, resolvedChannel.id, result.channelSequence);
+                            setOutput("airgap-url", url);
+                            writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
                         }
-                        else {
-                            setOutput("airgap-status", status);
+                        else if (result.airgapBuildStatus === "metadata") {
+                            // Metadata-only success: the channel doesn't have auto-build
+                            // enabled, so the worker only generated metadata and didn't
+                            // produce a bundle. No airgap-url to publish, but it's a
+                            // successful completion — don't fail the workflow.
+                            writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
+                        }
+                        else if (result.airgapBuildStatus === "warn") {
+                            info(`::warning::Airgap build completed with warnings for channel ${resolvedChannel.name}: ${result.airgapBuildError}`);
+                            writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
+                        }
+                        else if (terminalFailureStates.has(result.airgapBuildStatus)) {
+                            const msg = `Airgap build failed for channel ${resolvedChannel.name}: ${result.airgapBuildError || result.airgapBuildStatus}`;
+                            setOutput("airgap-status", result.airgapBuildStatus);
+                            writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
+                            setFailed(msg);
+                            return;
                         }
                     }
                     catch (error) {
                         setOutput("airgap-status", "failed");
                         console.warn("Failed to get airgap build status or download URL:", error.message);
+                        writeAirgapSummary(resolvedChannel.name, "failed", error.message);
+                        setFailed(`Airgap build monitoring failed: ${error.message}`);
+                        return;
                     }
                 }
                 else {
-                    setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
+                    info(`::warning::Airgap bundles are building asynchronously for channel ${resolvedChannel.name}. Enable wait-for-airgap-build: true to fail this workflow if the build fails.`);
+                    setOutput("airgap-status", "promoted-channel-building-async");
                 }
+            }
+            else {
+                setOutput("airgap-status", "promoted-channel-not-airgap-enabled");
             }
             setOutput("channel-slug", resolvedChannel.slug);
         }
