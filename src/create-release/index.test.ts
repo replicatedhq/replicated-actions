@@ -19,6 +19,12 @@ jest.mock("tmp-promise", () => ({
 
 let mockHttpGet: jest.Mock;
 
+// The three airgap helpers (getAirgapBuildStatus, getLatestAirgapStatusForRelease,
+// getAirgapBundleDownloadURL) live in replicated-lib. Rather than importing the
+// real lib (which CJS-requires @actions/http-client and trips ts-jest's ESM
+// resolver), we re-implement them here so each test's existing mockHttpGet
+// fixtures continue to drive the action's polling loop end-to-end. The lib's
+// own wire-shape mapping is covered by tests in the lib repo.
 jest.mock("replicated-lib", () => ({
   VendorPortalApi: jest.fn().mockImplementation(() => ({
     apiToken: "test-token",
@@ -39,8 +45,50 @@ jest.mock("replicated-lib", () => ({
   createChannel: jest.fn(),
   promoteRelease: jest.fn(),
   getApplicationDetails: jest.fn().mockResolvedValue({ id: "app-id-1" }),
-  pollForAirgapReleaseStatus: jest.fn(),
-  getDownloadUrlAirgapBuildRelease: jest.fn()
+  getAirgapBuildStatus: jest.fn(async (_api: any, appId: string, channelId: string, channelSequence: number) => {
+    const uri = `https://api.replicated.com/vendor/v3/app/${appId}/channel/${channelId}/release/${channelSequence}/airgap/status`;
+    const res = await mockHttpGet(uri);
+    if (res.message.statusCode === 404) return null;
+    if (res.message.statusCode !== 200) {
+      throw new Error(`Failed to get airgap build status: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    return {
+      channelId,
+      channelSequence,
+      channelName: body.channelName || "",
+      airgapBuildStatus: body.airgapBuildStatus || "",
+      airgapBuildError: body.airgapBuildError || ""
+    };
+  }),
+  getLatestAirgapStatusForRelease: jest.fn(async (_api: any, appId: string, channelId: string, releaseSequence: number) => {
+    const uri = `https://api.replicated.com/vendor/v3/app/${appId}/channel/${channelId}/releases`;
+    const res = await mockHttpGet(uri);
+    if (res.message.statusCode !== 200) {
+      throw new Error(`Failed to get channel releases: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    if (!body.releases || !Array.isArray(body.releases)) return null;
+    const matching = body.releases.filter((r: any) => r.sequence === releaseSequence);
+    if (matching.length === 0) return null;
+    const release = matching.reduce((latest: any, r: any) => ((r.channelSequence ?? 0) > (latest.channelSequence ?? 0) ? r : latest));
+    return {
+      channelId,
+      channelSequence: release.channelSequence ?? 0,
+      channelName: release.channelName || "",
+      airgapBuildStatus: release.airgapBuildStatus || "",
+      airgapBuildError: release.airgapBuildError || ""
+    };
+  }),
+  getAirgapBundleDownloadURL: jest.fn(async (_api: any, appId: string, channelId: string, channelSequence: number) => {
+    const uri = `https://api.replicated.com/vendor/v3/app/${appId}/channel/${channelId}/airgap/download-url?channelSequence=${channelSequence}`;
+    const res = await mockHttpGet(uri);
+    if (res.message.statusCode !== 200) {
+      throw new Error(`Failed to get airgap bundle download URL: Server responded with ${res.message.statusCode}`);
+    }
+    const body = JSON.parse(await res.readBody());
+    return body.url;
+  })
 }));
 
 import { findAndParseConfig, createRelease, createReleaseFromChart, getChannelDetails } from "replicated-lib";
@@ -517,7 +565,7 @@ describe("pollAirgapBuildStatus", () => {
       );
 
     const result = await pollAirgapBuildStatus(api, "app-id", "chan-1", 1, 1, 10);
-    expect(result.status).toBe("built");
+    expect(result.airgapBuildStatus).toBe("built");
     expect(mockHttpGet).toHaveBeenCalledTimes(3);
   });
 

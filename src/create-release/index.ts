@@ -3,7 +3,23 @@ import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as tmpPromise from "tmp-promise";
-import { VendorPortalApi, Channel, Release, createChannel, getChannelDetails, createRelease, createReleaseFromChart, promoteRelease, getApplicationDetails, findAndParseConfig, ReplicatedConfig } from "replicated-lib";
+import {
+  VendorPortalApi,
+  Channel,
+  Release,
+  AirgapBuildStatus,
+  createChannel,
+  getChannelDetails,
+  createRelease,
+  createReleaseFromChart,
+  promoteRelease,
+  getApplicationDetails,
+  findAndParseConfig,
+  ReplicatedConfig,
+  getAirgapBuildStatus,
+  getLatestAirgapStatusForRelease,
+  getAirgapBundleDownloadURL
+} from "replicated-lib";
 
 // Terminal failure states per PRD
 const terminalFailureStates = new Set(["failed", "failed_with_metadata", "cancelled"]);
@@ -16,76 +32,19 @@ const terminalSuccessStates = new Set(["built", "metadata", "warn"]);
 // In-flight states that require continued polling.
 const inFlightStates = new Set(["pending", "building", "building_bundle", "unknown"]);
 
-interface AirgapStatusResult {
-  status: string;
-  error: string;
-  channelSequence: number;
-}
-
-export async function getAirgapStatusFromChannelReleases(api: VendorPortalApi, appId: string, channelId: string, releaseSequence: number): Promise<AirgapStatusResult | null> {
-  const http = await api.client();
-  const uri = `${api.endpoint}/app/${appId}/channel/${channelId}/releases`;
-  const res = await http.get(uri);
-  if (res.message.statusCode !== 200) {
-    await res.readBody();
-    throw new Error(`Failed to get channel releases: Server responded with ${res.message.statusCode}`);
-  }
-  const body = JSON.parse(await res.readBody());
-  if (!body.releases || !Array.isArray(body.releases)) {
-    return null;
-  }
-  // A release can be promoted to the same channel multiple times — each
-  // promote produces a distinct channelSequence with its own airgap build.
-  // We want the most recent one (highest channelSequence) since the action
-  // just promoted, so its airgap build is the one we should follow.
-  const matching = body.releases.filter((r: any) => r.sequence === releaseSequence);
-  if (matching.length === 0) {
-    return null;
-  }
-  const release = matching.reduce((latest: any, r: any) => ((r.channelSequence ?? 0) > (latest.channelSequence ?? 0) ? r : latest));
-  return {
-    status: release.airgapBuildStatus || "",
-    error: release.airgapBuildError || "",
-    channelSequence: release.channelSequence || 0
-  };
-}
-
-// getAirgapBuildStatus polls the dedicated airgap build status endpoint for a
-// single channel-release. This is cheaper than scraping the full channel
-// releases list and mirrors the endpoint the CLI uses.
-export async function getAirgapBuildStatus(api: VendorPortalApi, appId: string, channelId: string, channelSequence: number): Promise<AirgapStatusResult | null> {
-  const http = await api.client();
-  const uri = `${api.endpoint}/app/${appId}/channel/${channelId}/release/${channelSequence}/airgap/status`;
-  const res = await http.get(uri);
-  if (res.message.statusCode === 404) {
-    return null;
-  }
-  if (res.message.statusCode !== 200) {
-    await res.readBody();
-    throw new Error(`Failed to get airgap build status: Server responded with ${res.message.statusCode}`);
-  }
-  const body = JSON.parse(await res.readBody());
-  return {
-    status: body.airgapBuildStatus || "",
-    error: body.airgapBuildError || "",
-    channelSequence: channelSequence
-  };
-}
-
-export async function pollAirgapBuildStatus(api: VendorPortalApi, appId: string, channelId: string, releaseSequence: number, timeoutSeconds: number, sleepMs?: number): Promise<AirgapStatusResult> {
+export async function pollAirgapBuildStatus(api: VendorPortalApi, appId: string, channelId: string, releaseSequence: number, timeoutSeconds: number, sleepMs?: number): Promise<AirgapBuildStatus> {
   const intervalMs = sleepMs || parseInt(process.env.REPLICATED_AIRGAP_POLL_MS || "") || 5000;
   const deadline = Date.now() + timeoutSeconds * 1000;
 
   // Resolve channelSequence once from the channel releases list, then switch to
   // the cheaper dedicated endpoint for the rest of the poll.
-  let channelSequence: number | undefined;
-  const initialResult = await getAirgapStatusFromChannelReleases(api, appId, channelId, releaseSequence);
+  const initialResult = await getLatestAirgapStatusForRelease(api, appId, channelId, releaseSequence);
   if (!initialResult) {
     throw new Error(`Release ${releaseSequence} not found in channel ${channelId}`);
   }
-  channelSequence = initialResult.channelSequence;
+  const channelSequence = initialResult.channelSequence;
 
-  if (terminalSuccessStates.has(initialResult.status) || terminalFailureStates.has(initialResult.status)) {
+  if (terminalSuccessStates.has(initialResult.airgapBuildStatus) || terminalFailureStates.has(initialResult.airgapBuildStatus)) {
     return initialResult;
   }
 
@@ -95,14 +54,14 @@ export async function pollAirgapBuildStatus(api: VendorPortalApi, appId: string,
       throw new Error(`Airgap build status endpoint returned 404 for channel sequence ${channelSequence}`);
     }
 
-    if (terminalSuccessStates.has(result.status) || terminalFailureStates.has(result.status)) {
+    if (terminalSuccessStates.has(result.airgapBuildStatus) || terminalFailureStates.has(result.airgapBuildStatus)) {
       return result;
     }
 
-    if (inFlightStates.has(result.status)) {
-      console.log(`Airgap build status: ${result.status}. Waiting ${intervalMs / 1000}s...`);
+    if (inFlightStates.has(result.airgapBuildStatus)) {
+      console.log(`Airgap build status: ${result.airgapBuildStatus}. Waiting ${intervalMs / 1000}s...`);
     } else {
-      console.log(`Airgap build status: ${result.status} (unexpected). Waiting ${intervalMs / 1000}s...`);
+      console.log(`Airgap build status: ${result.airgapBuildStatus} (unexpected). Waiting ${intervalMs / 1000}s...`);
     }
     await new Promise(f => setTimeout(f, intervalMs));
   }
@@ -228,30 +187,25 @@ export async function actionCreateRelease() {
             const app = await getApplicationDetails(apiClient, appSlug);
             const result = await pollAirgapBuildStatus(apiClient, app.id, resolvedChannel.id, +release.sequence, timeoutMinutes * 60);
 
-            core.setOutput("airgap-status", result.status);
+            core.setOutput("airgap-status", result.airgapBuildStatus);
 
-            if (result.status === "built") {
-              const http = await apiClient.client();
-              const uri = `${apiClient.endpoint}/app/${app.id}/channel/${resolvedChannel.id}/airgap/download-url?channelSequence=${result.channelSequence}`;
-              const res = await http.get(uri);
-              if (res.message.statusCode === 200) {
-                const body = JSON.parse(await res.readBody());
-                core.setOutput("airgap-url", body.url);
-              }
-              writeAirgapSummary(resolvedChannel.name, result.status, result.error);
-            } else if (result.status === "metadata") {
+            if (result.airgapBuildStatus === "built") {
+              const url = await getAirgapBundleDownloadURL(apiClient, app.id, resolvedChannel.id, result.channelSequence);
+              core.setOutput("airgap-url", url);
+              writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
+            } else if (result.airgapBuildStatus === "metadata") {
               // Metadata-only success: the channel doesn't have auto-build
               // enabled, so the worker only generated metadata and didn't
               // produce a bundle. No airgap-url to publish, but it's a
               // successful completion — don't fail the workflow.
-              writeAirgapSummary(resolvedChannel.name, result.status, result.error);
-            } else if (result.status === "warn") {
-              core.info(`::warning::Airgap build completed with warnings for channel ${resolvedChannel.name}: ${result.error}`);
-              writeAirgapSummary(resolvedChannel.name, result.status, result.error);
-            } else if (terminalFailureStates.has(result.status)) {
-              const msg = `Airgap build failed for channel ${resolvedChannel.name}: ${result.error || result.status}`;
-              core.setOutput("airgap-status", result.status);
-              writeAirgapSummary(resolvedChannel.name, result.status, result.error);
+              writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
+            } else if (result.airgapBuildStatus === "warn") {
+              core.info(`::warning::Airgap build completed with warnings for channel ${resolvedChannel.name}: ${result.airgapBuildError}`);
+              writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
+            } else if (terminalFailureStates.has(result.airgapBuildStatus)) {
+              const msg = `Airgap build failed for channel ${resolvedChannel.name}: ${result.airgapBuildError || result.airgapBuildStatus}`;
+              core.setOutput("airgap-status", result.airgapBuildStatus);
+              writeAirgapSummary(resolvedChannel.name, result.airgapBuildStatus, result.airgapBuildError);
               core.setFailed(msg);
               return;
             }
