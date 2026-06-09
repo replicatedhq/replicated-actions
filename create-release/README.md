@@ -15,6 +15,7 @@ version["version"]
 release_notes["release-notes"]
 wait_for_airgap_build["wait-for-airgap-build"]
 timeout_minutes["timeout-minutes"]
+notify_users["notify-users"]
 channel_slug["channel-slug"]
 release_sequence["release-sequence"]
 airgap_url["airgap-url"]
@@ -28,6 +29,7 @@ version ---> replicated_create_release
 release_notes ---> replicated_create_release
 wait_for_airgap_build ---> replicated_create_release
 timeout_minutes ---> replicated_create_release
+notify_users ---> replicated_create_release
 replicated_create_release ---> channel_slug
 replicated_create_release ---> release_sequence
 replicated_create_release ---> airgap_url
@@ -45,6 +47,7 @@ replicated_create_release ---> airgap_status
 | release-notes |  | False | Release notes. This will be ignored if `promote-channel` is not specified. |
 | wait-for-airgap-build |  | False | Wait for the airgap build status or not. Defaults to false. |
 | timeout-minutes |  | False | Maximum time (in minutes) to wait for the airgap build to complete. Defaults to 20 minutes. |
+| notify-users |  | False | Send a notification to channel subscribers when the release is promoted. Defaults to false. |
 
 ## Outputs
 | Name | Description |
