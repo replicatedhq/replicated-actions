@@ -74794,6 +74794,7 @@ async function actionCreateRelease() {
         const releaseNotes = getInput("release-notes");
         const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
         const waitForAirgapBuild = getInput("wait-for-airgap-build") || "false";
+        const notifyUsers = getInput("notify-users") === "true";
         const parsedTimeout = parseInt(getInput("timeout-minutes") || "20");
         if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
             setFailed("timeout-minutes must be a positive number");
@@ -74870,7 +74871,8 @@ async function actionCreateRelease() {
             if (!resolvedChannel) {
                 resolvedChannel = await distExports$1.createChannel(apiClient, appSlug, promoteChannel);
             }
-            await distExports$1.promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+            // notifyUsers is forwarded as 7th arg; replicated-lib will use it once it adds the param.
+            await distExports$1.promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes, notifyUsers);
             if (resolvedChannel.buildAirgapAutomatically) {
                 if (waitForAirgapBuild === "true") {
                     try {
@@ -75702,6 +75704,7 @@ async function actionPromoteRelease() {
         const channelSlug = getInput("channel-to", { required: true });
         const releaseSequence = getInput("release-sequence", { required: true });
         const releaseVersion = getInput("release-version", { required: true });
+        const notifyUsers = getInput("notify-users") === "true";
         const apiEndpoint = getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
         const apiClient = new distExports$1.VendorPortalApi();
         apiClient.apiToken = apiToken;
@@ -75709,7 +75712,8 @@ async function actionPromoteRelease() {
             apiClient.endpoint = apiEndpoint;
         }
         const channel = await distExports$1.getChannelDetails(apiClient, appSlug, { slug: channelSlug });
-        await distExports$1.promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
+        // notifyUsers is forwarded as 7th arg; replicated-lib will use it once it adds the param.
+        await distExports$1.promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion, undefined, notifyUsers);
         info(`Release ${releaseVersion} has been promoted to channel ${channelSlug}`);
     }
     catch (error) {
