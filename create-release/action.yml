@@ -28,6 +28,9 @@ inputs:
   timeout-minutes:
     description: "Maximum time (in minutes) to wait for the airgap build to complete. Defaults to 20 minutes."
     required: false
+  notify-users:
+    description: "Send a notification to channel subscribers when the release is promoted. Defaults to false."
+    required: false
 outputs:
   channel-slug: # slug of the channel
     description: "Contains the channel slug."

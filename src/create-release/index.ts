@@ -89,6 +89,7 @@ export async function actionCreateRelease() {
     const releaseNotes = core.getInput("release-notes");
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
     const waitForAirgapBuild = core.getInput("wait-for-airgap-build") || "false";
+    const notifyUsers = core.getInput("notify-users") === "true";
     const parsedTimeout = parseInt(core.getInput("timeout-minutes") || "20");
     if (isNaN(parsedTimeout) || parsedTimeout <= 0) {
       core.setFailed("timeout-minutes must be a positive number");
@@ -179,7 +180,7 @@ export async function actionCreateRelease() {
         resolvedChannel = await createChannel(apiClient, appSlug, promoteChannel);
       }
 
-      await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes);
+      await promoteRelease(apiClient, appSlug, resolvedChannel.id, +release.sequence, releaseVersion, releaseNotes, notifyUsers);
 
       if (resolvedChannel.buildAirgapAutomatically) {
         if (waitForAirgapBuild === "true") {

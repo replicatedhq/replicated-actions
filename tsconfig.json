@@ -14,7 +14,9 @@
         "strictNullChecks": true,
         "skipLibCheck": true,
         "allowJs": true,
+        "rootDir": "./src",
         "outDir": "build",
+        "useUnknownInCatchVariables": false,
         "pretty": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true

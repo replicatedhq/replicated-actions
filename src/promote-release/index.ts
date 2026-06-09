@@ -8,6 +8,7 @@ export async function actionPromoteRelease() {
     const channelSlug = core.getInput("channel-to", { required: true });
     const releaseSequence = core.getInput("release-sequence", { required: true });
     const releaseVersion = core.getInput("release-version", { required: true });
+    const notifyUsers = core.getInput("notify-users") === "true";
     const apiEndpoint = core.getInput("replicated-api-endpoint") || process.env.REPLICATED_API_ENDPOINT;
 
     const apiClient = new VendorPortalApi();
@@ -19,7 +20,7 @@ export async function actionPromoteRelease() {
 
     const channel: Channel = await getChannelDetails(apiClient, appSlug, { slug: channelSlug });
 
-    await promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion);
+    await promoteRelease(apiClient, appSlug, channel.id, +releaseSequence, releaseVersion, undefined, notifyUsers);
     core.info(`Release ${releaseVersion} has been promoted to channel ${channelSlug}`);
   } catch (error) {
     core.setFailed(error.message);

@@ -3,7 +3,8 @@ const config = {
     transform: {
       '^.+\\.(ts|tsx)$': ['ts-jest', {
         useESM: true,
-        tsconfig: { types: ['node', 'jest'] },
+        tsconfig: 'tsconfig.jest.json',
+        isolatedModules: true,
       }],
     },
     extensionsToTreatAsEsm: ['.ts'],

@@ -541,6 +541,55 @@ describe("actionCreateRelease airgap build handling", () => {
   });
 });
 
+describe("actionCreateRelease notify-users input", () => {
+  it("passes notifyUsers=true to promoteRelease when notify-users is 'true'", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "notify-users": "true"
+    });
+
+    await actionCreateRelease();
+
+    const promoteReleaseMock = jest.requireMock("replicated-lib").promoteRelease;
+    expect(promoteReleaseMock).toHaveBeenCalledWith(expect.any(Object), "my-app", "chan-1", 1, "", "", true);
+  });
+
+  it("passes notifyUsers=false to promoteRelease when notify-users is 'false'", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable",
+      "notify-users": "false"
+    });
+
+    await actionCreateRelease();
+
+    const promoteReleaseMock = jest.requireMock("replicated-lib").promoteRelease;
+    expect(promoteReleaseMock).toHaveBeenCalledWith(expect.any(Object), "my-app", "chan-1", 1, "", "", false);
+  });
+
+  it("passes notifyUsers=false to promoteRelease when notify-users is absent", async () => {
+    setInputs({
+      "api-token": "token",
+      "app-slug": "my-app",
+      chart: "",
+      "yaml-dir": "./manifests",
+      "promote-channel": "Unstable"
+    });
+
+    await actionCreateRelease();
+
+    const promoteReleaseMock = jest.requireMock("replicated-lib").promoteRelease;
+    expect(promoteReleaseMock).toHaveBeenCalledWith(expect.any(Object), "my-app", "chan-1", 1, "", "", false);
+  });
+});
+
 describe("pollAirgapBuildStatus", () => {
   it("continues polling through in-flight states and eventually succeeds", async () => {
     const api = new (jest.requireMock("replicated-lib").VendorPortalApi)();
