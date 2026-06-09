@@ -43,7 +43,7 @@
     "ts-node": "^10.9.2"
   },
   "engines": {
-    "node": "24.x"
+    "node": "24.16.0"
   },
   "overrides": {
     "braces": ">=3.0.3",
