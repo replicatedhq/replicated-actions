@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "rootDir": ".",
+    "outDir": "build",
+    "types": ["node", "jest"],
+    "isolatedModules": true
+  },
+  "include": ["src/**/*.ts"]
+}
