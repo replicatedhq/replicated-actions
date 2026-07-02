@@ -1,4 +1,4 @@
-# Compatibility Actions
+# Replicated Actions
 
 ## Examples
 
@@ -12,7 +12,7 @@ Based on your preference you can either use the simplified prepare-cluster versi
 
 See the [example workflow](example-workflows/development-helm-prepare-cluster.yaml) for more details and also the [prepare-cluster](prepare-cluster) directory for the actual action.
 
-https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394238d5f872c1b8c65/example-workflows/development-helm-prepare-cluster.yaml#L1-L35
+https://github.com/replicatedhq/replicated-actions/blob/6803131db735f7cc067de88fa14237c7462b247a/example-workflows/development-helm-prepare-cluster.yaml#L1-L35
 
 #### Customizable
 
@@ -20,13 +20,13 @@ https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394
 
 See the [example workflow](example-workflows/development-helm.yaml) for more details.
 
-https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394238d5f872c1b8c65/example-workflows/development-helm.yaml#L1-L140
+https://github.com/replicatedhq/replicated-actions/blob/6803131db735f7cc067de88fa14237c7462b247a/example-workflows/development-helm.yaml#L1-L140
 
 ##### Installation with KOTS
 
 See the [example workflow](example-workflows/development-kots.yaml) for more details.
 
-https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394238d5f872c1b8c65/example-workflows/development-kots.yaml#L1-L133
+https://github.com/replicatedhq/replicated-actions/blob/6803131db735f7cc067de88fa14237c7462b247a/example-workflows/development-kots.yaml#L1-L133
 
 ### Releasing
 
@@ -35,7 +35,7 @@ The next job will setup a compatibility matrix of clusters, deploy the app and e
 
 See the [example workflow](example-workflows/release.yaml) for more details.
 
-https://github.com/replicatedhq/replicated-actions/blob/71c3cdf8e9b72754fdad6394238d5f872c1b8c65/example-workflows/release.yaml#L1-L151
+https://github.com/replicatedhq/replicated-actions/blob/6803131db735f7cc067de88fa14237c7462b247a/example-workflows/release.yaml#L1-L151
 
 ## Local Development
 
