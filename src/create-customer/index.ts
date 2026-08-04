@@ -52,7 +52,9 @@ export async function actionCreateCustomer() {
     const customer = await createCustomer(apiClient, options);
 
     core.setOutput("customer-id", customer.customerId);
+    core.setSecret(customer.licenseId);
     core.setOutput("license-id", customer.licenseId);
+    core.setSecret(customer.license);
     core.setOutput("license-file", customer.license);
   } catch (error) {
     core.setFailed(error.message);

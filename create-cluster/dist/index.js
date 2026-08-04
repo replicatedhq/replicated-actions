@@ -29738,6 +29738,38 @@ function exportVariable(name, val) {
     issueCommand('set-env', { name }, convertedVal);
 }
 /**
+ * Registers a secret which will get masked from logs
+ *
+ * @param secret - Value of the secret to be masked
+ * @remarks
+ * This function instructs the Actions runner to mask the specified value in any
+ * logs produced during the workflow run. Once registered, the secret value will
+ * be replaced with asterisks (***) whenever it appears in console output, logs,
+ * or error messages.
+ *
+ * This is useful for protecting sensitive information such as:
+ * - API keys
+ * - Access tokens
+ * - Authentication credentials
+ * - URL parameters containing signatures (SAS tokens)
+ *
+ * Note that masking only affects future logs; any previous appearances of the
+ * secret in logs before calling this function will remain unmasked.
+ *
+ * @example
+ * ```typescript
+ * // Register an API token as a secret
+ * const apiToken = "abc123xyz456";
+ * setSecret(apiToken);
+ *
+ * // Now any logs containing this value will show *** instead
+ * console.log(`Using token: ${apiToken}`); // Outputs: "Using token: ***"
+ * ```
+ */
+function setSecret(secret) {
+    issueCommand('add-mask', {}, secret);
+}
+/**
  * Gets the value of an input.
  * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
  * Returns an empty string if the value is not defined.
@@ -73885,6 +73917,7 @@ async function actionCreateCluster() {
             setOutput("network-id", cluster.network_id);
         }
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
+        setSecret(kubeconfig);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
             writeFile$2(kubeconfigPath, kubeconfig);
@@ -73982,7 +74015,9 @@ async function actionCreateCustomer() {
         };
         const customer = await distExports$1.createCustomer(apiClient, options);
         setOutput("customer-id", customer.customerId);
+        setSecret(customer.licenseId);
         setOutput("license-id", customer.licenseId);
+        setSecret(customer.license);
         setOutput("license-file", customer.license);
     }
     catch (error) {
@@ -75542,6 +75577,9 @@ async function actionHelmInstall() {
     const namespace = getInput("namespace", { required: true }) || "default";
     const registryUsername = getInput("registry-username");
     const registryPassword = getInput("registry-password");
+    if (registryPassword) {
+        setSecret(registryPassword);
+    }
     const runPreflights = getBooleanInput("run-preflights");
     const values = getInput("values");
     const valuesFile = getInput("values-file");
@@ -78930,6 +78968,7 @@ async function actionUpgradeCluster() {
         cluster = await distExports$1.pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
         info(`Cluster ${cluster.id} is running.`);
         const kubeconfig = await distExports$1.getKubeconfig(apiClient, cluster.id);
+        setSecret(kubeconfig);
         setOutput("cluster-kubeconfig", kubeconfig);
         if (kubeconfigPath) {
             writeFile$1(kubeconfigPath, kubeconfig);
