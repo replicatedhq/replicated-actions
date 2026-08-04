@@ -47,6 +47,7 @@ export async function actionCreateCluster() {
       core.setOutput("network-id", cluster.network_id);
     }
     const kubeconfig = await getKubeconfig(apiClient, cluster.id);
+    core.setSecret(kubeconfig);
     core.setOutput("cluster-kubeconfig", kubeconfig);
 
     if (kubeconfigPath) {

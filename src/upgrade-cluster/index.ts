@@ -28,6 +28,7 @@ export async function actionUpgradeCluster() {
     cluster = await pollForStatus(apiClient, cluster.id, "running", timeoutMinutes * 60);
     core.info(`Cluster ${cluster.id} is running.`);
     const kubeconfig = await getKubeconfig(apiClient, cluster.id);
+    core.setSecret(kubeconfig);
     core.setOutput("cluster-kubeconfig", kubeconfig);
 
     if (kubeconfigPath) {
