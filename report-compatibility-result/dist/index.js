@@ -74015,7 +74015,9 @@ async function actionCreateCustomer() {
         };
         const customer = await distExports$1.createCustomer(apiClient, options);
         setOutput("customer-id", customer.customerId);
+        setSecret(customer.licenseId);
         setOutput("license-id", customer.licenseId);
+        setSecret(customer.license);
         setOutput("license-file", customer.license);
     }
     catch (error) {
@@ -75575,6 +75577,9 @@ async function actionHelmInstall() {
     const namespace = getInput("namespace", { required: true }) || "default";
     const registryUsername = getInput("registry-username");
     const registryPassword = getInput("registry-password");
+    if (registryPassword) {
+        setSecret(registryPassword);
+    }
     const runPreflights = getBooleanInput("run-preflights");
     const values = getInput("values");
     const valuesFile = getInput("values-file");
