@@ -10,6 +10,9 @@ export async function actionHelmInstall() {
   const namespace: string = core.getInput("namespace", { required: true }) || "default";
   const registryUsername: string = core.getInput("registry-username");
   const registryPassword: string = core.getInput("registry-password");
+  if (registryPassword) {
+    core.setSecret(registryPassword);
+  }
   const runPreflights: boolean = core.getBooleanInput("run-preflights");
   const values: string = core.getInput("values");
   const valuesFile: string = core.getInput("values-file");
