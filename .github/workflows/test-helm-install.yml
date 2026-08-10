@@ -20,10 +20,10 @@ jobs:
       APP_SLUG: replicated-actions-ci # from the Replicated QA team
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version-file: "package.json"
           cache: "npm"
           cache-dependency-path: |
             **/package-lock.json
