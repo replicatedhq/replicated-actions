@@ -36,9 +36,9 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.9.5",
-    "jest": "^30.4.2",
+    "jest": "^30.5.0",
     "prettier": "^3.9.6",
-    "rollup": "^4.62.4",
+    "rollup": "^4.63.1",
     "ts-jest": "^29.4.12",
     "ts-node": "^10.9.2"
   },
