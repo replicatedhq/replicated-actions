@@ -30842,6 +30842,7 @@ function requireClusters () {
 	clusters.StatusError = clusters.ClusterExposedPort = clusters.ClusterPort = clusters.Postgres = clusters.ObjectStore = clusters.Addon = clusters.ClusterVersion = clusters.Cluster = void 0;
 	clusters.createCluster = createCluster;
 	clusters.createClusterWithLicense = createClusterWithLicense;
+	clusters.schedulingStatusSuffix = schedulingStatusSuffix;
 	clusters.pollForStatus = pollForStatus;
 	clusters.getKubeconfig = getKubeconfig;
 	clusters.removeCluster = removeCluster;
@@ -30936,29 +30937,52 @@ function requireClusters () {
 	        network_id: body.cluster.network_id
 	    };
 	}
+	// Human-readable explanations for a cluster's or VM's last_scheduling_status, matching
+	// the messages shown in the vendor portal.
+	const schedulingStatusMessages = {
+	    "not-attempted": "waiting for an available server",
+	    "no-provisioners": "waiting for an available server",
+	    "insufficient-credits": "insufficient credits, add more credits in the vendor portal",
+	    "exceeds-limits": "quota exceeded, manage your quota on the Compatibility Matrix settings page in the vendor portal"
+	};
+	// Returns ", last scheduling status: <status>" for a cluster or VM that has one, or "".
+	// The explanation is left out for terminal states, where "waiting for an
+	// available server" would be misleading.
+	function schedulingStatusSuffix(resource, explain = true) {
+	    const schedulingStatus = resource.last_scheduling_status;
+	    if (!schedulingStatus) {
+	        return "";
+	    }
+	    const message = explain ? schedulingStatusMessages[schedulingStatus] : undefined;
+	    return `, last scheduling status: ${message ? `${schedulingStatus} (${message})` : schedulingStatus}`;
+	}
 	async function pollForStatus(vendorPortalApi, clusterId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
 	    // get clusters from the api, look for the status of the id to be ${status}
 	    // if it's not ${status}, sleep for 5 seconds and try again
 	    // if it is ${status}, return the cluster with that status
 	    await new Promise(f => setTimeout(f, sleeptimeMs)); // sleep for 5 seconds before polling as the cluster takes a few seconds to start provisioning
 	    // iterate for timeout/sleeptime times
+	    let lastCluster;
+	    let lastErrorStatusCode; // set when the most recent poll failed with a 5xx
 	    const iterations = (timeout * 1000) / sleeptimeMs;
 	    for (let i = 0; i < iterations; i++) {
 	        try {
 	            const clusterDetails = await getClusterDetails(vendorPortalApi, clusterId);
+	            lastCluster = clusterDetails;
+	            lastErrorStatusCode = undefined;
 	            if (clusterDetails.status === expectedStatus) {
 	                return clusterDetails;
 	            }
-	            if (clusterDetails.status === "error") {
-	                const schedulingStatus = clusterDetails.last_scheduling_status ? `, last scheduling status: ${clusterDetails.last_scheduling_status}` : "";
-	                throw new Error(`Cluster has entered error state${schedulingStatus}`);
+	            if (clusterDetails.status === "error" || clusterDetails.status === "upgrade_error") {
+	                throw new Error(`Cluster has entered ${clusterDetails.status} state${schedulingStatusSuffix(clusterDetails, false)}`);
 	            }
-	            console.debug(`Cluster status is ${clusterDetails.status}, sleeping for ${sleeptimeMs / 1000} seconds`);
+	            console.debug(`Cluster status is ${clusterDetails.status}${schedulingStatusSuffix(clusterDetails)}, sleeping for ${sleeptimeMs / 1000} seconds`);
 	        }
 	        catch (err) {
 	            if (err instanceof StatusError) {
 	                if (err.statusCode >= 500) {
 	                    // 5xx errors are likely transient, so we should retry
+	                    lastErrorStatusCode = err.statusCode;
 	                    console.debug(`Got HTTP error with status ${err.statusCode}, sleeping for ${sleeptimeMs / 1000} seconds`);
 	                }
 	                else {
@@ -30972,7 +30996,14 @@ function requireClusters () {
 	        }
 	        await new Promise(f => setTimeout(f, sleeptimeMs));
 	    }
-	    throw new Error(`Cluster did not reach state ${expectedStatus} within ${timeout} seconds`);
+	    let details = "";
+	    if (lastCluster) {
+	        details += `. Last observed status: ${lastCluster.status}${schedulingStatusSuffix(lastCluster)}`;
+	    }
+	    if (lastErrorStatusCode) {
+	        details += lastCluster ? `; later polls failed with HTTP ${lastErrorStatusCode}` : `. All polls failed, the last with HTTP ${lastErrorStatusCode}`;
+	    }
+	    throw new Error(`Cluster did not reach state ${expectedStatus} within ${timeout} seconds${details}`);
 	}
 	async function getClusterDetails(vendorPortalApi, clusterId) {
 	    const http = await vendorPortalApi.client();
@@ -65187,6 +65218,7 @@ function requireVms () {
 	        name: body.vm.name,
 	        id: body.vm.id,
 	        status: body.vm.status,
+	        last_scheduling_status: body.vm.last_scheduling_status,
 	        network_id: body.vm.network_id,
 	        sshEndpoint: body.vm.direct_ssh_endpoint,
 	        sshPort: body.vm.direct_ssh_port
@@ -65194,21 +65226,26 @@ function requireVms () {
 	}
 	async function pollForVMStatus(vendorPortalApi, vmId, expectedStatus, timeout = 120, sleeptimeMs = 5000) {
 	    await new Promise(f => setTimeout(f, sleeptimeMs));
+	    let lastVM;
+	    let lastErrorStatusCode; // set when the most recent poll failed with a 5xx
 	    const iterations = (timeout * 1000) / sleeptimeMs;
 	    for (let i = 0; i < iterations; i++) {
 	        try {
 	            const vmDetails = await getVMDetails(vendorPortalApi, vmId);
+	            lastVM = vmDetails;
+	            lastErrorStatusCode = undefined;
 	            if (vmDetails.status === expectedStatus) {
 	                return vmDetails;
 	            }
 	            if (vmDetails.status === "error") {
-	                throw new Error(`VM has entered error state`);
+	                throw new Error(`VM has entered error state${(0, clusters_1.schedulingStatusSuffix)(vmDetails, false)}`);
 	            }
-	            console.debug(`VM status is ${vmDetails.status}, sleeping for ${sleeptimeMs / 1000} seconds`);
+	            console.debug(`VM status is ${vmDetails.status}${(0, clusters_1.schedulingStatusSuffix)(vmDetails)}, sleeping for ${sleeptimeMs / 1000} seconds`);
 	        }
 	        catch (err) {
 	            if (err instanceof clusters_1.StatusError) {
 	                if (err.statusCode >= 500) {
+	                    lastErrorStatusCode = err.statusCode;
 	                    console.debug(`Got HTTP error with status ${err.statusCode}, sleeping for ${sleeptimeMs / 1000} seconds`);
 	                }
 	                else {
@@ -65222,7 +65259,14 @@ function requireVms () {
 	        }
 	        await new Promise(f => setTimeout(f, sleeptimeMs));
 	    }
-	    throw new Error(`VM did not reach state ${expectedStatus} within ${timeout} seconds`);
+	    let details = "";
+	    if (lastVM) {
+	        details += `. Last observed status: ${lastVM.status}${(0, clusters_1.schedulingStatusSuffix)(lastVM)}`;
+	    }
+	    if (lastErrorStatusCode) {
+	        details += lastVM ? `; later polls failed with HTTP ${lastErrorStatusCode}` : `. All polls failed, the last with HTTP ${lastErrorStatusCode}`;
+	    }
+	    throw new Error(`VM did not reach state ${expectedStatus} within ${timeout} seconds${details}`);
 	}
 	async function removeVM(vendorPortalApi, vmId) {
 	    const http = await vendorPortalApi.client();
