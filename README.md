@@ -37,6 +37,12 @@ See the [example workflow](example-workflows/release.yaml) for more details.
 
 https://github.com/replicatedhq/replicated-actions/blob/6803131db735f7cc067de88fa14237c7462b247a/example-workflows/release.yaml#L1-L151
 
+### Releasing from a .replicated config file
+
+If your repository has a `.replicated` config file, the `create-release` action can read the app slug, charts, manifests, and promotion channel from it, so the same file drives releases from the Replicated CLI and from CI. This workflow creates a release on every push to main using only that file and an API token.
+
+See the [example workflow](example-workflows/release-replicated-config.yaml) for more details, and the [create-release](create-release) README for which fields the action reads.
+
 ## Local Development
 
 Before committing changes, you can validate your work locally to ensure everything builds correctly.

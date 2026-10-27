@@ -1,0 +1,40 @@
+name: release-replicated-config
+
+# Creates a Replicated release on every push to main, reading the app, charts,
+# manifests, and promotion channel from the .replicated file at the root of
+# the repository instead of from workflow inputs.
+#
+# Example .replicated file:
+#
+#   appSlug: my-app
+#   charts:
+#     - path: ./chart
+#   manifests:
+#     - ./manifests/*.yaml
+#   promoteToChannelNames:
+#     - Unstable
+#
+# create-release reads .replicated only when neither `chart` nor `yaml-dir` is
+# set. Inputs set on the step, such as `app-slug` or `promote-channel`, take
+# precedence over the file.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # create-release runs `helm dependency update` and `helm package` for each chart in .replicated
+      - uses: azure/setup-helm@v4
+
+      - name: Create Replicated Release
+        id: create-release
+        uses: replicatedhq/replicated-actions/create-release@v1
+        with:
+          api-token: ${{ secrets.REPLICATED_API_TOKEN }}
+          version: 0.1.0-${{ github.run_number }}
