@@ -1,0 +1,21 @@
+README.md
+  s_7d29fa46b6ba42::t_fd5265e5207bad 40-45
+example-workflows/release-replicated-config.yaml
+  s_7d29fa46b6ba42::t_41ca04e84ad4f0 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e8cd8ef092d6934a6364c251c837ffcd44ce9778",
+  "prompts": {},
+  "sessions": {
+    "s_7d29fa46b6ba42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_7d29fa46b6ba42",
+        "model": "unknown"
+      },
+      "human_author": "Amber Alston <amber@replicated.com>"
+    }
+  }
+}
