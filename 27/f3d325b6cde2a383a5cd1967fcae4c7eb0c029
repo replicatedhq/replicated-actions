@@ -1,0 +1,21 @@
+package.json
+  s_b394a6ce2bab37::t_a1763f4d017a93 30
+package-lock.json
+  s_b394a6ce2bab37::t_927f0a5dd261b3 16,4874-4876,5091-5093,5100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "27f3d325b6cde2a383a5cd1967fcae4c7eb0c029",
+  "prompts": {},
+  "sessions": {
+    "s_b394a6ce2bab37": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e80a0958affek75iAhX5YocR2o",
+        "model": "accounts/fireworks/routers/kimi-latest"
+      },
+      "human_author": "Xav Paice <xav@replicated.com>"
+    }
+  }
+}
